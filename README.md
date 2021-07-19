@@ -37,3 +37,12 @@ npm run lint
 ### Customize configuration
 
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+## Icons
+
+Powered by [SVG Repo](https://www.svgrepo.com/)
+
+- [Drone](https://www.svgrepo.com/svg/235267/drone) licensed under [CC0 1.0][cc0]
+- [Plane](https://www.svgrepo.com/svg/151715/normal-plane) licensed under [CC0 1.0][cc0]
+
+[cc0]: https://creativecommons.org/publicdomain/zero/1.0/

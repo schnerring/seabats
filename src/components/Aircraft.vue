@@ -1,18 +1,20 @@
 <template>
-  <div class="aircraft">
-    <ul>
-      <li>ICAO: {{ aircraft.icao24 }}</li>
-      <li>Registration: {{ aircraft.registration }}</li>
-      <li>Model: {{ aircraft.model }}</li>
-    </ul>
-  </div>
+  <el-card class="box-card">
+    <div>ICAO: {{ aircraft.icao24 }}</div>
+    <div>Registration: {{ aircraft.registration }}</div>
+    <div>Model: {{ aircraft.model }}</div>
+  </el-card>
 </template>
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
 import { Aircraft as AircraftModel } from '@/models/Aircraft';
+import { ElCard } from 'element-plus';
 
 @Options({
+  components: {
+    ElCard
+  },
   props: {
     aircraft: Object as () => AircraftModel
   }

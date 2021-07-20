@@ -5,7 +5,7 @@
 
 <style scoped>
 #map {
-  height: 75vh;
+  height: 50vh;
   width: 100%;
 }
 </style>

@@ -1,5 +1,8 @@
 export interface Aircraft {
-  icao24: number;
+  icao: string;
   registration: string;
   model: string;
+  type: string;
+  onGround?: boolean;
+  lastActive?: Date;
 }

@@ -1,8 +1,20 @@
 # seabats
 
-## Development
+## Setup
 
-The project requires [Node](https://nodejs.org/) and the [Vue CLI](https://cli.vuejs.org/). Install the latest LTS version of Node, then run `npm install -g @vue/cli`.
+1. Install the [latest LTS version of Node](https://nodejs.org/)
+2. Install the [Vue CLI](https://cli.vuejs.org/): `npm install -g @vue/cli`
+
+### Optional
+
+1. Install [Visual Studio Code](https://code.visualstudio.com/)
+2. Install VS Code extensions (see also [.vscode/extensions.json](./.vscode/extensions.json)):
+    1. [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
+    2. [Vetur](https://marketplace.visualstudio.com/items?itemName=octref.vetur)
+    3. [Vue VSCode Snippets](https://marketplace.visualstudio.com/items?itemName=sdras.vue-vscode-snippets)
+3. Install extensions for Chrome:
+    1. [Vue.js devtools](https://chrome.google.com/webstore/detail/vuejs-devtools/ljjemllljcmogpfapbkkighbhhppjdbg)
+    2. [Redux DevTools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd?hl=en)
 
 ## Project setup
 

@@ -2,8 +2,7 @@
   "recommendations": [
     "davidanson.vscode-markdownlint",
     "dbaeumer.vscode-eslint",
-    "editorconfig.editorconfig",
-    "hollowtree.vue-snippets",
-    "octref.vetur"
+    "octref.vetur",
+    "sdras.vue-vscode-snippets",
   ]
 }

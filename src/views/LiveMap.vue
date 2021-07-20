@@ -1,5 +1,5 @@
 <template>
-  <div id='map'></div>
+  <div id="map"></div>
   <AircraftList />
 </template>
 
@@ -11,10 +11,10 @@
 </style>
 
 <script>
-import { Options, Vue } from 'vue-class-component';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-import AircraftList from '@/components/AircraftList.vue';
+import { Options, Vue } from "vue-class-component";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import AircraftList from "@/components/AircraftList.vue";
 
 @Options({
   components: {
@@ -29,8 +29,8 @@ import AircraftList from '@/components/AircraftList.vue';
   computed: {},
   methods: {},
   mounted() {
-    const map = L.map('map').setView(this.center, this.zoom);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    const map = L.map("map").setView(this.center, this.zoom);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);

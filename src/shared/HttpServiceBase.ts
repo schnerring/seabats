@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosInstance } from "axios";
 
 export abstract class HttpServiceBase {
   protected instance: AxiosInstance;

@@ -4,7 +4,7 @@
     <el-table-column type="selection" width="55"></el-table-column>
     <el-table-column label="Icon">
       <template #default="scope">
-        <icon-plane width="30" height="30" :color="'#' + scope.row.icao" />
+        <icon-plane width="30" height="30" :color="'#' + scope.row.icao.split('').reverse().join('')" />
       </template>
     </el-table-column>
     <el-table-column label="ICAO" property="icao"></el-table-column>
@@ -21,7 +21,8 @@
     </el-table-column>
     <el-table-column label="Status">
       <template #default="scope">
-        <el-tag size="small" type="danger" v-if="scope.row.onGround === undefined || scope.row.onGround">On Ground</el-tag>
+        <el-tag size="small" type="info" v-if="scope.row.onGround === undefined">Offline</el-tag>
+        <el-tag size="small" type="warning" v-else-if="scope.row.onGround">On Ground</el-tag>
         <el-tag size="small" type="success" v-else>In Flight</el-tag>
       </template>
     </el-table-column>
@@ -30,10 +31,9 @@
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import json from '@/assets/aircrafts.json';
 import { ElTag, ElTable, ElTableColumn,  } from 'element-plus';
 import IconPlane from '@/components/IconPlane.vue';
-import { Aircraft } from '@/models/Aircraft';
+import { mapState } from 'vuex';
 
 @Options({
   components: {
@@ -42,10 +42,8 @@ import { Aircraft } from '@/models/Aircraft';
     ElTableColumn,
     IconPlane
   },
-  data() {
-    return {
-      aircrafts: json as unknown as Aircraft[]
-    };
+  computed: {
+    ...mapState(['aircrafts'])
   }
 })
 export default class AircraftList extends Vue {

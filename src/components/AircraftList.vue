@@ -1,25 +1,53 @@
 <template>
-  <Aircraft
-    v-for="aircraft in aircrafts"
-    :key="aircraft.icao24"
-    :aircraft="aircraft"
-  />
+  <h1>Aircrafts</h1>
+  <el-table :data="aircrafts" ref="multipleTable">
+    <el-table-column type="selection" width="55"></el-table-column>
+    <el-table-column label="Icon">
+      <template #default="scope">
+        <icon-plane width="30" height="30" :color="'#' + scope.row.icao" />
+      </template>
+    </el-table-column>
+    <el-table-column label="ICAO" property="icao"></el-table-column>
+    <el-table-column label="Registration" property="registration"></el-table-column>
+    <el-table-column label="Last Active">
+      <template #default="scope">
+        <span v-if="scope.row.lastActive === undefined">
+          N/A
+        </span>
+        <span v-else>
+          {{ scope.row.lastActive }}
+        </span>
+      </template>
+    </el-table-column>
+    <el-table-column label="Status">
+      <template #default="scope">
+        <el-tag size="small" type="danger" v-if="scope.row.onGround === undefined || scope.row.onGround">On Ground</el-tag>
+        <el-tag size="small" type="success" v-else>In Flight</el-tag>
+      </template>
+    </el-table-column>
+  </el-table>
 </template>
 
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component';
-import Aircraft from '@/components/Aircraft.vue';
 import json from '@/assets/aircrafts.json';
+import { ElTag, ElTable, ElTableColumn,  } from 'element-plus';
+import IconPlane from '@/components/IconPlane.vue';
+import { Aircraft } from '@/models/Aircraft';
 
 @Options({
   components: {
-    Aircraft
+    ElTag,
+    ElTable,
+    ElTableColumn,
+    IconPlane
   },
   data() {
     return {
-      aircrafts: json
+      aircrafts: json as unknown as Aircraft[]
     };
   }
 })
-export default class AircraftList extends Vue {}
+export default class AircraftList extends Vue {
+}
 </script>

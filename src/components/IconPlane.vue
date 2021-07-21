@@ -23,6 +23,14 @@ import { Options, Vue } from "vue-class-component";
 
 @Options({
   props: {
+    width: {
+      type: String,
+      default: "18",
+    },
+    height: {
+      type: String,
+      default: "18",
+    },
     color: {
       type: String,
       default: "currentColor",

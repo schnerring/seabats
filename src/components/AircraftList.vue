@@ -34,12 +34,12 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
 import { ElTag, ElTable, ElTableColumn } from "element-plus";
 import IconPlane from "@/components/IconPlane.vue";
 import { mapState } from "vuex";
+import { defineComponent } from "@vue/runtime-core";
 
-@Options({
+export default defineComponent({
   components: {
     ElTag,
     ElTable,
@@ -49,6 +49,5 @@ import { mapState } from "vuex";
   computed: {
     ...mapState(["aircrafts"]),
   },
-})
-export default class AircraftList extends Vue {}
+});
 </script>

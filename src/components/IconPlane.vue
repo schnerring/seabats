@@ -19,9 +19,9 @@
 </template>
 
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
+import { defineComponent } from "@vue/runtime-core";
 
-@Options({
+export default defineComponent({
   props: {
     width: {
       type: String,
@@ -36,6 +36,5 @@ import { Options, Vue } from "vue-class-component";
       default: "currentColor",
     },
   },
-})
-export default class IconPlane extends Vue {}
+});
 </script>

@@ -10,13 +10,13 @@
 }
 </style>
 
-<script>
-import { Options, Vue } from "vue-class-component";
+<script lang="ts">
+import { defineComponent } from "vue";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import AircraftList from "@/components/AircraftList.vue";
 
-@Options({
+export default defineComponent({
   components: {
     AircraftList,
   },
@@ -26,8 +26,6 @@ import AircraftList from "@/components/AircraftList.vue";
       center: [17.385044, 78.486671],
     };
   },
-  computed: {},
-  methods: {},
   mounted() {
     const map = L.map("map").setView(this.center, this.zoom);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -35,6 +33,5 @@ import AircraftList from "@/components/AircraftList.vue";
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
   },
-})
-export default class LeafletMap extends Vue {}
+});
 </script>

@@ -7,11 +7,11 @@
         <icon-plane
           width="30"
           height="30"
-          :color="'#' + scope.row.icao.split('').reverse().join('')"
+          :color="'#' + scope.row.icao24.split('').reverse().join('')"
         />
       </template>
     </el-table-column>
-    <el-table-column label="ICAO" property="icao" />
+    <el-table-column label="Mode S Code (hex)" property="icao24" />
     <el-table-column label="Registration" property="registration" />
     <el-table-column label="Last Active">
       <template #default="scope">

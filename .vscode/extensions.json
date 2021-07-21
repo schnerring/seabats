@@ -4,8 +4,8 @@
     "dbaeumer.vscode-eslint",
     "editorconfig.editorconfig",
     "firefox-devtools.vscode-firefox-debug",
+    "firsttris.vscode-jest-runner",
     "octref.vetur",
-    "orta.vscode-jest",
     "sdras.vue-vscode-snippets",
   ]
 }

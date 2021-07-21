@@ -13,7 +13,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
+import L, { LatLng } from "leaflet";
 import AircraftList from "@/components/AircraftList.vue";
 
 export default defineComponent({
@@ -22,8 +22,8 @@ export default defineComponent({
   },
   data() {
     return {
-      zoom: 2,
-      center: [17.385044, 78.486671],
+      zoom: 5,
+      center: new LatLng(17.385044, 78.486671),
     };
   },
   mounted() {

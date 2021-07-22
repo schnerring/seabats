@@ -2,8 +2,8 @@
   <el-form :inline="true" :model="form" @submit.prevent="login">
     <el-form-item>
       <el-input
-        v-model="form.passphrase"
-        placeholder="Passphrase"
+        v-model="form.password"
+        placeholder="Password"
         type="password"
       />
     </el-form-item>
@@ -34,7 +34,7 @@ export default defineComponent({
   data() {
     return {
       form: {
-        passphrase: "",
+        password: "",
       },
     };
   },
@@ -42,15 +42,15 @@ export default defineComponent({
     ...mapActions(["unlockApp"]),
     async login() {
       try {
-        await this.unlockApp(this.form.passphrase);
+        await this.unlockApp(this.form.password);
       } catch (e) {
         ElNotification({
           type: "error",
-          title: "Error",
+          title: "Login Failed",
           message: e,
         });
       } finally {
-        this.form.passphrase = "";
+        this.form.password = "";
       }
     },
   },

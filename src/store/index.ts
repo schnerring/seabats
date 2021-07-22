@@ -1,12 +1,12 @@
 import { State } from "@vue/runtime-core";
 import { createStore } from "vuex";
-import { checkPassphrase } from "@/shared/Auth";
+import { checkAppPassword } from "@/shared/Auth";
 import { LOGOUT, UNLOCK_APP } from "./types";
 import router from "../router";
 
 export const store = createStore<State>({
   state: {
-    passphrase: "",
+    appPassword: "",
     openSkyUser: {
       username: "",
       password: "",
@@ -17,14 +17,14 @@ export const store = createStore<State>({
     tracks: [],
   },
   getters: {
-    isLoggedIn: (state) => !!state.passphrase,
+    isLoggedIn: (state) => !!state.appPassword,
   },
   mutations: {
-    [UNLOCK_APP](state, passphrase) {
-      state.passphrase = passphrase;
+    [UNLOCK_APP](state, password) {
+      state.appPassword = password;
     },
     [LOGOUT](state) {
-      state.passphrase = "";
+      state.appPassword = "";
       state.openSkyUser = {
         username: "",
         password: "",
@@ -32,9 +32,9 @@ export const store = createStore<State>({
     },
   },
   actions: {
-    async unlockApp({ commit }, passphrase) {
-      if (await checkPassphrase(passphrase)) {
-        commit(UNLOCK_APP, passphrase);
+    async unlockApp({ commit }, password) {
+      if (await checkAppPassword(password)) {
+        commit(UNLOCK_APP, password);
         router.push("/");
         return;
       }

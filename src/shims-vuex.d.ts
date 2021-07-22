@@ -7,7 +7,7 @@ import { User } from "./shared/User";
 
 declare module "@vue/runtime-core" {
   export interface State {
-    passphrase: string;
+    appPassword: string;
     openSkyUser: User;
     aircrafts: Aircraft[];
     aircraftStates: AircraftState[];

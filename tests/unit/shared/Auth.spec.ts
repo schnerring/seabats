@@ -1,25 +1,25 @@
 import axios from "axios";
 import bcrypt from "bcryptjs";
 
-import { checkPassphrase } from "@/shared/Auth";
+import { checkAppPassword } from "@/shared/Auth";
 
-const passphrase = "foobar";
-const passphraseHash = bcrypt.hashSync(passphrase);
+const password = "foobar";
+const passwordHash = bcrypt.hashSync(password);
 
 jest.mock("axios");
 const axiosMock = axios as jest.Mocked<typeof axios>;
 axiosMock.get.mockResolvedValue({
-  data: { passphraseHashBcrypt: passphraseHash },
+  data: { appPasswordHashBcrypt: passwordHash },
 });
 
-describe("check", () => {
-  test("returns true if passphrase is correct", async () => {
-    const actual = await checkPassphrase(passphrase);
+describe("checkAppPassword", () => {
+  test("returns true if password is correct", async () => {
+    const actual = await checkAppPassword(password);
     await expect(actual).toBeTruthy();
   });
-  test("returns false if passphrase is incorrect", async () => {
-    const wrongPassphrase = "barfoo";
-    const actual = await checkPassphrase(wrongPassphrase);
+  test("returns false if password is incorrect", async () => {
+    const wrongPassword = "barfoo";
+    const actual = await checkAppPassword(wrongPassword);
     await expect(actual).toBeFalsy();
   });
 });

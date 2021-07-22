@@ -1,8 +1,8 @@
 import axios from "axios";
 import bcrypt from "bcryptjs";
 
-export async function checkPassphrase(passphrase: string): Promise<boolean> {
+export async function checkAppPassword(password: string): Promise<boolean> {
   const response = await axios.get("settings.json");
-  const passphraseHash = response.data.passphraseHashBcrypt;
-  return await bcrypt.compare(passphrase, passphraseHash);
+  const hash = response.data.appPasswordHashBcrypt;
+  return await bcrypt.compare(password, hash);
 }

@@ -1,5 +1,6 @@
 <template>
   <el-form :inline="true" :model="form" @submit.prevent="login">
+    <p>Please enter the app password to continue</p>
     <el-form-item>
       <el-input
         v-model="form.password"

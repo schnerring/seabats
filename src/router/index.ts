@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import LiveMap from "@/views/LiveMap.vue";
-import Login from "@/views/Login.vue";
+import UnlockApp from "@/views/UnlockApp.vue";
 import { store } from "../store/index";
 
 const routes: Array<RouteRecordRaw> = [
@@ -16,7 +16,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/login",
     name: "Login",
-    component: Login,
+    component: UnlockApp,
   },
   {
     path: "/about",

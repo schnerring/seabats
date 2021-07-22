@@ -1,5 +1,5 @@
 export interface AircraftState {
-  icao24: string;
+  icao: string;
   callsign?: string;
   country: string;
   lastContact: Date;

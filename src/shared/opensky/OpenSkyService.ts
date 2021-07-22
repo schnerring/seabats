@@ -22,7 +22,7 @@ export class OpenSkyService extends HttpServiceBase {
   // Get the state vectors for a given time.
   // If time is omitted, the current time will be used.
   public async getStateVectors(
-    icao24s: string[],
+    icaos: string[],
     time?: Date
   ): Promise<AircraftState[]> {
     // const rateLimitAuthSeconds = 5;
@@ -34,8 +34,8 @@ export class OpenSkyService extends HttpServiceBase {
       params.push(["time", dayjs(time).unix().toString()]);
     }
 
-    for (const icao24 of icao24s) {
-      params.push(["icao24", icao24]);
+    for (const icao of icaos) {
+      params.push(["icao24", icao]);
     }
 
     this.lastStateVectorRequest = new Date();
@@ -48,7 +48,7 @@ export class OpenSkyService extends HttpServiceBase {
     return response.data.states.map(
       (s: unknown[]) =>
         <AircraftState>{
-          icao24: s[StateVectorField.icao24],
+          icao: s[StateVectorField.icao24],
           callsign: s[StateVectorField.callsign],
           country: s[StateVectorField.origin_country],
           lastContact: s[StateVectorField.last_contact]

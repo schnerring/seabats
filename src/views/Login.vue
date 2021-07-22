@@ -1,5 +1,5 @@
 <template>
-  <el-form :inline="true" :model="form" class="demo-form-inline">
+  <el-form :inline="true" :model="form" @submit.prevent="login">
     <el-form-item>
       <el-input
         v-model="form.passphrase"
@@ -8,7 +8,7 @@
       />
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="onSubmit">Login</el-button>
+      <el-button type="primary" @click="login">Login</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -22,7 +22,7 @@ import {
   ElInput,
   ElNotification,
 } from "element-plus";
-import { checkPassphrase } from "@/shared/Auth";
+import { mapActions } from "vuex";
 
 export default defineComponent({
   components: {
@@ -39,22 +39,20 @@ export default defineComponent({
     };
   },
   methods: {
-    async onSubmit() {
-      const loggedIn = await checkPassphrase(this.form.passphrase);
-      if (loggedIn) {
-        // TODO
-        console.log("success");
-        return;
+    ...mapActions(["unlockApp"]),
+    async login() {
+      try {
+        await this.unlockApp(this.form.passphrase);
+      } catch (e) {
+        ElNotification({
+          type: "error",
+          title: "Error",
+          message: e,
+        });
+      } finally {
+        this.form.passphrase = "";
       }
-      this.form.passphrase = "";
-      ElNotification({
-        title: "Error",
-        message: "The passphrase you entered is incorrect. Please try again.",
-        type: "error",
-      });
     },
   },
 });
 </script>
-
-<style scoped></style>

@@ -8,25 +8,21 @@
   {
     "icao24": "407637",
     "registration": "G-WKTH",
-    "model": "Diamond DA62",
-    "type": "plane"
+    "model": "Diamond DA62"
   },
   {
     "icao24": "40785B",
     "registration": "G-WKTI",
-    "model": "Diamond DA62",
-    "type": "plane"
+    "model": "Diamond DA62"
   },
   {
     "icao24": "43ED4B",
     "registration": "2-WKTJ",
-    "model": "Beechcraft 300 Super King Air 350",
-    "type": "plane"
+    "model": "Beechcraft 300 Super King Air 350"
   },
   {
     "icao24": "4D232D",
-    "registration": "as2132",
-    "model": "IAI Heron Shoval",
-    "type": "drone"
+    "registration": "AS2132",
+    "model": "IAI Heron Shoval"
   }
 ]

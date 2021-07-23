@@ -1,32 +1,40 @@
 <template>
-  <div id="map"></div>
+  <div id="traceMap"></div>
 </template>
-
-<style scoped>
-#map {
-  height: 50vh;
-  width: 100%;
-}
-</style>
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { Map, LatLng, TileLayer } from "leaflet";
 import "leaflet/dist/leaflet.css";
-import L, { LatLng } from "leaflet";
 
 export default defineComponent({
   data() {
     return {
-      zoom: 5,
-      center: new LatLng(17.385044, 78.486671),
+      zoom: 6,
+      center: new LatLng(35.917973, 14.409943),
+      map: {} as Map,
     };
   },
   mounted() {
-    const map = L.map("map").setView(this.center, this.zoom);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(map);
+    this.map = new Map("traceMap");
+    this.map.setView(this.center, this.zoom);
+    const osmLayer = new TileLayer(
+      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }
+    );
+    this.map.addLayer(osmLayer);
+  },
+  beforeUnmount() {
+    this.map.remove();
   },
 });
 </script>
+
+<style scoped>
+#traceMap {
+  flex-grow: 1;
+}
+</style>

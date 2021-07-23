@@ -36,7 +36,7 @@
 <script lang="ts">
 import { ElTag, ElTable, ElTableColumn } from "element-plus";
 import IconPlane from "@/components/IconPlane.vue";
-import { mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
 import { defineComponent } from "@vue/runtime-core";
 
 export default defineComponent({
@@ -48,6 +48,12 @@ export default defineComponent({
   },
   computed: {
     ...mapState(["aircrafts"]),
+  },
+  methods: {
+    ...mapActions(["getAircrafts"]),
+  },
+  created() {
+    this.getAircrafts();
   },
 });
 </script>

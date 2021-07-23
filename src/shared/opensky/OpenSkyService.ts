@@ -1,7 +1,6 @@
 import { HttpServiceBase } from "@/shared/HttpServiceBase";
 import dayjs from "dayjs";
-import { Aircraft } from "@/shared/Aircraft";
-import { AircraftState } from "@/shared/AircraftState";
+import { AircraftState } from "@/shared/opensky/AircraftState";
 import { StateVectorField } from "@/shared/opensky/StateVectorFields";
 
 export class OpenSkyService extends HttpServiceBase {
@@ -9,14 +8,6 @@ export class OpenSkyService extends HttpServiceBase {
 
   constructor() {
     super("https://opensky-network.org/api");
-  }
-
-  async getAircrafts(): Promise<Aircraft[]> {
-    const response = await this.instance({
-      baseURL: "",
-      url: "aircrafts.json",
-    });
-    return response.data;
   }
 
   // Get the state vectors for a given time.

@@ -1,6 +1,7 @@
 <template>
   <div id="map"></div>
   <AircraftList />
+  <FlightList />
 </template>
 
 <style scoped>
@@ -15,10 +16,12 @@ import { defineComponent } from "vue";
 import "leaflet/dist/leaflet.css";
 import L, { LatLng } from "leaflet";
 import AircraftList from "@/components/AircraftList.vue";
+import FlightList from "@/components/FlightList.vue";
 
 export default defineComponent({
   components: {
     AircraftList,
+    FlightList,
   },
   data() {
     return {

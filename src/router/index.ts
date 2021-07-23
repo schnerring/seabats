@@ -10,7 +10,7 @@ const routes: Array<RouteRecordRaw> = [
     name: "Live Map",
     component: LiveMap,
     meta: {
-      requireAuth: true,
+      // requireAuth: true,
     },
   },
   {

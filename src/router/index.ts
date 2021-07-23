@@ -1,14 +1,14 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import LiveMap from "@/views/LiveMap.vue";
+import TraceMap from "@/views/TraceMap.vue";
 import UnlockApp from "@/views/UnlockApp.vue";
 import { store } from "../store/index";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    alias: "/live",
-    name: "Live Map",
-    component: LiveMap,
+    alias: "/trace",
+    name: "Trace Map",
+    component: TraceMap,
     meta: {
       // requireAuth: true,
     },

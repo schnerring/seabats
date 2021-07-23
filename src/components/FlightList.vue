@@ -1,10 +1,12 @@
 <template>
-  <h1>Flights</h1>
-  <el-table :data="flights" ref="multipleTable">
-    <el-table-column type="selection" width="55" />
-    <el-table-column label="ICAO" property="icao" />
-    <el-table-column label="Date" property="date" />
-  </el-table>
+  <div class="container">
+    <h1>Flights</h1>
+    <el-table :data="flights" ref="multipleTable" height="100%">
+      <el-table-column type="selection" width="55" />
+      <el-table-column label="ICAO" property="icao" />
+      <el-table-column label="Date" property="date" />
+    </el-table>
+  </div>
 </template>
 
 <script lang="ts">
@@ -28,3 +30,10 @@ export default defineComponent({
   },
 });
 </script>
+<style scoped>
+.container {
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+}
+</style>

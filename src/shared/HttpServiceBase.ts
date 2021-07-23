@@ -11,10 +11,10 @@ export abstract class HttpServiceBase {
   }
 
   async getAircrafts(): Promise<Aircraft[]> {
-    const response = await this.instance({
-      baseURL: "",
-      url: "aircrafts.json",
-    });
+    const response = await this.instance.get<Aircraft[]>("aircrafts.json");
+    for (const aircraft of response.data) {
+      aircraft.isSelected = true;
+    }
     return response.data;
   }
 }

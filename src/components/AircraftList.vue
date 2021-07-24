@@ -2,7 +2,7 @@
   <div class="card-list">
     <el-card v-for="aircraft in aircrafts" :key="aircraft.icao" shadow="hover">
       <div class="card-content">
-        <el-checkbox v-model="aircraft.isSelected"></el-checkbox>
+        <el-checkbox @change="selectionChanged(aircraft)"></el-checkbox>
         <icon-plane
           width="30"
           height="30"
@@ -19,6 +19,8 @@ import { ElCard, ElCheckbox } from "element-plus";
 import IconPlane from "@/components/IconPlane.vue";
 import { mapActions, mapState } from "vuex";
 import { defineComponent } from "@vue/runtime-core";
+import { Aircraft } from "@/shared/Aircraft";
+import { AIRCRAFT_SELECTION_CHANGE } from "@/store/types";
 
 export default defineComponent({
   components: {
@@ -30,7 +32,10 @@ export default defineComponent({
     ...mapState(["aircrafts"]),
   },
   methods: {
-    ...mapActions(["getAircrafts"]),
+    ...mapActions(["getAircrafts", AIRCRAFT_SELECTION_CHANGE]),
+    selectionChanged(aircraft: Aircraft) {
+      this.aircraftSelectionChange({ aircraft });
+    },
   },
   created() {
     this.getAircrafts();

@@ -11,7 +11,7 @@ import {
 import router from "../router";
 import { SampleDataService } from "@/shared/adsb/SampleDataService";
 
-const sampleDataService = new SampleDataService();
+export const sampleDataService = new SampleDataService();
 
 export const store = createStore<State>({
   state: {
@@ -74,12 +74,14 @@ export const store = createStore<State>({
       const aircrafts = await sampleDataService.getAircrafts();
       commit(GET_AIRCRAFTS, aircrafts);
     },
-    async getFlights({ commit }) {
-      const flights = await sampleDataService.getFlights();
+    async getFlights({ commit, state }) {
+      const icaos = state.selectedAircrafts.map((a) => a.icao);
+      const flights = await sampleDataService.getFlights(icaos);
       commit(GET_FLIGHTS, flights);
     },
-    [AIRCRAFT_SELECTION_CHANGE]({ commit }, payload) {
+    [AIRCRAFT_SELECTION_CHANGE]({ commit, dispatch }, payload) {
       commit(AIRCRAFT_SELECTION_CHANGE, payload);
+      dispatch("getFlights");
     },
   },
   modules: {},

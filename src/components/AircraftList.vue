@@ -29,7 +29,7 @@ export default defineComponent({
     IconPlane,
   },
   computed: {
-    ...mapState(["aircrafts"]),
+    ...mapState(["aircrafts", "selectedAircrafts"]),
   },
   methods: {
     ...mapActions(["getAircrafts", AIRCRAFT_SELECTION_CHANGE]),
@@ -37,8 +37,8 @@ export default defineComponent({
       this.aircraftSelectionChange({ aircraft });
     },
   },
-  created() {
-    this.getAircrafts();
+  async created() {
+    await this.getAircrafts();
   },
 });
 </script>

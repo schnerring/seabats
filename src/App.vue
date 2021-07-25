@@ -29,7 +29,6 @@ import { defineComponent } from "vue";
 import { mapActions, mapGetters } from "vuex";
 import AircraftList from "@/components/AircraftList.vue";
 import FlightList from "@/components/FlightList.vue";
-import { sampleDataService } from "@/store";
 
 export default defineComponent({
   components: {
@@ -41,9 +40,6 @@ export default defineComponent({
   },
   methods: {
     ...mapActions(["logout"]),
-  },
-  async created() {
-    await sampleDataService.init();
   },
 });
 </script>

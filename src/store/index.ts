@@ -6,7 +6,8 @@ import {
   UNLOCK_APP,
   GET_FLIGHTS,
   GET_AIRCRAFTS,
-  AIRCRAFT_SELECTION_CHANGE,
+  SELECT_AIRCRAFT,
+  UNSELECT_AIRCRAFT,
 } from "./types";
 import router from "../router";
 import { SampleDataService } from "@/shared/adsb/SampleDataService";
@@ -21,7 +22,7 @@ export const store = createStore<State>({
       password: "",
     },
     aircrafts: [],
-    selectedAircrafts: [],
+    selectedAircraftIcaos: [],
     aircraftStates: [],
     flights: [],
     selectedFlights: [],
@@ -31,13 +32,13 @@ export const store = createStore<State>({
     isLoggedIn: (state) => !!state.appPassword,
   },
   mutations: {
-    [AIRCRAFT_SELECTION_CHANGE](state, payload) {
-      const i = state.selectedAircrafts.indexOf(payload.aircraft);
-      if (i < 0) {
-        state.selectedAircrafts.push(payload.aircraft);
-      } else {
-        state.selectedAircrafts.splice(i, 1);
-      }
+    [SELECT_AIRCRAFT](state, icao) {
+      state.selectedAircraftIcaos.push(icao);
+    },
+    [UNSELECT_AIRCRAFT](state, icao) {
+      state.selectedAircraftIcaos = state.selectedAircraftIcaos.filter(
+        (i) => i !== icao
+      );
     },
     [UNLOCK_APP](state, password) {
       state.appPassword = password;
@@ -75,13 +76,18 @@ export const store = createStore<State>({
       commit(GET_AIRCRAFTS, aircrafts);
     },
     async getFlights({ commit, state }) {
-      const icaos = state.selectedAircrafts.map((a) => a.icao);
-      const flights = await sampleDataService.getFlights(icaos);
+      const flights = await sampleDataService.getFlights(
+        state.selectedAircraftIcaos
+      );
       commit(GET_FLIGHTS, flights);
     },
-    [AIRCRAFT_SELECTION_CHANGE]({ commit, dispatch }, payload) {
-      commit(AIRCRAFT_SELECTION_CHANGE, payload);
-      dispatch("getFlights");
+    async selectAircraft({ commit, dispatch }, payload) {
+      commit(SELECT_AIRCRAFT, payload.icao);
+      await dispatch("getFlights");
+    },
+    async unselectAircraft({ commit, dispatch }, payload) {
+      commit(UNSELECT_AIRCRAFT, payload.icao);
+      await dispatch("getFlights");
     },
   },
   modules: {},

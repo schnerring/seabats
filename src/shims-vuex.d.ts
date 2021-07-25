@@ -10,7 +10,7 @@ declare module "@vue/runtime-core" {
     appPassword: string;
     openSkyUser: User;
     aircrafts: Aircraft[];
-    selectedAircrafts: Aircraft[];
+    selectedAircraftIcaos: string[];
     aircraftStates: AircraftState[];
     flights: Flight[];
     selectedFlights: Flight[];

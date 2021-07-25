@@ -14,7 +14,7 @@ foreach ($aircraft in $aircrafts) {
     $downloadUrl = "$baseUrl/$y/$m/$d/$($icao.Substring(4))/trace_full_$icao.json"
     $outFile = "$adsbDataDir/$y$m$d-$icao-trace.json"
     try {
-      Invoke-WebRequest -Uri $downloadUrl -OutFile "$outFile" -Resume
+      Invoke-WebRequest -Uri $downloadUrl -OutFile "$outFile"
       Write-Host "Downloaded: $outFile"
     }
     catch {

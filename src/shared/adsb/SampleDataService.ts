@@ -6,15 +6,13 @@ import { Trace } from "../Trace";
 import dayjs from "dayjs";
 
 export class SampleDataService extends HttpServiceBase {
-  async getFlights(): Promise<Flight[]> {
+  private flights: Flight[] = [];
+
+  async init(): Promise<void> {
     const response = await this.instance.get<TraceFileResponse[]>(
       "adsb/sample-traces.json"
     );
-
-    if (!response.data)
-      throw "ADSB sample data not initialized. Please run the initalization script and try again.";
-
-    return response.data.map((tc) => {
+    this.flights = response.data.map((tc) => {
       return <Flight>{
         icao: tc.icao ?? tc.hex,
         date: dayjs.unix(tc.timestamp).toDate(),
@@ -39,5 +37,12 @@ export class SampleDataService extends HttpServiceBase {
         }),
       };
     });
+  }
+  async getFlights(icaos: string[]): Promise<Flight[]> {
+    try {
+      return this.flights.filter((f) => icaos.includes(f.icao));
+    } catch {
+      throw "ADSB sample data not initialized. Please run the initalization script and try again.";
+    }
   }
 }

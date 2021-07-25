@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import L, { Map, LatLng, TileLayer, Polyline } from "leaflet";
+import { Canvas, Map, LatLng, TileLayer, Polyline } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { mapState } from "vuex";
 import { Flight } from "@/shared/Flight";
@@ -22,14 +22,21 @@ export default defineComponent({
     ...mapState(["flights"]),
   },
   watch: {
-    flights(newValue, oldValue) {
+    flights(flights: Flight[]) {
       this.polylines.forEach((pl) => pl.remove());
       this.polylines = [];
-      this.drawTraces(newValue);
+      for (const flight of flights) {
+        const coords = flight.traces.map((t) => new LatLng(t.lat, t.lon));
+        const polyline = new Polyline(coords, {
+          color: `#${flight.icao.split("").reverse().join("")}`,
+        });
+        this.polylines.push(polyline);
+        polyline.addTo(this.map as Map);
+      }
     },
   },
   mounted() {
-    this.map = new Map("traceMap");
+    this.map = new Map("traceMap", { renderer: new Canvas() });
     this.map.setView(this.center, this.zoom);
     const osmLayer = new TileLayer(
       "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -39,20 +46,6 @@ export default defineComponent({
       }
     );
     this.map.addLayer(osmLayer);
-  },
-  methods: {
-    drawTraces(flights: Flight[]) {
-      flights.forEach((flight) => {
-        // [[1,2], [2,3], [4,5]]
-        // const coords = flight.traces.map((t) => [t.lat, t.lon]);
-        const coords = flight.traces.map((t) => new LatLng(t.lat, t.lon));
-        const polyline = L.polyline(coords, {
-          color: `#${flight.icao.split("").reverse().join("")}`,
-        });
-        this.polylines.push(polyline);
-        polyline.addTo(this.map as Map);
-      });
-    },
   },
   beforeUnmount() {
     this.map.remove();

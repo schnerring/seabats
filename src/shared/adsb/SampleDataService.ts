@@ -6,10 +6,10 @@ import { Trace } from "../Trace";
 import dayjs from "dayjs";
 
 export class SampleDataService extends HttpServiceBase {
-  private flights: Flight[] = [];
+  private flights?: Flight[];
 
   async getFlights(icaos: string[]): Promise<Flight[]> {
-    if (this.flights.length === 0) {
+    if (!this.flights) {
       const response = await this.instance.get<TraceFileResponse[]>(
         "adsb/sample-traces.json"
       );

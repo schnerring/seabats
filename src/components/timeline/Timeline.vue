@@ -1,5 +1,5 @@
 <template>
-  <div class="d3"></div>
+  <div class="d3" ref="d3"></div>
 </template>
 
 <script lang="ts">
@@ -21,7 +21,13 @@ export default defineComponent({
     return {
       minDate: this.initMinDate,
       maxDate: this.initMaxDate,
+      resizeObserver: new ResizeObserver((entries) => {
+        for (const entry of entries) console.log(`Size change: ${entry}`);
+      }),
     };
+  },
+  mounted() {
+    this.resizeObserver.observe(this.$refs["d3"] as Element);
   },
 });
 </script>

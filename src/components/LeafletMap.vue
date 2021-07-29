@@ -36,7 +36,10 @@ export default defineComponent({
     },
   },
   mounted() {
-    this.map = new Map("leaflet", { renderer: new Canvas() });
+    this.map = new Map("leaflet", {
+      renderer: new Canvas(),
+      zoomControl: false,
+    });
     this.map.setView(this.center, this.zoom);
     const osmLayer = new TileLayer(
       "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",

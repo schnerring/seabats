@@ -54,7 +54,8 @@ export default defineComponent({
 </script>
 
 <style scoped>
-#traceMap {
-  flex-grow: 1;
+#leaflet {
+  height: inherit;
+  z-index: inherit;
 }
 </style>

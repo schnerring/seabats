@@ -1,14 +1,14 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import TraceMap from "@/views/TraceMap.vue";
+import TimelineMap from "@/views/TimelineMap.vue";
 import UnlockApp from "@/views/UnlockApp.vue";
 import { store } from "../store/index";
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
-    alias: "/trace",
-    name: "Trace Map",
-    component: TraceMap,
+    alias: "/map",
+    name: "Map",
+    component: TimelineMap,
     meta: {
       // requireAuth: true,
     },

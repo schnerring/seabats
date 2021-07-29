@@ -5,9 +5,11 @@ export interface ITimeline {
 }
 
 export interface ITrack {
+  label: string;
   events: IEvent[];
 }
 
 export interface IEvent {
-  date: Date;
+  start: Date;
+  end: Date;
 }

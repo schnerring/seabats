@@ -1,18 +1,12 @@
 <template>
   <nav>
-    <router-link to="/">Trace</router-link> |
+    <router-link to="/">Map</router-link> |
     <router-link to="/about">About</router-link
     ><span v-if="isLoggedIn"> | <a @click="logout">Logout</a></span>
   </nav>
   <main>
     <div id="map">
       <router-view />
-    </div>
-    <div id="aircrafts">
-      <aircraft-list />
-    </div>
-    <div id="flights">
-      <flight-list />
     </div>
   </main>
   <footer>
@@ -27,14 +21,8 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { mapActions, mapGetters } from "vuex";
-import AircraftList from "@/components/AircraftList.vue";
-import FlightList from "@/components/FlightList.vue";
 
 export default defineComponent({
-  components: {
-    AircraftList,
-    FlightList,
-  },
   computed: {
     ...mapGetters(["isLoggedIn"]),
   },
@@ -83,14 +71,7 @@ nav {
 }
 
 main {
-  display: grid;
   grid-area: main;
-  grid-template-areas:
-    "aircrafts flights"
-    "map flights";
-  grid-template-columns: 1fr 30%;
-  grid-template-rows: auto 1fr;
-  overflow-y: hidden;
 }
 
 footer {
@@ -107,6 +88,7 @@ footer {
 
 #map {
   grid-area: map;
-  display: flex;
+  height: 100%;
+  position: relative;
 }
 </style>

@@ -8,6 +8,8 @@
 import { defineComponent } from "vue";
 import dayjs from "dayjs";
 import { debounce } from "lodash";
+import { ITrack } from "@/components/timeline/timeline";
+
 import {
   scaleTime,
   axisBottom,
@@ -17,6 +19,8 @@ import {
   scaleLinear,
   ScaleLinear,
   Selection,
+  selectAll,
+  BaseType,
 } from "d3";
 
 export default defineComponent({
@@ -31,7 +35,11 @@ export default defineComponent({
     },
     height: {
       type: Number,
-      default: 400,
+      default: 200,
+    },
+    tracks: {
+      type: Array as () => ITrack[],
+      default: [] as ITrack[],
     },
   },
   data() {
@@ -39,7 +47,7 @@ export default defineComponent({
       minDate: this.initMinDate,
       maxDate: this.initMaxDate,
       width: 0,
-      margin: { top: 10, right: 30, bottom: 30, left: 60 },
+      margin: { top: 0, right: 30, bottom: 30, left: 150 },
       xAxisDefinition: {} as Axis<Date | NumberValue>,
       xAxis: {} as Selection<SVGGElement, unknown, HTMLElement, any>,
       svg: {} as Selection<SVGGElement, unknown, HTMLElement, any>,
@@ -75,15 +83,20 @@ export default defineComponent({
   mounted() {
     this.xAxisDefinition = axisBottom(this.xScale);
     this.svg = select(".d3 svg");
-    this.svg.attr("width", this.svgWidth()).attr("height", this.svgHeight());
+    this.svg
+      .attr("width", this.svgWidth())
+      .attr("height", this.svgHeight())
+      .attr("transform", `translate(${this.margin.left}, ${this.margin.top})`);
 
     this.xAxis = this.svg
       .append("g")
-      .attr("transform", `translate(${this.margin.left}, ${this.margin.top})`)
+      .attr("transform", `translate(0, ${this.svgHeight() - 20})`)
       .attr("class", "x-axis")
       .call(this.xAxisDefinition);
-
+    selectAll(".x-axis line, .x-axis path").attr("stroke", "var(--blau)");
+    selectAll(".x-axis text").attr("fill", "var(--blau)");
     this.resizeObserver.observe(this.$refs["d3"] as Element);
+    this.svg.append("circle").attr("cx", "-50 50").attr("r", "50");
   },
 });
 </script>
@@ -95,5 +108,17 @@ export default defineComponent({
   opacity: 0.7;
   width: inherit;
   z-index: inherit;
+}
+.svg-style {
+  border-left: solid var(--blau) 1pt;
+  border-right: solid var(--blau) 1pt;
+}
+.x-axis line,
+.x-axis path {
+  stroke: var(--blau);
+}
+.d3 {
+  border-bottom: 1pt solid var(--blau);
+  border-top: 1pt solid var(--blau);
 }
 </style>

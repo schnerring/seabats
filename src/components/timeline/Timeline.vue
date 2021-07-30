@@ -1,7 +1,5 @@
 <template>
-  <div class="d3" ref="d3">
-    <svg></svg>
-  </div>
+  <div class="d3" ref="d3"></div>
 </template>
 
 <script lang="ts">
@@ -21,7 +19,6 @@ import {
   ScaleLinear,
   scaleBand,
   Selection,
-  selectAll,
 } from "d3";
 
 export default defineComponent({
@@ -34,10 +31,6 @@ export default defineComponent({
       type: Date,
       default: dayjs().toDate(),
     },
-    height: {
-      type: Number,
-      default: 200,
-    },
     tracks: {
       type: Array as () => ITrack[],
       default: [] as ITrack[],
@@ -45,35 +38,48 @@ export default defineComponent({
   },
   data() {
     return {
+      height: 0,
+      width: 0,
       minDate: this.initMinDate,
       maxDate: this.initMaxDate,
-      width: 0,
       margin: { top: 0, right: 30, bottom: 30, left: 150 },
       xAxisDefinition: {} as Axis<Date | NumberValue>,
       xAxis: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
-      svg: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
+      svg: {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>,
       planeBars: {} as Selection<SVGRectElement, ITrack, SVGGElement, unknown>,
       xScale: {} as ScaleLinear<number, number, never>,
       yScale: {} as ScaleBand<string>,
       resizeObserver: new ResizeObserver(
         debounce((entries) => {
-          this.update(entries);
+          this.onResize(entries);
         }, 250)
       ),
     };
   },
   methods: {
-    update(entries: ResizeObserverEntry[]) {
+    onResize(entries: ResizeObserverEntry[]) {
       entries.forEach((entry) => {
-        this.width = entry.contentBoxSize[0].inlineSize;
+        this.height = entry.contentRect.height;
+        this.width = entry.contentRect.width;
+
+        this.svg
+          .attr("width", this.svgWidth())
+          .attr("height", this.svgHeight());
+
         this.xScale.range([0, this.svgWidth()]);
-        this.xAxis.call(this.xAxisDefinition);
-        this.svg.transition().attr("width", this.svgWidth());
+        this.xAxis
+          .attr("transform", `translate(0, ${this.svgHeight() - 20})`)
+          .call(this.xAxisDefinition);
+        this.yScale.rangeRound([0, this.svgHeight() - 20]);
         this.planeBars
           .transition()
           .attr("width", this.svgWidth())
           .attr("fill", "var(--hellblau)")
-          .attr("height", "20");
+          .attr("height", this.yScale.bandwidth)
+          .attr("y", (t) => {
+            const result = this.yScale(t.label);
+            return result === undefined ? null : (result as number);
+          });
       });
     },
     svgHeight() {
@@ -86,36 +92,30 @@ export default defineComponent({
     },
   },
   created() {
-    this.xScale = scaleLinear().domain([0, 100]).range([0, 100]);
-    this.yScale = scaleBand()
-      .domain(this.tracks.map((t) => t.label))
-      .rangeRound([0, 200]);
+    this.xScale = scaleLinear()
+      .domain([0, 100])
+      .rangeRound([0, this.svgWidth()]);
+    this.yScale = scaleBand().domain(this.tracks.map((t) => t.label));
   },
   mounted() {
     this.xAxisDefinition = axisBottom(this.xScale);
-    this.svg = select(".d3 svg");
-    this.svg
-      .attr("width", this.svgWidth())
-      .attr("height", this.svgHeight())
+    this.svg = select(".d3")
+      .append("svg")
       .attr("transform", `translate(${this.margin.left}, ${this.margin.top})`);
 
     this.xAxis = this.svg
       .append("g")
-      .attr("transform", `translate(0, ${this.svgHeight() - 20})`)
       .attr("class", "x-axis")
       .call(this.xAxisDefinition);
-    this.resizeObserver.observe(this.$refs["d3"] as Element);
 
     this.planeBars = this.svg
       .selectAll(".plane")
       .data(this.tracks)
       .enter()
       .append("rect")
-      .attr("class", "plane-bars")
-      .attr("y", (t) => {
-        const result = this.yScale(t.label);
-        return result === undefined ? null : (result as number);
-      });
+      .attr("class", "plane-bars");
+
+    this.resizeObserver.observe(this.$refs["d3"] as Element);
   },
 });
 </script>

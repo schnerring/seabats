@@ -73,7 +73,7 @@ export default defineComponent({
         this.trackRects
           .transition()
           .attr("width", this.svgWidth())
-          .attr("fill", "var(--hellblau)")
+          .attr("fill", "var(--blue200)")
           .attr("height", this.yScale.bandwidth)
           .attr("y", (t) => {
             const result = this.yScale(t.label);
@@ -94,7 +94,9 @@ export default defineComponent({
     this.xScale = scaleTime()
       .domain([this.initMinDate, this.initMaxDate])
       .rangeRound([0, this.svgWidth()]);
-    this.yScale = scaleBand().domain(this.tracks.map((t) => t.label));
+    this.yScale = scaleBand()
+      .domain(this.tracks.map((t) => t.label))
+      .padding(0.6);
   },
   mounted() {
     this.xAxisDefinition = axisBottom(this.xScale);

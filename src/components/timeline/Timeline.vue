@@ -17,7 +17,9 @@ import {
   Axis,
   NumberValue,
   scaleLinear,
+  ScaleBand,
   ScaleLinear,
+  scaleBand,
   Selection,
   selectAll,
   BaseType,
@@ -49,9 +51,11 @@ export default defineComponent({
       width: 0,
       margin: { top: 0, right: 30, bottom: 30, left: 150 },
       xAxisDefinition: {} as Axis<Date | NumberValue>,
-      xAxis: {} as Selection<SVGGElement, unknown, HTMLElement, any>,
-      svg: {} as Selection<SVGGElement, unknown, HTMLElement, any>,
+      xAxis: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
+      svg: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
+      planeBars: {} as Selection<SVGRectElement, ITrack, SVGGElement, unknown>,
       xScale: {} as ScaleLinear<number, number, never>,
+      yScale: {} as ScaleBand<string>,
       resizeObserver: new ResizeObserver(
         debounce((entries) => {
           this.update(entries);
@@ -66,6 +70,11 @@ export default defineComponent({
         this.xScale.range([0, this.svgWidth()]);
         this.xAxis.call(this.xAxisDefinition);
         this.svg.transition().attr("width", this.svgWidth());
+        this.planeBars
+          .transition()
+          .attr("width", this.svgWidth())
+          .attr("fill", "var(--hellblau)")
+          .attr("height", "20");
       });
     },
     svgHeight() {
@@ -79,6 +88,9 @@ export default defineComponent({
   },
   created() {
     this.xScale = scaleLinear().domain([0, 100]).range([0, 100]);
+    this.yScale = scaleBand()
+      .domain(this.tracks.map((t) => t.label))
+      .rangeRound([0, 200]);
   },
   mounted() {
     this.xAxisDefinition = axisBottom(this.xScale);
@@ -96,7 +108,17 @@ export default defineComponent({
     selectAll(".x-axis line, .x-axis path").attr("stroke", "var(--blau)");
     selectAll(".x-axis text").attr("fill", "var(--blau)");
     this.resizeObserver.observe(this.$refs["d3"] as Element);
-    this.svg.append("circle").attr("cx", "-50 50").attr("r", "50");
+
+    this.planeBars = this.svg
+      .selectAll(".plane")
+      .data(this.tracks)
+      .enter()
+      .append("rect")
+      .attr("class", "plane-bars")
+      .attr("y", (t) => {
+        const result = this.yScale(t.label);
+        return result === undefined ? null : (result as number);
+      });
   },
 });
 </script>

@@ -22,7 +22,6 @@ import {
   scaleBand,
   Selection,
   selectAll,
-  BaseType,
 } from "d3";
 
 export default defineComponent({
@@ -105,8 +104,6 @@ export default defineComponent({
       .attr("transform", `translate(0, ${this.svgHeight() - 20})`)
       .attr("class", "x-axis")
       .call(this.xAxisDefinition);
-    selectAll(".x-axis line, .x-axis path").attr("stroke", "var(--blau)");
-    selectAll(".x-axis text").attr("fill", "var(--blau)");
     this.resizeObserver.observe(this.$refs["d3"] as Element);
 
     this.planeBars = this.svg
@@ -125,22 +122,16 @@ export default defineComponent({
 
 <style scoped>
 .d3 {
-  background: #fff;
+  background: white;
+  color: var(--blue900);
   height: inherit;
   opacity: 0.7;
   width: inherit;
   z-index: inherit;
 }
-.svg-style {
-  border-left: solid var(--blau) 1pt;
-  border-right: solid var(--blau) 1pt;
-}
-.x-axis line,
-.x-axis path {
-  stroke: var(--blau);
-}
+
 .d3 {
-  border-bottom: 1pt solid var(--blau);
-  border-top: 1pt solid var(--blau);
+  border-bottom: 1pt solid var(--blue900);
+  border-top: 1pt solid var(--blue900);
 }
 </style>

@@ -46,7 +46,7 @@ export default defineComponent({
       xAxisDefinition: {} as Axis<Date | NumberValue>,
       xAxis: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
       svg: {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>,
-      planeBars: {} as Selection<SVGRectElement, ITrack, SVGGElement, unknown>,
+      trackRects: {} as Selection<SVGRectElement, ITrack, SVGGElement, unknown>,
       xScale: {} as ScaleLinear<number, number, never>,
       yScale: {} as ScaleBand<string>,
       resizeObserver: new ResizeObserver(
@@ -71,7 +71,7 @@ export default defineComponent({
           .attr("transform", `translate(0, ${this.svgHeight() - 20})`)
           .call(this.xAxisDefinition);
         this.yScale.rangeRound([0, this.svgHeight() - 20]);
-        this.planeBars
+        this.trackRects
           .transition()
           .attr("width", this.svgWidth())
           .attr("fill", "var(--hellblau)")
@@ -99,6 +99,7 @@ export default defineComponent({
   },
   mounted() {
     this.xAxisDefinition = axisBottom(this.xScale);
+
     this.svg = select(".d3")
       .append("svg")
       .attr("transform", `translate(${this.margin.left}, ${this.margin.top})`);
@@ -108,12 +109,13 @@ export default defineComponent({
       .attr("class", "x-axis")
       .call(this.xAxisDefinition);
 
-    this.planeBars = this.svg
-      .selectAll(".plane")
+    this.trackRects = this.svg
+      .append("g")
+      .selectAll(".track")
       .data(this.tracks)
       .enter()
       .append("rect")
-      .attr("class", "plane-bars");
+      .attr("class", "track");
 
     this.resizeObserver.observe(this.$refs["d3"] as Element);
   },

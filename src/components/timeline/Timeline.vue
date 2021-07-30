@@ -42,12 +42,12 @@ export default defineComponent({
       minDate: this.initMinDate,
       maxDate: this.initMaxDate,
       margin: { top: 0, right: 30, bottom: 30, left: 150 },
+      xScale: {} as ScaleTime<number, number, never>,
+      yScale: {} as ScaleBand<string>,
       xAxisDefinition: {} as Axis<Date | NumberValue>,
       xAxis: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
       svg: {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>,
       trackRects: {} as Selection<SVGRectElement, ITrack, SVGGElement, unknown>,
-      xScale: {} as ScaleTime<number, number, never>,
-      yScale: {} as ScaleBand<string>,
       resizeObserver: new ResizeObserver(
         debounce((entries) => {
           this.onResize(entries);
@@ -62,17 +62,17 @@ export default defineComponent({
         this.width = entry.contentRect.width;
 
         this.svg
-          .attr("width", this.svgWidth())
-          .attr("height", this.svgHeight());
+          .attr("width", this.innerWidth())
+          .attr("height", this.innerHeight());
 
-        this.xScale.range([0, this.svgWidth()]);
+        this.xScale.range([0, this.innerWidth()]);
         this.xAxis
-          .attr("transform", `translate(0, ${this.svgHeight() - 20})`)
+          .attr("transform", `translate(0, ${this.innerHeight() - 20})`)
           .call(this.xAxisDefinition);
-        this.yScale.rangeRound([0, this.svgHeight() - 20]);
+        this.yScale.rangeRound([0, this.innerHeight() - 20]);
         this.trackRects
           .transition()
-          .attr("width", this.svgWidth())
+          .attr("width", this.innerWidth())
           .attr("fill", "var(--blue200)")
           .attr("height", this.yScale.bandwidth)
           .attr("y", (t) => {
@@ -81,11 +81,11 @@ export default defineComponent({
           });
       });
     },
-    svgHeight() {
+    innerHeight() {
       const height = this.height - this.margin.top - this.margin.bottom;
       return height < 0 ? 0 : height;
     },
-    svgWidth() {
+    innerWidth() {
       const width = this.width - this.margin.left - this.margin.right;
       return width < 0 ? 0 : width;
     },
@@ -93,14 +93,15 @@ export default defineComponent({
   created() {
     this.xScale = scaleTime()
       .domain([this.initMinDate, this.initMaxDate])
-      .rangeRound([0, this.svgWidth()]);
+      .rangeRound([0, this.innerWidth()]);
+
     this.yScale = scaleBand()
       .domain(this.tracks.map((t) => t.label))
       .padding(0.6);
+
+    this.xAxisDefinition = axisBottom(this.xScale);
   },
   mounted() {
-    this.xAxisDefinition = axisBottom(this.xScale);
-
     this.svg = select(".d3")
       .append("svg")
       .attr("transform", `translate(${this.margin.left}, ${this.margin.top})`);

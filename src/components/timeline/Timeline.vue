@@ -8,6 +8,8 @@
 import { defineComponent } from "vue";
 import dayjs from "dayjs";
 import { debounce } from "lodash";
+import { ITrack } from "@/components/timeline/timeline";
+
 import {
   scaleTime,
   axisBottom,
@@ -15,8 +17,12 @@ import {
   Axis,
   NumberValue,
   scaleLinear,
+  ScaleBand,
   ScaleLinear,
+  scaleBand,
   Selection,
+  selectAll,
+  BaseType,
 } from "d3";
 
 export default defineComponent({
@@ -31,7 +37,11 @@ export default defineComponent({
     },
     height: {
       type: Number,
-      default: 400,
+      default: 200,
+    },
+    tracks: {
+      type: Array as () => ITrack[],
+      default: [] as ITrack[],
     },
   },
   data() {
@@ -39,11 +49,13 @@ export default defineComponent({
       minDate: this.initMinDate,
       maxDate: this.initMaxDate,
       width: 0,
-      margin: { top: 10, right: 30, bottom: 30, left: 60 },
+      margin: { top: 0, right: 30, bottom: 30, left: 150 },
       xAxisDefinition: {} as Axis<Date | NumberValue>,
-      xAxis: {} as Selection<SVGGElement, unknown, HTMLElement, any>,
-      svg: {} as Selection<SVGGElement, unknown, HTMLElement, any>,
+      xAxis: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
+      svg: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
+      planeBars: {} as Selection<SVGRectElement, ITrack, SVGGElement, unknown>,
       xScale: {} as ScaleLinear<number, number, never>,
+      yScale: {} as ScaleBand<string>,
       resizeObserver: new ResizeObserver(
         debounce((entries) => {
           this.update(entries);
@@ -58,6 +70,11 @@ export default defineComponent({
         this.xScale.range([0, this.svgWidth()]);
         this.xAxis.call(this.xAxisDefinition);
         this.svg.transition().attr("width", this.svgWidth());
+        this.planeBars
+          .transition()
+          .attr("width", this.svgWidth())
+          .attr("fill", "var(--hellblau)")
+          .attr("height", "20");
       });
     },
     svgHeight() {
@@ -71,19 +88,37 @@ export default defineComponent({
   },
   created() {
     this.xScale = scaleLinear().domain([0, 100]).range([0, 100]);
+    this.yScale = scaleBand()
+      .domain(this.tracks.map((t) => t.label))
+      .rangeRound([0, 200]);
   },
   mounted() {
     this.xAxisDefinition = axisBottom(this.xScale);
     this.svg = select(".d3 svg");
-    this.svg.attr("width", this.svgWidth()).attr("height", this.svgHeight());
+    this.svg
+      .attr("width", this.svgWidth())
+      .attr("height", this.svgHeight())
+      .attr("transform", `translate(${this.margin.left}, ${this.margin.top})`);
 
     this.xAxis = this.svg
       .append("g")
-      .attr("transform", `translate(${this.margin.left}, ${this.margin.top})`)
+      .attr("transform", `translate(0, ${this.svgHeight() - 20})`)
       .attr("class", "x-axis")
       .call(this.xAxisDefinition);
-
+    selectAll(".x-axis line, .x-axis path").attr("stroke", "var(--blau)");
+    selectAll(".x-axis text").attr("fill", "var(--blau)");
     this.resizeObserver.observe(this.$refs["d3"] as Element);
+
+    this.planeBars = this.svg
+      .selectAll(".plane")
+      .data(this.tracks)
+      .enter()
+      .append("rect")
+      .attr("class", "plane-bars")
+      .attr("y", (t) => {
+        const result = this.yScale(t.label);
+        return result === undefined ? null : (result as number);
+      });
   },
 });
 </script>
@@ -95,5 +130,17 @@ export default defineComponent({
   opacity: 0.7;
   width: inherit;
   z-index: inherit;
+}
+.svg-style {
+  border-left: solid var(--blau) 1pt;
+  border-right: solid var(--blau) 1pt;
+}
+.x-axis line,
+.x-axis path {
+  stroke: var(--blau);
+}
+.d3 {
+  border-bottom: 1pt solid var(--blau);
+  border-top: 1pt solid var(--blau);
 }
 </style>

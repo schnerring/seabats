@@ -37,11 +37,10 @@ export default defineComponent({
   },
   data() {
     return {
-      height: 0,
-      width: 0,
+      outerSize: { height: 0, width: 0 },
       minDate: this.initMinDate,
       maxDate: this.initMaxDate,
-      margin: { top: 0, right: 30, bottom: 30, left: 150 },
+      margin: { top: 10, right: 30, bottom: 30, left: 150 },
       xScale: {} as ScaleTime<number, number, never>,
       yScale: {} as ScaleBand<string>,
       xAxisDefinition: {} as Axis<Date | NumberValue>,
@@ -58,42 +57,53 @@ export default defineComponent({
   methods: {
     onResize(entries: ResizeObserverEntry[]) {
       entries.forEach((entry) => {
-        this.height = entry.contentRect.height;
-        this.width = entry.contentRect.width;
-
-        this.svg
-          .attr("width", this.innerWidth())
-          .attr("height", this.innerHeight());
-
-        this.xScale.range([0, this.innerWidth()]);
-        this.xAxis
-          .attr("transform", `translate(0, ${this.innerHeight() - 20})`)
-          .call(this.xAxisDefinition);
-        this.yScale.rangeRound([0, this.innerHeight() - 20]);
-        this.trackRects
-          .transition()
-          .attr("width", this.innerWidth())
-          .attr("fill", "var(--blue200)")
-          .attr("height", this.yScale.bandwidth)
-          .attr("y", (t) => {
-            const result = this.yScale(t.label);
-            return result === undefined ? null : (result as number);
-          });
+        this.outerSize = {
+          height: entry.contentRect.height,
+          width: entry.contentRect.width,
+        };
       });
     },
-    innerHeight() {
-      const height = this.height - this.margin.top - this.margin.bottom;
-      return height < 0 ? 0 : height;
-    },
-    innerWidth() {
-      const width = this.width - this.margin.left - this.margin.right;
-      return width < 0 ? 0 : width;
+  },
+  watch: {
+    outerSize(outerSize: { height: number; width: number }) {
+      const innerSize = {
+        height: Math.max(
+          0,
+          outerSize.height - this.margin.top - this.margin.bottom
+        ),
+        width: Math.max(
+          0,
+          outerSize.width - this.margin.left - this.margin.right
+        ),
+      };
+
+      this.svg
+        .transition()
+        .attr("width", innerSize.width)
+        .attr("height", innerSize.height);
+
+      const paddingBottom = 20;
+
+      this.xScale.rangeRound([0, innerSize.width]);
+      this.yScale.rangeRound([0, innerSize.height - paddingBottom]);
+
+      this.xAxis
+        .transition()
+        .attr("transform", `translate(0, ${innerSize.height - paddingBottom})`)
+        .call(this.xAxisDefinition);
+
+      this.trackRects
+        .transition()
+        .attr("width", innerSize.width)
+        .attr("height", this.yScale.bandwidth)
+        .attr("y", (t) => {
+          const y = this.yScale(t.label);
+          return y === undefined ? null : y;
+        });
     },
   },
   created() {
-    this.xScale = scaleTime()
-      .domain([this.initMinDate, this.initMaxDate])
-      .rangeRound([0, this.innerWidth()]);
+    this.xScale = scaleTime().domain([this.initMinDate, this.initMaxDate]);
 
     this.yScale = scaleBand()
       .domain(this.tracks.map((t) => t.label))
@@ -117,7 +127,8 @@ export default defineComponent({
       .data(this.tracks)
       .enter()
       .append("rect")
-      .attr("class", "track");
+      .attr("class", "track")
+      .attr("fill", "var(--blue200)");
 
     this.resizeObserver.observe(this.$refs["d3"] as Element);
   },
@@ -127,6 +138,8 @@ export default defineComponent({
 <style scoped>
 .d3 {
   background: white;
+  border-bottom: var(--blue900) solid 1px;
+  border-top: var(--blue900) solid 1px;
   color: var(--blue900);
   height: inherit;
   opacity: 0.7;

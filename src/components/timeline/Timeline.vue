@@ -14,11 +14,10 @@ import {
   select,
   Axis,
   NumberValue,
-  scaleLinear,
   ScaleBand,
-  ScaleLinear,
   scaleBand,
   Selection,
+  ScaleTime,
 } from "d3";
 
 export default defineComponent({
@@ -47,7 +46,7 @@ export default defineComponent({
       xAxis: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
       svg: {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>,
       trackRects: {} as Selection<SVGRectElement, ITrack, SVGGElement, unknown>,
-      xScale: {} as ScaleLinear<number, number, never>,
+      xScale: {} as ScaleTime<number, number, never>,
       yScale: {} as ScaleBand<string>,
       resizeObserver: new ResizeObserver(
         debounce((entries) => {
@@ -92,8 +91,8 @@ export default defineComponent({
     },
   },
   created() {
-    this.xScale = scaleLinear()
-      .domain([0, 100])
+    this.xScale = scaleTime()
+      .domain([this.initMinDate, this.initMaxDate])
       .rangeRound([0, this.svgWidth()]);
     this.yScale = scaleBand().domain(this.tracks.map((t) => t.label));
   },
@@ -130,10 +129,5 @@ export default defineComponent({
   opacity: 0.7;
   width: inherit;
   z-index: inherit;
-}
-
-.d3 {
-  border-bottom: 1pt solid var(--blue900);
-  border-top: 1pt solid var(--blue900);
 }
 </style>

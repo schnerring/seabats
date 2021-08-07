@@ -1,3 +1,3 @@
 import PouchDB from "pouchdb";
 
-export const pouchDb = new PouchDB("flights");
+export const db = new PouchDB("flights");

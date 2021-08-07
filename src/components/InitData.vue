@@ -13,7 +13,7 @@
 import { defineComponent } from "vue";
 import { Flight } from "@/shared/Flight";
 import { AdsbExchangeResponse } from "@/shared/adsb/AdsbExchangeResponse";
-import { pouchDb } from "@/shared/db/PouchService";
+import { db } from "@/shared/db/PouchService";
 
 export default defineComponent({
   methods: {
@@ -22,7 +22,7 @@ export default defineComponent({
         const tc: AdsbExchangeResponse = JSON.parse(await files[i].text());
         const flight = new Flight(tc);
         try {
-          await pouchDb.put(flight);
+          await db.put(flight);
         } catch (error) {
           if (error.name === "conflict") {
             console.info(

@@ -1,4 +1,4 @@
-export interface TraceFileResponse {
+export interface AdsbExchangeResponse {
   icao: string;
   hex: string;
   timestamp: number;

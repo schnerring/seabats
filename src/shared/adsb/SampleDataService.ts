@@ -1,6 +1,6 @@
 import { HttpServiceBase } from "@/shared/HttpServiceBase";
 import { Flight } from "../Flight";
-import { TraceFileResponse } from "./trace-file-response";
+import { AdsbExchangeResponse } from "./AdsbExchangeResponse";
 import { TraceFileFields } from "./TraceFileFields";
 import { Trace } from "../Trace";
 import dayjs from "dayjs";
@@ -10,7 +10,7 @@ export class SampleDataService extends HttpServiceBase {
 
   async getFlights(icaos: string[]): Promise<Flight[]> {
     if (!this.flights) {
-      const response = await this.instance.get<TraceFileResponse[]>(
+      const response = await this.instance.get<AdsbExchangeResponse[]>(
         "adsb/sample-traces.json"
       );
       this.flights = response.data.map((tc) => {

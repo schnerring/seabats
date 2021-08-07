@@ -3,6 +3,7 @@
     <router-link to="/">Map</router-link> |
     <router-link to="/about">About</router-link
     ><span v-if="isLoggedIn"> | <a @click="logout">Logout</a></span>
+    <InitData />
   </nav>
   <main>
     <div id="map">
@@ -19,10 +20,14 @@
 </template>
 
 <script lang="ts">
+import InitData from "@/components/InitData.vue";
 import { defineComponent } from "vue";
 import { mapActions, mapGetters } from "vuex";
 
 export default defineComponent({
+  components: {
+    InitData,
+  },
   computed: {
     ...mapGetters(["isLoggedIn"]),
   },

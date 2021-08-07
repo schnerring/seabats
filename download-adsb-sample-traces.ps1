@@ -23,15 +23,3 @@ foreach ($aircraft in $aircrafts) {
     $date = $date.AddMonths(1)
   }
 }
-
-$jsonFiles = Get-Item public/adsb/*-trace.json
-
-$traces = [System.Collections.ArrayList]@()
-foreach ($jsonFile in $jsonFiles) {
-  $trace = Get-Content $jsonFile | ConvertFrom-Json
-  $traces.Add($trace)
-}
-
-$exportFile = "public/adsb/sample-traces.json"
-$traces | ConvertTo-Json -Depth 5 -Compress | Out-File -FilePath $exportFile
-Write-Host "Exported traces to: $exportFile"

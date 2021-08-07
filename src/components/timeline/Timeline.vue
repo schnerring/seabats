@@ -6,12 +6,13 @@
 import { defineComponent } from "vue";
 import dayjs from "dayjs";
 import { debounce } from "lodash";
-import { ITrack } from "@/components/timeline/timeline";
+import { IEvent, ITrack } from "@/components/timeline/timeline";
 
 import {
   scaleTime,
   axisBottom,
   select,
+  selectAll,
   Axis,
   NumberValue,
   ScaleBand,
@@ -24,7 +25,7 @@ export default defineComponent({
   props: {
     initMinDate: {
       type: Date,
-      default: dayjs().subtract(1, "years").toDate(),
+      default: dayjs().subtract(2, "year").toDate(),
     },
     initMaxDate: {
       type: Date,
@@ -100,6 +101,21 @@ export default defineComponent({
           const y = this.yScale(t.label);
           return y === undefined ? null : y;
         });
+
+      selectAll<SVGRectElement, IEvent>(".event")
+        .attr("width", (event) => {
+          const yEnd = this.xScale(event.end);
+          const yStart = this.xScale(event.start);
+          return Math.max(10, yEnd - yStart);
+        })
+        .attr("height", this.yScale.bandwidth)
+        .attr(
+          "transform",
+          (event) =>
+            `translate(${this.xScale(event.start)}, ${this.yScale(
+              "Diamond DA42 Twin Star"
+            )})`
+        );
     },
   },
   created() {
@@ -129,6 +145,17 @@ export default defineComponent({
       .append("rect")
       .attr("class", "track")
       .attr("fill", "var(--blue200)");
+
+    this.tracks.forEach((track) => {
+      this.svg
+        .append("g")
+        .selectAll(".event")
+        .data(track.events)
+        .enter()
+        .append("rect")
+        .attr("class", "event")
+        .attr("fill", "var(--blue600)");
+    });
 
     this.resizeObserver.observe(this.$refs["d3"] as Element);
   },

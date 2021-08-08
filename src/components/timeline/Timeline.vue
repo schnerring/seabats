@@ -6,7 +6,8 @@
 import { defineComponent } from "vue";
 import dayjs from "dayjs";
 import { debounce } from "lodash";
-import { IEvent, ITrack } from "@/components/timeline/timeline";
+import { IEvent } from "@/components/timeline/timeline";
+import { uniq } from "lodash";
 
 import {
   scaleTime,
@@ -23,31 +24,39 @@ import {
 
 export default defineComponent({
   props: {
-    initMinDate: {
+    minDate: {
+      type: Date,
+      default: new Date(2016, 1, 1),
+    },
+    maxDate: {
+      type: Date,
+      default: new Date(),
+    },
+    initFromDate: {
       type: Date,
       default: dayjs().subtract(2, "year").toDate(),
     },
-    initMaxDate: {
+    initToDate: {
       type: Date,
       default: dayjs().toDate(),
     },
-    tracks: {
-      type: Array as () => ITrack[],
-      default: [] as ITrack[],
+    events: {
+      type: Array as () => IEvent[],
+      default: [] as IEvent[],
     },
   },
   data() {
     return {
       outerSize: { height: 0, width: 0 },
-      minDate: this.initMinDate,
-      maxDate: this.initMaxDate,
+      fromDate: this.initFromDate,
+      toDate: this.initToDate,
       margin: { top: 10, right: 30, bottom: 30, left: 150 },
       xScale: {} as ScaleTime<number, number, never>,
       yScale: {} as ScaleBand<string>,
       xAxisDefinition: {} as Axis<Date | NumberValue>,
       xAxis: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
       svg: {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>,
-      trackRects: {} as Selection<SVGRectElement, ITrack, SVGGElement, unknown>,
+      trackRects: {} as Selection<SVGRectElement, string, SVGGElement, unknown>,
       resizeObserver: new ResizeObserver(
         debounce((entries) => {
           this.onResize(entries);
@@ -56,17 +65,7 @@ export default defineComponent({
     };
   },
   methods: {
-    onResize(entries: ResizeObserverEntry[]) {
-      entries.forEach((entry) => {
-        this.outerSize = {
-          height: entry.contentRect.height,
-          width: entry.contentRect.width,
-        };
-      });
-    },
-  },
-  watch: {
-    outerSize(outerSize: { height: number; width: number }) {
+    drawEvents(outerSize: { height: number; width: number }) {
       const innerSize = {
         height: Math.max(
           0,
@@ -97,34 +96,76 @@ export default defineComponent({
         .transition()
         .attr("width", innerSize.width)
         .attr("height", this.yScale.bandwidth)
-        .attr("y", (t) => {
-          const y = this.yScale(t.label);
+        .attr("y", (label) => {
+          const y = this.yScale(label);
+          return y === undefined ? null : y;
+        });
+      this.trackRects
+        .transition()
+        .attr("width", innerSize.width)
+        .attr("height", this.yScale.bandwidth)
+        .attr("y", (label) => {
+          const y = this.yScale(label);
           return y === undefined ? null : y;
         });
 
-      selectAll<SVGRectElement, IEvent>(".event")
+      this.svg
+        .append("g")
+        .selectAll(".event")
+        .data(this.events)
+        .enter()
+        .append("rect")
+        .attr("class", "event")
+        .attr("fill", "var(--blue600)")
         .attr("width", (event) => {
-          const yEnd = this.xScale(event.end);
-          const yStart = this.xScale(event.start);
-          return Math.max(10, yEnd - yStart);
+          const xEnd = this.xScale(event.end);
+          const xStart = this.xScale(event.start);
+          return Math.max(10, xEnd - xStart);
         })
         .attr("height", this.yScale.bandwidth)
         .attr(
           "transform",
           (event) =>
             `translate(${this.xScale(event.start)}, ${this.yScale(
-              "Diamond DA42 Twin Star"
+              event.label
             )})`
         );
     },
+    onResize(entries: ResizeObserverEntry[]) {
+      entries.forEach((entry) => {
+        this.outerSize = {
+          height: entry.contentRect.height,
+          width: entry.contentRect.width,
+        };
+      });
+    },
+  },
+  watch: {
+    events() {
+      this.yScale = scaleBand()
+        .domain(this.events.map((t) => t.label))
+        .padding(0.6);
+
+      this.trackRects = this.svg
+        .append("g")
+        .selectAll(".track")
+        .data(uniq(this.events.map((event) => event.label)))
+        .enter()
+        .append("rect")
+        .attr("class", "track")
+        .attr("fill", "var(--blue200)");
+
+      this.drawEvents(this.outerSize);
+    },
+    outerSize(outerSize: { height: number; width: number }) {
+      this.drawEvents(outerSize);
+    },
   },
   created() {
-    this.xScale = scaleTime().domain([this.initMinDate, this.initMaxDate]);
-
+    this.xScale = scaleTime().domain([this.fromDate, this.toDate]);
     this.yScale = scaleBand()
-      .domain(this.tracks.map((t) => t.label))
+      .domain(this.events.map((t) => t.label))
       .padding(0.6);
-
     this.xAxisDefinition = axisBottom(this.xScale);
   },
   mounted() {
@@ -140,22 +181,20 @@ export default defineComponent({
     this.trackRects = this.svg
       .append("g")
       .selectAll(".track")
-      .data(this.tracks)
+      .data(uniq(this.events.map((event) => event.label)))
       .enter()
       .append("rect")
       .attr("class", "track")
       .attr("fill", "var(--blue200)");
 
-    this.tracks.forEach((track) => {
-      this.svg
-        .append("g")
-        .selectAll(".event")
-        .data(track.events)
-        .enter()
-        .append("rect")
-        .attr("class", "event")
-        .attr("fill", "var(--blue600)");
-    });
+    this.svg
+      .append("g")
+      .selectAll(".event")
+      .data(this.events)
+      .enter()
+      .append("rect")
+      .attr("class", "event")
+      .attr("fill", "var(--blue600)");
 
     this.resizeObserver.observe(this.$refs["d3"] as Element);
   },

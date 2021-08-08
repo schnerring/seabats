@@ -13,12 +13,13 @@ export class Flight {
   constructor(tc: AdsbExchangeResponse) {
     this.icao = tc.icao ?? tc.hex;
     this._id = `${this.icao}-${tc.timestamp}`;
-    this.date = dayjs.unix(tc.timestamp).toDate();
+    const flightDate = dayjs.unix(tc.timestamp);
+    this.date = flightDate.toDate();
     this.traces = tc.trace.map((t) => {
       const flags = t[TraceFileFields.Flags] as number;
       return {
-        date: dayjs
-          .unix(t[TraceFileFields.SecondsAfterTimestamp] as number)
+        date: flightDate
+          .add(t[TraceFileFields.SecondsAfterTimestamp] as number, "seconds")
           .toDate(),
         lat: t[TraceFileFields.Lat],
         lon: t[TraceFileFields.Lon],

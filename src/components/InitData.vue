@@ -13,7 +13,7 @@
 import { defineComponent } from "vue";
 import { Flight } from "@/shared/Flight";
 import { AdsbExchangeResponse } from "@/shared/adsb/AdsbExchangeResponse";
-import { db } from "@/shared/db/PouchService";
+import { db } from "@/shared/DataService";
 
 export default defineComponent({
   methods: {

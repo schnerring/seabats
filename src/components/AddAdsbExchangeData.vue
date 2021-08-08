@@ -13,7 +13,7 @@
 import { defineComponent } from "vue";
 import { Flight } from "@/shared/Flight";
 import { AdsbExchangeResponse } from "@/shared/adsb/AdsbExchangeResponse";
-import { db } from "@/shared/DataService";
+import { addFlight } from "@/shared/DataService";
 
 export default defineComponent({
   methods: {
@@ -21,17 +21,7 @@ export default defineComponent({
       for (let i = 0; i < files.length; i++) {
         const tc: AdsbExchangeResponse = JSON.parse(await files[i].text());
         const flight = new Flight(tc);
-        try {
-          await db.put(flight);
-        } catch (error) {
-          if (error.name === "conflict") {
-            console.info(
-              `Skip duplicate flight: ${flight._id}, ${flight.date}`
-            );
-          } else {
-            throw error;
-          }
-        }
+        await addFlight(flight);
       }
     },
   },

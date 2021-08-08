@@ -4,8 +4,20 @@ import { Aircraft } from "./Aircraft";
 import { Flight } from "./Flight";
 import axios from "axios";
 
-export const db = new PouchDB("flights");
+const db = new PouchDB("flights");
 PouchDB.plugin(find);
+
+export async function addFlight(flight: Flight): Promise<void> {
+  try {
+    await db.put(flight);
+  } catch (error) {
+    if (error.name === "conflict") {
+      console.info(`Skip duplicate flight: ${flight._id}, ${flight.date}`);
+    } else {
+      throw error;
+    }
+  }
+}
 
 export async function getFlights(from: Date, to: Date): Promise<Flight[]> {
   await db.createIndex({

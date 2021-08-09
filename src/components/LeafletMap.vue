@@ -30,31 +30,29 @@ export default defineComponent({
   watch: {
     flights(flights: Flight[]) {
       for (const flight of flights) {
-        const coords = flight.traces.map((t) => new LatLng(t.lat, t.lon));
-        const polyline = new Polyline(coords, {
-          color: `#${flight.icao.split("").reverse().join("")}`,
-        });
         if (this.polylines.has(flight._id)) {
           continue;
         }
+        const coords = flight.traces.map((t) => new LatLng(t.lat, t.lon));
+        const polyline = new Polyline(coords, {
+          color: `#42a5f5`, // TODO var?
+        });
+        // Add the polyline to the Typescript map
         this.polylines.set(flight._id, polyline);
+        // Render the polyline in Leaflet
         polyline.addTo(this.map as LeafletMap);
       }
-      const polylinesToRemove = new Map<string, Polyline>();
-      for (const polyline of this.polylines) {
-        const key = polyline[0];
-        const existingFlight = flights.find((flight) => flight._id === key);
+      for (const flightId of this.polylines.keys()) {
+        const existingFlight = flights.find(
+          (flight) => flight._id === flightId
+        );
         if (existingFlight) {
           continue;
         }
-        const value = polyline[1];
-        polylinesToRemove.set(key, value);
-      }
-      for (const polylineToRemove of polylinesToRemove) {
-        const key = polylineToRemove[0];
-        const value = polylineToRemove[1];
-        value.remove();
-        this.polylines.delete(key);
+        // Un-render the polyline from Leaflet
+        this.polylines.get(flightId)?.remove();
+        // remove the polyline from the Typescript Map
+        this.polylines.delete(flightId);
       }
     },
   },

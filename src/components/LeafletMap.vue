@@ -4,7 +4,13 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { Canvas, Map, LatLng, TileLayer, Polyline } from "leaflet";
+import {
+  Canvas,
+  Map as LeafletMap,
+  LatLng,
+  TileLayer,
+  Polyline,
+} from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { mapState } from "vuex";
 import { Flight } from "@/shared/Flight";
@@ -14,8 +20,8 @@ export default defineComponent({
     return {
       zoom: 6,
       center: new LatLng(35.917973, 14.409943),
-      map: {} as Map,
-      polylines: [] as Polyline[],
+      map: {} as LeafletMap,
+      polylines: new Map() as Map<string, Polyline>,
     };
   },
   computed: {
@@ -23,20 +29,37 @@ export default defineComponent({
   },
   watch: {
     flights(flights: Flight[]) {
-      this.polylines.forEach((pl) => pl.remove());
-      this.polylines = [];
       for (const flight of flights) {
         const coords = flight.traces.map((t) => new LatLng(t.lat, t.lon));
         const polyline = new Polyline(coords, {
           color: `#${flight.icao.split("").reverse().join("")}`,
         });
-        this.polylines.push(polyline);
-        polyline.addTo(this.map as Map);
+        if (this.polylines.has(flight._id)) {
+          continue;
+        }
+        this.polylines.set(flight._id, polyline);
+        polyline.addTo(this.map as LeafletMap);
+      }
+      const polylinesToRemove = new Map<string, Polyline>();
+      for (const polyline of this.polylines) {
+        const key = polyline[0];
+        const existingFlight = flights.find((flight) => flight._id === key);
+        if (existingFlight) {
+          continue;
+        }
+        const value = polyline[1];
+        polylinesToRemove.set(key, value);
+      }
+      for (const polylineToRemove of polylinesToRemove) {
+        const key = polylineToRemove[0];
+        const value = polylineToRemove[1];
+        value.remove();
+        this.polylines.delete(key);
       }
     },
   },
   mounted() {
-    this.map = new Map("leaflet", {
+    this.map = new LeafletMap("leaflet", {
       renderer: new Canvas(),
       zoomControl: false,
     });

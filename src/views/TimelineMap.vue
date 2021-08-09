@@ -1,6 +1,11 @@
 <template>
   <div class="timeline">
-    <timeline :initToDate="to" :initFromDate="from" :events="events" />
+    <timeline
+      :initToDate="to"
+      :initFromDate="from"
+      :events="events"
+      @event-mouseover="highlightFlight"
+    />
   </div>
   <div class="map">
     <leaflet-map />
@@ -20,13 +25,16 @@ import dayjs from "dayjs";
 export default defineComponent({
   data() {
     return {
-      from: new Date(2020, 7, 31),
-      to: new Date(2020, 8, 2),
+      from: new Date(2016, 1, 1),
+      to: new Date(2021, 8, 2),
       dbData: {},
       events: [] as IEvent[],
     };
   },
   methods: {
+    highlightFlight(event: IEvent) {
+      console.log(event.key);
+    },
     ...mapActions(["getFlights"]),
   },
   computed: {

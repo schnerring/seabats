@@ -56,6 +56,7 @@ export default defineComponent({
       xAxisDefinition: {} as Axis<Date | NumberValue>,
       xAxis: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
       svg: {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>,
+      eventGroup: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
       trackRects: {} as Selection<SVGRectElement, string, SVGGElement, unknown>,
       resizeObserver: new ResizeObserver(
         debounce((entries) => {
@@ -100,17 +101,10 @@ export default defineComponent({
           const y = this.yScale(label);
           return y === undefined ? null : y;
         });
-      this.trackRects
-        .transition()
-        .attr("width", innerSize.width)
-        .attr("height", this.yScale.bandwidth)
-        .attr("y", (label) => {
-          const y = this.yScale(label);
-          return y === undefined ? null : y;
-        });
 
-      this.svg
-        .append("g")
+      this.eventGroup = this.svg.append("g").attr("class", "eventGroup");
+
+      this.eventGroup
         .selectAll(".event")
         .data(this.events)
         .enter()
@@ -129,7 +123,16 @@ export default defineComponent({
             `translate(${this.xScale(event.start)}, ${this.yScale(
               event.label
             )})`
-        );
+        )
+        .on("mouseover.fill", function () {
+          select(this).attr("fill", "var(--blue900)");
+        })
+        .on("mouseover.emit", (event, data) => {
+          this.$emit("eventMouseover", data);
+        })
+        .on("mouseout", function (event, data) {
+          select(this).attr("fill", "var(--blue600)");
+        });
     },
     onResize(entries: ResizeObserverEntry[]) {
       entries.forEach((entry) => {

@@ -1,15 +1,12 @@
 export interface ITimeline {
   min: Date;
   max: Date;
-  tracks: ITrack[];
-}
-
-export interface ITrack {
-  label: string;
-  events: IEvent[];
+  tracks: IEvent[];
 }
 
 export interface IEvent {
+  key: string;
+  label: string;
   start: Date;
   end: Date;
 }

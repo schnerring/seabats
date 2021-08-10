@@ -1,6 +1,11 @@
 <template>
   <div class="timeline">
-    <timeline :tracks="tracks" />
+    <timeline
+      :initToDate="to"
+      :initFromDate="from"
+      :events="events"
+      @event-mouseover="highlightFlight"
+    />
   </div>
   <div class="map">
     <leaflet-map />
@@ -9,60 +14,66 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { mapState, mapActions } from "vuex";
+import { first, last } from "lodash";
 import LeafletMap from "@/components/LeafletMap.vue";
 import Timeline from "@/components/timeline/Timeline.vue";
-import { ITrack, IEvent } from "@/components/timeline/timeline";
+import { IEvent } from "@/components/timeline/timeline";
+import { Flight } from "@/shared/Flight";
 import dayjs from "dayjs";
 
 export default defineComponent({
   data() {
     return {
-      tracks: [
-        {
-          label: "Diamond DA42 Twin Star",
-          events: [
-            {
-              start: dayjs().subtract(1, "day").toDate(),
-              end: dayjs().subtract(1, "day").add(4, "hour").toDate(),
-            } as IEvent,
-            {
-              start: dayjs().subtract(7, "day").toDate(),
-              end: dayjs().subtract(7, "day").add(6, "hour").toDate(),
-            } as IEvent,
-          ] as IEvent[],
-        } as ITrack,
-        {
-          label: "DIA DA42 Twin Star",
-          events: [
-            {
-              start: dayjs().subtract(1, "day").toDate(),
-              end: dayjs().subtract(1, "day").add(4, "hour").toDate(),
-            } as IEvent,
-            {
-              start: dayjs().subtract(7, "day").toDate(),
-              end: dayjs().subtract(7, "day").add(6, "hour").toDate(),
-            } as IEvent,
-          ] as IEvent[],
-        } as ITrack,
-        {
-          label: "Beechcraft 300 Super King Air 350",
-          events: [
-            {
-              start: dayjs().subtract(3, "day").toDate(),
-              end: dayjs().subtract(3, "day").add(1, "hour").toDate(),
-            } as IEvent,
-            {
-              start: dayjs().subtract(40, "day").toDate(),
-              end: dayjs().subtract(40, "day").add(11, "hour").toDate(),
-            } as IEvent,
-          ] as IEvent[],
-        } as ITrack,
-      ] as ITrack[],
+      from: new Date(2016, 1, 1),
+      to: new Date(2021, 8, 2),
+      dbData: {},
+      events: [] as IEvent[],
     };
+  },
+  methods: {
+    highlightFlight(event: IEvent) {
+      console.log(event.key);
+    },
+    ...mapActions(["getFlights"]),
+  },
+  computed: {
+    ...mapState(["flights"]),
+  },
+  watch: {
+    flights(flights: Flight[]) {
+      this.events = flights.map((f) => {
+        const dates = f.traces.map((t) => t.date);
+        return {
+          label: f.icao,
+          key: f._id,
+          start: first(dates),
+          end: last(dates),
+        } as IEvent;
+      });
+    },
   },
   components: {
     LeafletMap,
     Timeline,
+  },
+  beforeCreate() {
+    const fromDate = localStorage.getItem("timeline.from");
+    if (fromDate) {
+      this.from = dayjs(fromDate).toDate();
+    } else {
+      this.to = dayjs().subtract(2, "months").toDate();
+    }
+    const toDate = localStorage.getItem("timeline.to");
+    if (toDate) {
+      this.to = dayjs(toDate).toDate();
+    } else {
+      this.to = new Date();
+    }
+  },
+  async beforeMount() {
+    const payload = { from: this.from, to: this.to };
+    await this.getFlights(payload);
   },
 });
 </script>

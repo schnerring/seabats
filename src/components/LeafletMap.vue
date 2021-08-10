@@ -4,7 +4,13 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { Canvas, Map, LatLng, TileLayer, Polyline } from "leaflet";
+import {
+  Canvas,
+  Map as LeafletMap,
+  LatLng,
+  TileLayer,
+  Polyline,
+} from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { mapState } from "vuex";
 import { Flight } from "@/shared/Flight";
@@ -14,8 +20,8 @@ export default defineComponent({
     return {
       zoom: 6,
       center: new LatLng(35.917973, 14.409943),
-      map: {} as Map,
-      polylines: [] as Polyline[],
+      map: {} as LeafletMap,
+      polylines: new Map() as Map<string, Polyline>,
     };
   },
   computed: {
@@ -23,20 +29,35 @@ export default defineComponent({
   },
   watch: {
     flights(flights: Flight[]) {
-      this.polylines.forEach((pl) => pl.remove());
-      this.polylines = [];
       for (const flight of flights) {
+        if (this.polylines.has(flight._id)) {
+          continue;
+        }
         const coords = flight.traces.map((t) => new LatLng(t.lat, t.lon));
         const polyline = new Polyline(coords, {
-          color: `#${flight.icao.split("").reverse().join("")}`,
+          color: `#42a5f5`, // TODO var?
         });
-        this.polylines.push(polyline);
-        polyline.addTo(this.map as Map);
+        // Add the polyline to the Typescript map
+        this.polylines.set(flight._id, polyline);
+        // Render the polyline in Leaflet
+        polyline.addTo(this.map as LeafletMap);
+      }
+      for (const flightId of this.polylines.keys()) {
+        const existingFlight = flights.find(
+          (flight) => flight._id === flightId
+        );
+        if (existingFlight) {
+          continue;
+        }
+        // Un-render the polyline from Leaflet
+        this.polylines.get(flightId)?.remove();
+        // remove the polyline from the Typescript Map
+        this.polylines.delete(flightId);
       }
     },
   },
   mounted() {
-    this.map = new Map("leaflet", {
+    this.map = new LeafletMap("leaflet", {
       renderer: new Canvas(),
       zoomControl: false,
     });

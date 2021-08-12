@@ -1,9 +1,7 @@
 <template>
   <nav>
-    <router-link to="/">Map</router-link> |
-    <router-link to="/about">About</router-link
-    ><span v-if="isLoggedIn"> | <a @click="logout">Logout</a></span>
-    <add-adsb-exchange-data />
+    <router-link to="/">Map</router-link>
+    <router-link to="/info">Info</router-link>
   </nav>
   <main>
     <div id="map">
@@ -20,14 +18,10 @@
 </template>
 
 <script lang="ts">
-import AddAdsbExchangeData from "@/components/AddAdsbExchangeData.vue";
 import { defineComponent } from "vue";
 import { mapActions, mapGetters } from "vuex";
 
 export default defineComponent({
-  components: {
-    AddAdsbExchangeData,
-  },
   computed: {
     ...mapGetters(["isLoggedIn"]),
   },
@@ -73,10 +67,11 @@ body {
   height: 100vh;
   overflow-y: hidden;
 }
-
 nav {
+  display: flex;
+  justify-content: space-between;
   grid-area: nav;
-  padding: 30px;
+  padding: 5px;
 
   a {
     font-weight: bold;

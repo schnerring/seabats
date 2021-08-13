@@ -20,6 +20,8 @@ import {
   scaleBand,
   Selection,
   ScaleTime,
+  brushX,
+  BrushBehavior,
 } from "d3";
 
 export default defineComponent({
@@ -34,7 +36,7 @@ export default defineComponent({
     },
     initFromDate: {
       type: Date,
-      default: dayjs().subtract(2, "year").toDate(),
+      default: dayjs().subtract(1, "year").toDate(),
     },
     initToDate: {
       type: Date,
@@ -55,6 +57,9 @@ export default defineComponent({
       yScale: {} as ScaleBand<string>,
       xAxisDefinition: {} as Axis<Date | NumberValue>,
       xAxis: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
+      brushGroup: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
+      brush: {} as BrushBehavior<unknown>,
+      defaultSelection: [] as number[],
       svg: {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>,
       eventGroup: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
       trackRects: {} as Selection<SVGRectElement, string, SVGGElement, unknown>,
@@ -66,6 +71,12 @@ export default defineComponent({
     };
   },
   methods: {
+    brushed() {
+      console.log("brushed");
+    },
+    brushEnded() {
+      console.log("brush ended");
+    },
     drawEvents(outerSize: { height: number; width: number }) {
       const innerSize = {
         height: Math.max(
@@ -102,8 +113,25 @@ export default defineComponent({
           return y === undefined ? null : y;
         });
 
+      const topLeft: [number, number] = [0, 0];
+      const bottomRight: [number, number] = [
+        innerSize.width,
+        innerSize.height - paddingBottom,
+      ];
+      this.brush.extent([topLeft, bottomRight]);
+
+      this.defaultSelection = [
+        this.xScale(dayjs(this.toDate).subtract(1, "year").toDate()),
+        this.xScale(this.toDate),
+      ];
+
+      this.brushGroup
+        .call(this.brush)
+        .call(this.brush.move, this.defaultSelection);
+
       this.eventGroup = this.svg.append("g").attr("class", "eventGroup");
 
+      this.eventGroup.selectAll(".event").remove();
       this.eventGroup
         .selectAll(".event")
         .data(this.events)
@@ -170,6 +198,8 @@ export default defineComponent({
       .domain(this.events.map((t) => t.label))
       .padding(0.6);
     this.xAxisDefinition = axisBottom(this.xScale);
+
+    this.brush = brushX().on("brush", this.brushed).on("end", this.brushEnded);
   },
   mounted() {
     this.svg = select(".d3")
@@ -198,6 +228,8 @@ export default defineComponent({
       .append("rect")
       .attr("class", "event")
       .attr("fill", "var(--blue600)");
+
+    this.brushGroup = this.svg.append("g").attr("class", "timeline-brush");
 
     this.resizeObserver.observe(this.$refs["d3"] as Element);
   },

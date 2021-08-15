@@ -19,13 +19,25 @@ const routes: Array<RouteRecordRaw> = [
     component: UnlockApp,
   },
   {
-    path: "/about",
-    name: "About",
+    path: "/admin",
+    name: "Admin",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
     component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue"),
+      import(/* webpackChunkName: "about" */ "../views/Admin.vue"),
+  },
+  {
+    path: "/info",
+    name: "Info",
+    // Lazy loading
+    component: () => import(/* webpackChunkName: "info" */ "../views/Info.vue"),
+  },
+  {
+    path: "/info",
+    name: "Archive",
+    component: () =>
+      import(/* webpackChunkName: "archive" */ "../views/Info.vue"),
   },
 ];
 

@@ -1,4 +1,5 @@
 <template>
+  <button @click="zoomClick">Zoom Out</button>
   <div class="d3" ref="d3"></div>
 </template>
 
@@ -25,6 +26,7 @@ import {
 } from "d3";
 
 export default defineComponent({
+  emits: ["eventMouseover", "dateRangeChanged"],
   props: {
     minDate: {
       type: Date,
@@ -33,14 +35,6 @@ export default defineComponent({
     maxDate: {
       type: Date,
       default: new Date(),
-    },
-    initFromDate: {
-      type: Date,
-      default: dayjs().subtract(1, "year").toDate(),
-    },
-    initToDate: {
-      type: Date,
-      default: dayjs().toDate(),
     },
     events: {
       type: Array as () => IEvent[],
@@ -55,8 +49,10 @@ export default defineComponent({
   data() {
     return {
       outerSize: { height: 0, width: 0 },
-      fromDate: this.initFromDate,
-      toDate: this.initToDate,
+      zoom: {
+        from: dayjs().subtract(3, "months").toDate(),
+        to: new Date(),
+      },
       margin: { top: 10, right: 30, bottom: 30, left: 150 },
       xScale: {} as ScaleTime<number, number, never>,
       yScale: {} as ScaleBand<string>,
@@ -90,6 +86,12 @@ export default defineComponent({
     brushed() {
       console.debug("brushed");
     },
+    zoomClick() {
+      this.zoom = {
+        from: dayjs(this.zoom.from).subtract(3, "months").toDate(),
+        to: this.zoom.to,
+      };
+    },
     brushEnded() {
       console.debug("brush ended");
     },
@@ -119,6 +121,7 @@ export default defineComponent({
         .transition()
         .attr("transform", `translate(0, ${innerSize.height - paddingBottom})`)
         .call(this.xAxisDefinition);
+
       if (this.trackRects) {
         this.trackRects
           .transition()
@@ -129,6 +132,7 @@ export default defineComponent({
             return y === undefined ? null : y;
           });
       }
+
       if (this.trackRectTexts) {
         this.trackRectTexts
           .transition()
@@ -147,8 +151,8 @@ export default defineComponent({
       this.brush.extent([topLeft, bottomRight]);
 
       this.defaultSelection = [
-        this.xScale(dayjs(this.toDate).subtract(1, "year").toDate()),
-        this.xScale(this.toDate),
+        this.xScale(dayjs(this.zoom.to).subtract(2, "months").toDate()),
+        this.xScale(this.zoom.to),
       ];
 
       this.brushGroup
@@ -158,6 +162,8 @@ export default defineComponent({
       this.eventGroup = this.svg.append("g").attr("class", "eventGroup");
 
       this.eventGroup.selectAll(".event").remove();
+
+      if (!this.events) return;
 
       this.eventGroup
         .selectAll(".event")
@@ -199,6 +205,17 @@ export default defineComponent({
     },
   },
   watch: {
+    zoom(zoom: { from: Date; to: Date }) {
+      if (zoom.from < this.minDate) {
+        zoom.from = this.minDate;
+      }
+      if (zoom.to > this.maxDate) {
+        zoom.to = this.maxDate;
+      }
+      localStorage.setItem("timeline.zoom.from", this.zoom.from.toISOString());
+      // TODO re-render axis etc.
+      this.$emit("dateRangeChanged", this.zoom.from, this.zoom.to);
+    },
     events() {
       this.yScale = scaleBand()
         .domain(this.events.map((t) => t.label))
@@ -229,12 +246,17 @@ export default defineComponent({
     },
   },
   created() {
-    this.xScale = scaleTime().domain([this.fromDate, this.toDate]);
+    // Read timeline zoom from last visit
+    const from = localStorage.getItem("timeline.zoom.from");
+    if (from) {
+      this.zoom.from = dayjs(from).toDate();
+    }
+
+    this.xScale = scaleTime().domain([this.zoom.from, this.zoom.to]);
     this.yScale = scaleBand()
       .domain(this.events.map((t) => t.label))
       .padding(0.6);
-    this.xAxisDefinition = axisBottom(this.xScale).ticks(30);
-
+    this.xAxisDefinition = axisBottom(this.xScale);
     this.brush = brushX().on("brush", this.brushed).on("end", this.brushEnded);
   },
   mounted() {
@@ -256,7 +278,6 @@ export default defineComponent({
     //   .append("rect")
     //   .attr("class", "track")
     //   .attr("fill", "var(--blue200)");
-
     // this.trackRectTexts = this.svg
     //   .append("g")
     //   .attr("class", "track-label-group")
@@ -266,19 +287,20 @@ export default defineComponent({
     //   .append("text")
     //   .attr("class", "track-label")
     //   .text((label) => `#${label}`);
-
-    this.svg
-      .append("g")
-      .selectAll(".event")
-      .data(this.events)
-      .enter()
-      .append("rect")
-      .attr("class", "event")
-      .attr("fill", "var(--blue600)");
+    // this.svg
+    //   .append("g")
+    //   .selectAll(".event")
+    //   .data(this.events)
+    //   .enter()
+    //   .append("rect")
+    //   .attr("class", "event")
+    //   .attr("fill", "var(--blue600)");
 
     this.brushGroup = this.svg.append("g").attr("class", "timeline-brush");
 
     this.resizeObserver.observe(this.$refs["d3"] as Element);
+
+    this.$emit("dateRangeChanged", this.zoom.from, this.zoom.to);
   },
 });
 </script>

@@ -58,8 +58,8 @@ export default defineComponent({
       yScale: {} as ScaleBand<string>,
       xAxisDefinition: {} as Axis<Date | NumberValue>,
       xAxis: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
-      brushGroup: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
-      brush: {} as BrushBehavior<unknown>,
+      //brushGroup: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
+      //brush: {} as BrushBehavior<unknown>,
       defaultSelection: [] as number[],
       svg: {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>,
       eventGroup: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
@@ -142,22 +142,22 @@ export default defineComponent({
             return y === undefined ? null : y;
           });
       }
+      // Brush
+      // const topLeft: [number, number] = [0, 0];
+      // const bottomRight: [number, number] = [
+      //   innerSize.width,
+      //   innerSize.height - paddingBottom,
+      // ];
+      // this.brush.extent([topLeft, bottomRight]);
 
-      const topLeft: [number, number] = [0, 0];
-      const bottomRight: [number, number] = [
-        innerSize.width,
-        innerSize.height - paddingBottom,
-      ];
-      this.brush.extent([topLeft, bottomRight]);
+      // this.defaultSelection = [
+      //   this.xScale(dayjs(this.zoom.to).subtract(2, "months").toDate()),
+      //   this.xScale(this.zoom.to),
+      // ];
 
-      this.defaultSelection = [
-        this.xScale(dayjs(this.zoom.to).subtract(2, "months").toDate()),
-        this.xScale(this.zoom.to),
-      ];
-
-      this.brushGroup
-        .call(this.brush)
-        .call(this.brush.move, this.defaultSelection);
+      // this.brushGroup
+      //   .call(this.brush)
+      //   .call(this.brush.move, this.defaultSelection);
 
       this.eventGroup = this.svg.append("g").attr("class", "eventGroup");
 
@@ -206,6 +206,9 @@ export default defineComponent({
   },
   watch: {
     zoom(zoom: { from: Date; to: Date }) {
+      // zoom change occured
+      // if (zoom.to < zoom.from) {
+      // }
       if (zoom.from < this.minDate) {
         zoom.from = this.minDate;
       }
@@ -217,6 +220,7 @@ export default defineComponent({
       this.$emit("dateRangeChanged", this.zoom.from, this.zoom.to);
     },
     events() {
+      // data change occured
       this.yScale = scaleBand()
         .domain(this.events.map((t) => t.label))
         .padding(0.6);
@@ -242,6 +246,7 @@ export default defineComponent({
       this.drawEvents(this.outerSize);
     },
     outerSize(outerSize: { height: number; width: number }) {
+      // dimension change
       this.drawEvents(outerSize);
     },
   },
@@ -257,7 +262,7 @@ export default defineComponent({
       .domain(this.events.map((t) => t.label))
       .padding(0.6);
     this.xAxisDefinition = axisBottom(this.xScale);
-    this.brush = brushX().on("brush", this.brushed).on("end", this.brushEnded);
+    // this.brush = brushX().on("brush", this.brushed).on("end", this.brushEnded);
   },
   mounted() {
     this.svg = select(".d3")
@@ -296,7 +301,7 @@ export default defineComponent({
     //   .attr("class", "event")
     //   .attr("fill", "var(--blue600)");
 
-    this.brushGroup = this.svg.append("g").attr("class", "timeline-brush");
+    // this.brushGroup = this.svg.append("g").attr("class", "timeline-brush");
 
     this.resizeObserver.observe(this.$refs["d3"] as Element);
 

@@ -47,6 +47,11 @@ export default defineComponent({
       default: [] as IEvent[],
     },
   },
+  computed: {
+    labels(): string[] {
+      return uniq(this.events.map((e) => e.label));
+    },
+  },
   data() {
     return {
       outerSize: { height: 0, width: 0 },
@@ -62,7 +67,18 @@ export default defineComponent({
       defaultSelection: [] as number[],
       svg: {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>,
       eventGroup: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
-      trackRects: {} as Selection<SVGRectElement, string, SVGGElement, unknown>,
+      trackRects: null as unknown as Selection<
+        SVGRectElement,
+        string,
+        SVGGElement,
+        unknown
+      >,
+      trackRectTexts: null as unknown as Selection<
+        SVGTextElement,
+        string,
+        SVGGElement,
+        unknown
+      >,
       resizeObserver: new ResizeObserver(
         debounce((entries) => {
           this.onResize(entries);
@@ -72,10 +88,10 @@ export default defineComponent({
   },
   methods: {
     brushed() {
-      console.log("brushed");
+      console.debug("brushed");
     },
     brushEnded() {
-      console.log("brush ended");
+      console.debug("brush ended");
     },
     drawEvents(outerSize: { height: number; width: number }) {
       const innerSize = {
@@ -103,15 +119,25 @@ export default defineComponent({
         .transition()
         .attr("transform", `translate(0, ${innerSize.height - paddingBottom})`)
         .call(this.xAxisDefinition);
-
-      this.trackRects
-        .transition()
-        .attr("width", innerSize.width)
-        .attr("height", this.yScale.bandwidth)
-        .attr("y", (label) => {
-          const y = this.yScale(label);
-          return y === undefined ? null : y;
-        });
+      if (this.trackRects) {
+        this.trackRects
+          .transition()
+          .attr("width", innerSize.width)
+          .attr("height", this.yScale.bandwidth)
+          .attr("y", (label) => {
+            const y = this.yScale(label);
+            return y === undefined ? null : y;
+          });
+      }
+      if (this.trackRectTexts) {
+        this.trackRectTexts
+          .transition()
+          .attr("x", -this.margin.left / 2)
+          .attr("y", (label) => {
+            const y = this.yScale(label);
+            return y === undefined ? null : y;
+          });
+      }
 
       const topLeft: [number, number] = [0, 0];
       const bottomRight: [number, number] = [
@@ -132,6 +158,7 @@ export default defineComponent({
       this.eventGroup = this.svg.append("g").attr("class", "eventGroup");
 
       this.eventGroup.selectAll(".event").remove();
+
       this.eventGroup
         .selectAll(".event")
         .data(this.events)
@@ -186,6 +213,15 @@ export default defineComponent({
         .attr("class", "track")
         .attr("fill", "var(--blue200)");
 
+      this.trackRectTexts = this.svg
+        .append("g")
+        .attr("class", "track-label-group")
+        .selectAll(".track-label")
+        .data(this.labels)
+        .enter()
+        .append("text")
+        .attr("class", "track-label")
+        .text((label) => `#${label}`);
       this.drawEvents(this.outerSize);
     },
     outerSize(outerSize: { height: number; width: number }) {
@@ -197,13 +233,14 @@ export default defineComponent({
     this.yScale = scaleBand()
       .domain(this.events.map((t) => t.label))
       .padding(0.6);
-    this.xAxisDefinition = axisBottom(this.xScale);
+    this.xAxisDefinition = axisBottom(this.xScale).ticks(30);
 
     this.brush = brushX().on("brush", this.brushed).on("end", this.brushEnded);
   },
   mounted() {
     this.svg = select(".d3")
       .append("svg")
+      .attr("class", "canvas")
       .attr("transform", `translate(${this.margin.left}, ${this.margin.top})`);
 
     this.xAxis = this.svg
@@ -211,14 +248,24 @@ export default defineComponent({
       .attr("class", "x-axis")
       .call(this.xAxisDefinition);
 
-    this.trackRects = this.svg
-      .append("g")
-      .selectAll(".track")
-      .data(uniq(this.events.map((event) => event.label)))
-      .enter()
-      .append("rect")
-      .attr("class", "track")
-      .attr("fill", "var(--blue200)");
+    // this.trackRects = this.svg
+    //   .append("g")
+    //   .selectAll(".track")
+    //   .data(this.labels)
+    //   .enter()
+    //   .append("rect")
+    //   .attr("class", "track")
+    //   .attr("fill", "var(--blue200)");
+
+    // this.trackRectTexts = this.svg
+    //   .append("g")
+    //   .attr("class", "track-label-group")
+    //   .selectAll(".track-label")
+    //   .data(this.labels)
+    //   .enter()
+    //   .append("text")
+    //   .attr("class", "track-label")
+    //   .text((label) => `#${label}`);
 
     this.svg
       .append("g")
@@ -236,7 +283,7 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
+<style>
 .d3 {
   background: white;
   border-bottom: var(--blue900) solid 1px;
@@ -246,5 +293,8 @@ export default defineComponent({
   opacity: 0.7;
   width: inherit;
   z-index: inherit;
+}
+.canvas {
+  overflow: inherit;
 }
 </style>

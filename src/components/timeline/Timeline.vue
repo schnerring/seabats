@@ -42,6 +42,13 @@ export default defineComponent({
     },
   },
   computed: {
+    maxZoomFactor(): number {
+      const minDisplayedDays = 4;
+      return (
+        dayjs(this.maxDate).diff(dayjs(this.minDate), "days", true) /
+        minDisplayedDays
+      );
+    },
     labels(): { key: string; label: string }[] {
       const keyLabels = this.events.map((e) => {
         return {
@@ -119,13 +126,12 @@ export default defineComponent({
 
       this.xScale.rangeRound([0, innerSize.width]);
       this.yScale.rangeRound([0, innerSize.height - paddingBottom]);
-
       this.zoomBehavior
         .extent([
           [0, 0],
           [innerSize.width, innerSize.height],
         ])
-        .scaleExtent([1, 2]);
+        .scaleExtent([1, this.maxZoomFactor]);
 
       this.zoomRect
         .attr("width", innerSize.width)
@@ -252,7 +258,7 @@ export default defineComponent({
     //   this.zoom.from = dayjs(from).toDate();
     // }
 
-    this.xScale = scaleTime().domain([this.zoom.from, this.zoom.to]);
+    this.xScale = scaleTime().domain([this.minDate, this.maxDate]);
     this.yScale = scaleBand()
       .domain(this.labels.map((kl) => kl.key))
       .padding(0.6);
@@ -291,7 +297,7 @@ export default defineComponent({
 
     this.resizeObserver.observe(this.$refs["d3"] as Element);
 
-    this.$emit("dateRangeChanged", this.zoom.from, this.zoom.to);
+    this.$emit("dateRangeChanged", this.minDate, this.maxDate);
   },
 });
 </script>

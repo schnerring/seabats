@@ -6,9 +6,8 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import dayjs from "dayjs";
-import { debounce } from "lodash";
+import { debounce, uniqBy } from "lodash";
 import { IEvent } from "@/components/timeline/timeline";
-import { uniq } from "lodash";
 
 import {
   scaleTime,
@@ -21,8 +20,7 @@ import {
   scaleBand,
   Selection,
   ScaleTime,
-  brushX,
-  BrushBehavior,
+  BaseType,
 } from "d3";
 
 export default defineComponent({
@@ -42,15 +40,22 @@ export default defineComponent({
     },
   },
   computed: {
-    labels(): string[] {
-      return uniq(this.events.map((e) => e.label));
+    labels(): { key: string; label: string }[] {
+      const keyLabels = this.events.map((e) => {
+        return {
+          key: e.key,
+          label: e.label,
+        };
+      });
+      return uniqBy(keyLabels, (event) => event.key);
     },
   },
   data() {
     return {
       outerSize: { height: 0, width: 0 },
       zoom: {
-        from: dayjs().subtract(3, "months").toDate(),
+        // from: dayjs().subtract(3, "months").toDate(),
+        from: dayjs().subtract(0.75, "months").toDate(),
         to: new Date(),
       },
       margin: { top: 10, right: 30, bottom: 30, left: 150 },
@@ -58,20 +63,18 @@ export default defineComponent({
       yScale: {} as ScaleBand<string>,
       xAxisDefinition: {} as Axis<Date | NumberValue>,
       xAxis: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
-      //brushGroup: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
-      //brush: {} as BrushBehavior<unknown>,
+      tracksSelection: {} as Selection<
+        BaseType,
+        { key: string; label: string },
+        SVGGElement,
+        unknown
+      >,
       defaultSelection: [] as number[],
       svg: {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>,
       eventGroup: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
       trackRects: null as unknown as Selection<
         SVGRectElement,
-        string,
-        SVGGElement,
-        unknown
-      >,
-      trackRectTexts: null as unknown as Selection<
-        SVGTextElement,
-        string,
+        { key: string; label: string },
         SVGGElement,
         unknown
       >,
@@ -83,17 +86,11 @@ export default defineComponent({
     };
   },
   methods: {
-    brushed() {
-      console.debug("brushed");
-    },
     zoomClick() {
       this.zoom = {
         from: dayjs(this.zoom.from).subtract(3, "months").toDate(),
         to: this.zoom.to,
       };
-    },
-    brushEnded() {
-      console.debug("brush ended");
     },
     drawEvents(outerSize: { height: number; width: number }) {
       const innerSize = {
@@ -122,42 +119,16 @@ export default defineComponent({
         .attr("transform", `translate(0, ${innerSize.height - paddingBottom})`)
         .call(this.xAxisDefinition);
 
-      if (this.trackRects) {
-        this.trackRects
-          .transition()
-          .attr("width", innerSize.width)
-          .attr("height", this.yScale.bandwidth)
-          .attr("y", (label) => {
-            const y = this.yScale(label);
-            return y === undefined ? null : y;
-          });
-      }
+      selectAll<SVGGElement, { key: string; label: string }>(".track-group")
+        .transition()
+        .attr("transform", (kl) => {
+          const y = this.yScale(kl.key);
+          return y === undefined ? "translate(0, 0)" : `translate(0, ${y})`;
+        });
 
-      if (this.trackRectTexts) {
-        this.trackRectTexts
-          .transition()
-          .attr("x", -this.margin.left / 2)
-          .attr("y", (label) => {
-            const y = this.yScale(label);
-            return y === undefined ? null : y;
-          });
-      }
-      // Brush
-      // const topLeft: [number, number] = [0, 0];
-      // const bottomRight: [number, number] = [
-      //   innerSize.width,
-      //   innerSize.height - paddingBottom,
-      // ];
-      // this.brush.extent([topLeft, bottomRight]);
-
-      // this.defaultSelection = [
-      //   this.xScale(dayjs(this.zoom.to).subtract(2, "months").toDate()),
-      //   this.xScale(this.zoom.to),
-      // ];
-
-      // this.brushGroup
-      //   .call(this.brush)
-      //   .call(this.brush.move, this.defaultSelection);
+      selectAll(".track-rect")
+        .attr("width", innerSize.width)
+        .attr("height", this.yScale.bandwidth);
 
       this.eventGroup = this.svg.append("g").attr("class", "eventGroup");
 
@@ -181,9 +152,7 @@ export default defineComponent({
         .attr(
           "transform",
           (event) =>
-            `translate(${this.xScale(event.start)}, ${this.yScale(
-              event.label
-            )})`
+            `translate(${this.xScale(event.start)}, ${this.yScale(event.key)})`
         )
         .on("mouseover.fill", function () {
           select(this).attr("fill", "var(--blue900)");
@@ -206,7 +175,6 @@ export default defineComponent({
   },
   watch: {
     zoom(zoom: { from: Date; to: Date }) {
-      // zoom change occured
       // if (zoom.to < zoom.from) {
       // }
       if (zoom.from < this.minDate) {
@@ -220,33 +188,38 @@ export default defineComponent({
       this.$emit("dateRangeChanged", this.zoom.from, this.zoom.to);
     },
     events() {
-      // data change occured
       this.yScale = scaleBand()
-        .domain(this.events.map((t) => t.label))
+        .domain(this.labels.map((kl) => kl.key))
         .padding(0.6);
 
-      this.trackRects = this.svg
-        .append("g")
-        .selectAll(".track")
-        .data(uniq(this.events.map((event) => event.label)))
-        .enter()
-        .append("rect")
-        .attr("class", "track")
-        .attr("fill", "var(--blue200)");
+      this.tracksSelection = this.tracksSelection
+        .data(this.labels, (d) => d.key)
+        .join(
+          (enter) => {
+            const g = enter.append("g").attr("class", "track-group");
+            g.append("rect")
+              .attr("class", "track-rect")
+              .attr("fill", "var(--blue200)");
+            g.append("text")
+              .attr("class", "track-label")
+              .attr("text-anchor", "end")
+              .attr("dominant-baseline", "text-before-edge")
+              .attr("transform", "translate(-10, 0)")
+              .attr("text-align", "right")
+              .text((d) => d.label);
+            return g;
+          },
+          (update) => {
+            return update;
+          },
+          (exit) => {
+            return exit.remove();
+          }
+        );
 
-      this.trackRectTexts = this.svg
-        .append("g")
-        .attr("class", "track-label-group")
-        .selectAll(".track-label")
-        .data(this.labels)
-        .enter()
-        .append("text")
-        .attr("class", "track-label")
-        .text((label) => `#${label}`);
       this.drawEvents(this.outerSize);
     },
     outerSize(outerSize: { height: number; width: number }) {
-      // dimension change
       this.drawEvents(outerSize);
     },
   },
@@ -259,10 +232,9 @@ export default defineComponent({
 
     this.xScale = scaleTime().domain([this.zoom.from, this.zoom.to]);
     this.yScale = scaleBand()
-      .domain(this.events.map((t) => t.label))
+      .domain(this.labels.map((kl) => kl.key))
       .padding(0.6);
     this.xAxisDefinition = axisBottom(this.xScale);
-    // this.brush = brushX().on("brush", this.brushed).on("end", this.brushEnded);
   },
   mounted() {
     this.svg = select(".d3")
@@ -275,33 +247,10 @@ export default defineComponent({
       .attr("class", "x-axis")
       .call(this.xAxisDefinition);
 
-    // this.trackRects = this.svg
-    //   .append("g")
-    //   .selectAll(".track")
-    //   .data(this.labels)
-    //   .enter()
-    //   .append("rect")
-    //   .attr("class", "track")
-    //   .attr("fill", "var(--blue200)");
-    // this.trackRectTexts = this.svg
-    //   .append("g")
-    //   .attr("class", "track-label-group")
-    //   .selectAll(".track-label")
-    //   .data(this.labels)
-    //   .enter()
-    //   .append("text")
-    //   .attr("class", "track-label")
-    //   .text((label) => `#${label}`);
-    // this.svg
-    //   .append("g")
-    //   .selectAll(".event")
-    //   .data(this.events)
-    //   .enter()
-    //   .append("rect")
-    //   .attr("class", "event")
-    //   .attr("fill", "var(--blue600)");
-
-    // this.brushGroup = this.svg.append("g").attr("class", "timeline-brush");
+    this.tracksSelection = this.svg
+      .append("g")
+      .attr("class", "tracks-g")
+      .selectAll(".track");
 
     this.resizeObserver.observe(this.$refs["d3"] as Element);
 

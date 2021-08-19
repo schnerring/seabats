@@ -14,11 +14,12 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { mapState, mapActions } from "vuex";
-import { first, last } from "lodash";
+import { first, last, find } from "lodash";
 import LeafletMap from "@/components/LeafletMap.vue";
 import Timeline from "@/components/timeline/Timeline.vue";
 import { IEvent } from "@/components/timeline/timeline";
 import { Flight } from "@/shared/Flight";
+import { Aircraft } from "@/shared/Aircraft";
 
 export default defineComponent({
   data() {
@@ -34,18 +35,23 @@ export default defineComponent({
     highlightFlight(event: IEvent) {
       console.log(event.key);
     },
-    ...mapActions(["getFlights"]),
+    ...mapActions(["getAircrafts", "getFlights"]),
   },
   computed: {
-    ...mapState(["flights"]),
+    ...mapState(["aircrafts", "flights"]),
   },
   watch: {
-    flights(flights: Flight[]) {
+    async flights(flights: Flight[]) {
+      await this.getAircrafts();
       this.events = flights.map((f) => {
         const dates = f.traces.map((t) => t.date);
+        const aircraft = find(
+          this.aircrafts,
+          (a: Aircraft) => a.icao === f.icao
+        ); // TODO dictionary
         return {
-          label: f.icao,
-          key: f._id,
+          label: aircraft.model,
+          key: f.icao,
           start: first(dates),
           end: last(dates),
         } as IEvent;

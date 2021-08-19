@@ -71,10 +71,9 @@ export default defineComponent({
       >,
       defaultSelection: [] as number[],
       svg: {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>,
-      eventGroup: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
-      trackRects: null as unknown as Selection<
+      eventsSelection: {} as Selection<
         SVGRectElement,
-        { key: string; label: string },
+        IEvent,
         SVGGElement,
         unknown
       >,
@@ -130,19 +129,8 @@ export default defineComponent({
         .attr("width", innerSize.width)
         .attr("height", this.yScale.bandwidth);
 
-      this.eventGroup = this.svg.append("g").attr("class", "eventGroup");
-
-      this.eventGroup.selectAll(".event").remove();
-
-      if (!this.events) return;
-
-      this.eventGroup
-        .selectAll(".event")
+      selectAll(".event")
         .data(this.events)
-        .enter()
-        .append("rect")
-        .attr("class", "event")
-        .attr("fill", "var(--blue600)")
         .attr("width", (event) => {
           const xEnd = this.xScale(event.end);
           const xStart = this.xScale(event.start);
@@ -191,6 +179,22 @@ export default defineComponent({
       this.yScale = scaleBand()
         .domain(this.labels.map((kl) => kl.key))
         .padding(0.6);
+
+      this.eventsSelection = this.eventsSelection
+        .data(this.events, (e) => e.key)
+        .join(
+          (enter) =>
+            enter
+              .append("rect")
+              .attr("class", "event")
+              .attr("fill", "var(--blue600)"),
+          (update) => {
+            return update;
+          },
+          (exit) => {
+            return exit.remove();
+          }
+        );
 
       this.tracksSelection = this.tracksSelection
         .data(this.labels, (d) => d.key)
@@ -251,6 +255,11 @@ export default defineComponent({
       .append("g")
       .attr("class", "tracks-g")
       .selectAll(".track");
+
+    this.eventsSelection = this.svg
+      .append("g")
+      .attr("class", "events-g")
+      .selectAll(".event");
 
     this.resizeObserver.observe(this.$refs["d3"] as Element);
 

@@ -189,7 +189,7 @@ export default defineComponent({
       if (zoom.to > this.maxDate) {
         zoom.to = this.maxDate;
       }
-      localStorage.setItem("timeline.zoom.from", this.zoom.from.toISOString());
+      // localStorage.setItem("timeline.zoom.from", this.zoom.from.toISOString());
       // TODO re-render axis etc.
       this.$emit("dateRangeChanged", this.zoom.from, this.zoom.to);
     },
@@ -247,10 +247,10 @@ export default defineComponent({
   },
   created() {
     // Read timeline zoom from last visit
-    const from = localStorage.getItem("timeline.zoom.from");
-    if (from) {
-      this.zoom.from = dayjs(from).toDate();
-    }
+    // const from = localStorage.getItem("timeline.zoom.from");
+    // if (from) {
+    //   this.zoom.from = dayjs(from).toDate();
+    // }
 
     this.xScale = scaleTime().domain([this.zoom.from, this.zoom.to]);
     this.yScale = scaleBand()

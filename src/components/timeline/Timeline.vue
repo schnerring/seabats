@@ -11,6 +11,7 @@ import { IEvent } from "@/components/timeline/timeline";
 
 import {
   scaleTime,
+  zoom,
   axisBottom,
   select,
   selectAll,
@@ -21,6 +22,7 @@ import {
   Selection,
   ScaleTime,
   BaseType,
+  ZoomBehavior,
 } from "d3";
 
 export default defineComponent({
@@ -58,6 +60,8 @@ export default defineComponent({
         from: dayjs().subtract(0.75, "months").toDate(),
         to: new Date(),
       },
+      zoomBehavior: {} as ZoomBehavior<SVGRectElement, unknown>,
+      zoomRect: {} as Selection<SVGRectElement, unknown, HTMLElement, unknown>,
       margin: { top: 10, right: 30, bottom: 30, left: 150 },
       xScale: {} as ScaleTime<number, number, never>,
       yScale: {} as ScaleBand<string>,
@@ -85,6 +89,9 @@ export default defineComponent({
     };
   },
   methods: {
+    zoomTest(event: Event) {
+      console.log(event);
+    },
     zoomClick() {
       this.zoom = {
         from: dayjs(this.zoom.from).subtract(3, "months").toDate(),
@@ -112,6 +119,17 @@ export default defineComponent({
 
       this.xScale.rangeRound([0, innerSize.width]);
       this.yScale.rangeRound([0, innerSize.height - paddingBottom]);
+
+      this.zoomBehavior
+        .extent([
+          [0, 0],
+          [innerSize.width, innerSize.height],
+        ])
+        .scaleExtent([1, 2]);
+
+      this.zoomRect
+        .attr("width", innerSize.width)
+        .attr("height", innerSize.height);
 
       this.xAxis
         .transition()
@@ -245,6 +263,16 @@ export default defineComponent({
       .append("svg")
       .attr("class", "canvas")
       .attr("transform", `translate(${this.margin.left}, ${this.margin.top})`);
+
+    this.zoomBehavior = zoom<SVGRectElement, unknown>()
+      .scaleExtent([0.5, 20]) // This control how much you can unzoom (x0.5) and zoom (x20)
+      .on("zoom", this.zoomTest);
+
+    this.zoomRect = this.svg
+      .append("rect")
+      .style("fill", "none")
+      .style("pointer-events", "all")
+      .call(this.zoomBehavior);
 
     this.xAxis = this.svg
       .append("g")

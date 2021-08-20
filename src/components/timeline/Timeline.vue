@@ -23,6 +23,7 @@ import {
   ScaleTime,
   BaseType,
   ZoomBehavior,
+  D3ZoomEvent,
 } from "d3";
 
 export default defineComponent({
@@ -42,12 +43,12 @@ export default defineComponent({
     },
   },
   computed: {
+    daysInDomain(): number {
+      return dayjs(this.maxDate).diff(dayjs(this.minDate), "days", true);
+    },
     maxZoomFactor(): number {
       const minDisplayedDays = 4;
-      return (
-        dayjs(this.maxDate).diff(dayjs(this.minDate), "days", true) /
-        minDisplayedDays
-      );
+      return this.daysInDomain / minDisplayedDays;
     },
     labels(): { key: string; label: string }[] {
       const keyLabels = this.events.map((e) => {
@@ -96,8 +97,14 @@ export default defineComponent({
     };
   },
   methods: {
-    zoomTest(event: Event) {
-      console.log(event);
+    zoomTest(event: D3ZoomEvent<SVGRectElement, unknown>) {
+      this.xScale = event.transform.rescaleX(this.xScale);
+      this.xAxisDefinition = axisBottom(this.xScale);
+      this.$emit(
+        "dateRangeChanged",
+        this.xScale.domain()[0],
+        this.xScale.domain()[1]
+      );
     },
     zoomClick() {
       this.zoom = {
@@ -126,12 +133,12 @@ export default defineComponent({
 
       this.xScale.rangeRound([0, innerSize.width]);
       this.yScale.rangeRound([0, innerSize.height - paddingBottom]);
-      this.zoomBehavior
-        .extent([
-          [0, 0],
-          [innerSize.width, innerSize.height],
-        ])
-        .scaleExtent([1, this.maxZoomFactor]);
+
+      this.zoomBehavior.extent([
+        [0, 0],
+        [innerSize.width, innerSize.height],
+      ]);
+      // .scaleExtent([1, this.maxZoomFactor]);
 
       this.zoomRect
         .attr("width", innerSize.width)
@@ -271,14 +278,8 @@ export default defineComponent({
       .attr("transform", `translate(${this.margin.left}, ${this.margin.top})`);
 
     this.zoomBehavior = zoom<SVGRectElement, unknown>()
-      .scaleExtent([0.5, 20]) // This control how much you can unzoom (x0.5) and zoom (x20)
+      // .scaleExtent([0.5, 20]) // This control how much you can unzoom (x0.5) and zoom (x20)
       .on("zoom", this.zoomTest);
-
-    this.zoomRect = this.svg
-      .append("rect")
-      .style("fill", "none")
-      .style("pointer-events", "all")
-      .call(this.zoomBehavior);
 
     this.xAxis = this.svg
       .append("g")
@@ -289,6 +290,17 @@ export default defineComponent({
       .append("g")
       .attr("class", "tracks-g")
       .selectAll(".track");
+
+    this.zoomRect = this.svg
+      .append("rect")
+      .style("fill", "none")
+      .style("pointer-events", "all")
+      .call(this.zoomBehavior)
+      .on("mousedown.zoom", null);
+    // TODO
+    // .on("touchstart.zoom", null)
+    // .on("touchmove.zoom", null)
+    // .on("touchend.zoom", null);
 
     this.eventsSelection = this.svg
       .append("g")

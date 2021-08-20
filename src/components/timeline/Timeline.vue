@@ -5,12 +5,12 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import dayjs from "dayjs";
-import { debounce } from "lodash";
+import { debounce, uniqBy } from "lodash";
 import { IEvent } from "@/components/timeline/timeline";
-import { uniq } from "lodash";
 
 import {
   scaleTime,
+  zoom,
   axisBottom,
   select,
   selectAll,
@@ -20,11 +20,13 @@ import {
   scaleBand,
   Selection,
   ScaleTime,
-  brushX,
-  BrushBehavior,
+  BaseType,
+  ZoomBehavior,
+  D3ZoomEvent,
 } from "d3";
 
 export default defineComponent({
+  emits: ["eventMouseover", "dateRangeChanged"],
   props: {
     minDate: {
       type: Date,
@@ -34,35 +36,53 @@ export default defineComponent({
       type: Date,
       default: new Date(),
     },
-    initFromDate: {
-      type: Date,
-      default: dayjs().subtract(1, "year").toDate(),
-    },
-    initToDate: {
-      type: Date,
-      default: dayjs().toDate(),
-    },
     events: {
       type: Array as () => IEvent[],
       default: [] as IEvent[],
     },
   },
+  computed: {
+    daysInDomain(): number {
+      return dayjs(this.maxDate).diff(dayjs(this.minDate), "days", true);
+    },
+    maxZoomFactor(): number {
+      const minDisplayedDays = 4;
+      return this.daysInDomain / minDisplayedDays;
+    },
+    labels(): { key: string; label: string }[] {
+      const keyLabels = this.events.map((e) => {
+        return {
+          key: e.key,
+          label: e.label,
+        };
+      });
+      return uniqBy(keyLabels, (event) => event.key);
+    },
+  },
   data() {
     return {
       outerSize: { height: 0, width: 0 },
-      fromDate: this.initFromDate,
-      toDate: this.initToDate,
+      zoomBehavior: {} as ZoomBehavior<SVGRectElement, unknown>,
+      zoomRect: {} as Selection<SVGRectElement, unknown, HTMLElement, unknown>,
       margin: { top: 10, right: 30, bottom: 30, left: 150 },
       xScale: {} as ScaleTime<number, number, never>,
       yScale: {} as ScaleBand<string>,
       xAxisDefinition: {} as Axis<Date | NumberValue>,
       xAxis: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
-      brushGroup: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
-      brush: {} as BrushBehavior<unknown>,
+      tracksSelection: {} as Selection<
+        BaseType,
+        { key: string; label: string },
+        SVGGElement,
+        unknown
+      >,
       defaultSelection: [] as number[],
       svg: {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>,
-      eventGroup: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
-      trackRects: {} as Selection<SVGRectElement, string, SVGGElement, unknown>,
+      eventsSelection: {} as Selection<
+        SVGRectElement,
+        IEvent,
+        SVGGElement,
+        unknown
+      >,
       resizeObserver: new ResizeObserver(
         debounce((entries) => {
           this.onResize(entries);
@@ -71,11 +91,14 @@ export default defineComponent({
     };
   },
   methods: {
-    brushed() {
-      console.log("brushed");
-    },
-    brushEnded() {
-      console.log("brush ended");
+    zoom(event: D3ZoomEvent<SVGRectElement, unknown>) {
+      this.xScale = event.transform.rescaleX(this.xScale);
+      this.xAxisDefinition = axisBottom(this.xScale);
+      this.$emit(
+        "dateRangeChanged",
+        this.xScale.domain()[0],
+        this.xScale.domain()[1]
+      );
     },
     drawEvents(outerSize: { height: number; width: number }) {
       const innerSize = {
@@ -99,46 +122,34 @@ export default defineComponent({
       this.xScale.rangeRound([0, innerSize.width]);
       this.yScale.rangeRound([0, innerSize.height - paddingBottom]);
 
+      this.zoomBehavior.extent([
+        [0, 0],
+        [innerSize.width, innerSize.height],
+      ]);
+      // .scaleExtent([1, this.maxZoomFactor]);
+
+      this.zoomRect
+        .attr("width", innerSize.width)
+        .attr("height", innerSize.height);
+
       this.xAxis
         .transition()
         .attr("transform", `translate(0, ${innerSize.height - paddingBottom})`)
         .call(this.xAxisDefinition);
 
-      this.trackRects
+      selectAll<SVGGElement, { key: string; label: string }>(".track-group")
         .transition()
-        .attr("width", innerSize.width)
-        .attr("height", this.yScale.bandwidth)
-        .attr("y", (label) => {
-          const y = this.yScale(label);
-          return y === undefined ? null : y;
+        .attr("transform", (kl) => {
+          const y = this.yScale(kl.key);
+          return y === undefined ? "translate(0, 0)" : `translate(0, ${y})`;
         });
 
-      const topLeft: [number, number] = [0, 0];
-      const bottomRight: [number, number] = [
-        innerSize.width,
-        innerSize.height - paddingBottom,
-      ];
-      this.brush.extent([topLeft, bottomRight]);
+      selectAll(".track-rect")
+        .attr("width", innerSize.width)
+        .attr("height", this.yScale.bandwidth);
 
-      this.defaultSelection = [
-        this.xScale(dayjs(this.toDate).subtract(1, "year").toDate()),
-        this.xScale(this.toDate),
-      ];
-
-      this.brushGroup
-        .call(this.brush)
-        .call(this.brush.move, this.defaultSelection);
-
-      this.eventGroup = this.svg.append("g").attr("class", "eventGroup");
-
-      this.eventGroup.selectAll(".event").remove();
-      this.eventGroup
-        .selectAll(".event")
+      selectAll(".event")
         .data(this.events)
-        .enter()
-        .append("rect")
-        .attr("class", "event")
-        .attr("fill", "var(--blue600)")
         .attr("width", (event) => {
           const xEnd = this.xScale(event.end);
           const xStart = this.xScale(event.start);
@@ -148,9 +159,7 @@ export default defineComponent({
         .attr(
           "transform",
           (event) =>
-            `translate(${this.xScale(event.start)}, ${this.yScale(
-              event.label
-            )})`
+            `translate(${this.xScale(event.start)}, ${this.yScale(event.key)})`
         )
         .on("mouseover.fill", function () {
           select(this).attr("fill", "var(--blue900)");
@@ -174,17 +183,49 @@ export default defineComponent({
   watch: {
     events() {
       this.yScale = scaleBand()
-        .domain(this.events.map((t) => t.label))
+        .domain(this.labels.map((kl) => kl.key))
         .padding(0.6);
 
-      this.trackRects = this.svg
-        .append("g")
-        .selectAll(".track")
-        .data(uniq(this.events.map((event) => event.label)))
-        .enter()
-        .append("rect")
-        .attr("class", "track")
-        .attr("fill", "var(--blue200)");
+      this.eventsSelection = this.eventsSelection
+        .data(this.events, (e) => e.key)
+        .join(
+          (enter) =>
+            enter
+              .append("rect")
+              .attr("class", "event")
+              .attr("fill", "var(--blue600)"),
+          (update) => {
+            return update;
+          },
+          (exit) => {
+            return exit.remove();
+          }
+        );
+
+      this.tracksSelection = this.tracksSelection
+        .data(this.labels, (d) => d.key)
+        .join(
+          (enter) => {
+            const g = enter.append("g").attr("class", "track-group");
+            g.append("rect")
+              .attr("class", "track-rect")
+              .attr("fill", "var(--blue200)");
+            g.append("text")
+              .attr("class", "track-label")
+              .attr("text-anchor", "end")
+              .attr("dominant-baseline", "text-before-edge")
+              .attr("transform", "translate(-10, 0)")
+              .attr("text-align", "right")
+              .text((d) => d.label);
+            return g;
+          },
+          (update) => {
+            return update;
+          },
+          (exit) => {
+            return exit.remove();
+          }
+        );
 
       this.drawEvents(this.outerSize);
     },
@@ -193,50 +234,62 @@ export default defineComponent({
     },
   },
   created() {
-    this.xScale = scaleTime().domain([this.fromDate, this.toDate]);
+    // Read timeline zoom from last visit
+    // const from = localStorage.getItem("timeline.zoom.from");
+    // if (from) {
+    //   this.zoom.from = dayjs(from).toDate();
+    // }
+
+    this.xScale = scaleTime().domain([this.minDate, this.maxDate]);
     this.yScale = scaleBand()
-      .domain(this.events.map((t) => t.label))
+      .domain(this.labels.map((kl) => kl.key))
       .padding(0.6);
     this.xAxisDefinition = axisBottom(this.xScale);
-
-    this.brush = brushX().on("brush", this.brushed).on("end", this.brushEnded);
   },
   mounted() {
     this.svg = select(".d3")
       .append("svg")
+      .attr("class", "canvas")
       .attr("transform", `translate(${this.margin.left}, ${this.margin.top})`);
+
+    this.zoomBehavior = zoom<SVGRectElement, unknown>()
+      // .scaleExtent([0.5, 20]) // This control how much you can unzoom (x0.5) and zoom (x20)
+      .on("zoom", this.zoom);
 
     this.xAxis = this.svg
       .append("g")
       .attr("class", "x-axis")
       .call(this.xAxisDefinition);
 
-    this.trackRects = this.svg
+    this.tracksSelection = this.svg
       .append("g")
-      .selectAll(".track")
-      .data(uniq(this.events.map((event) => event.label)))
-      .enter()
-      .append("rect")
-      .attr("class", "track")
-      .attr("fill", "var(--blue200)");
+      .attr("class", "tracks-g")
+      .selectAll(".track");
 
-    this.svg
+    this.zoomRect = this.svg
+      .append("rect")
+      .style("fill", "none")
+      .style("pointer-events", "all")
+      .call(this.zoomBehavior)
+      .on("mousedown.zoom", null);
+    // TODO
+    // .on("touchstart.zoom", null)
+    // .on("touchmove.zoom", null)
+    // .on("touchend.zoom", null);
+
+    this.eventsSelection = this.svg
       .append("g")
-      .selectAll(".event")
-      .data(this.events)
-      .enter()
-      .append("rect")
-      .attr("class", "event")
-      .attr("fill", "var(--blue600)");
-
-    this.brushGroup = this.svg.append("g").attr("class", "timeline-brush");
+      .attr("class", "events-g")
+      .selectAll(".event");
 
     this.resizeObserver.observe(this.$refs["d3"] as Element);
+
+    this.$emit("dateRangeChanged", this.minDate, this.maxDate);
   },
 });
 </script>
 
-<style scoped>
+<style>
 .d3 {
   background: white;
   border-bottom: var(--blue900) solid 1px;
@@ -246,5 +299,8 @@ export default defineComponent({
   opacity: 0.7;
   width: inherit;
   z-index: inherit;
+}
+.canvas {
+  overflow: inherit;
 }
 </style>

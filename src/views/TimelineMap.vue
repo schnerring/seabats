@@ -1,10 +1,9 @@
 <template>
   <div class="timeline">
     <timeline
-      :initToDate="to"
-      :initFromDate="from"
       :events="events"
       @event-mouseover="highlightFlight"
+      @date-range-changed="dateRangeChanged"
     />
   </div>
   <div class="map">
@@ -15,38 +14,44 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { mapState, mapActions } from "vuex";
-import { first, last } from "lodash";
+import { first, last, find } from "lodash";
 import LeafletMap from "@/components/LeafletMap.vue";
 import Timeline from "@/components/timeline/Timeline.vue";
 import { IEvent } from "@/components/timeline/timeline";
 import { Flight } from "@/shared/Flight";
-import dayjs from "dayjs";
+import { Aircraft } from "@/shared/Aircraft";
 
 export default defineComponent({
   data() {
     return {
-      from: new Date(2016, 1, 1),
-      to: new Date(2021, 8, 2),
       dbData: {},
       events: [] as IEvent[],
     };
   },
   methods: {
+    async dateRangeChanged(from: Date, to: Date) {
+      await this.getFlights({ from, to });
+    },
     highlightFlight(event: IEvent) {
       console.log(event.key);
     },
-    ...mapActions(["getFlights"]),
+    ...mapActions(["getAircrafts", "getFlights"]),
   },
   computed: {
-    ...mapState(["flights"]),
+    ...mapState(["aircrafts", "flights"]),
   },
   watch: {
-    flights(flights: Flight[]) {
+    async flights(flights: Flight[]) {
+      await this.getAircrafts();
       this.events = flights.map((f) => {
         const dates = f.traces.map((t) => t.date);
+        const aircraft = find(
+          this.aircrafts,
+          (a: Aircraft) => a.icao === f.icao
+        ); // TODO dictionary
         return {
-          label: f.icao,
-          key: f._id,
+          label: aircraft.model,
+          key: f.icao,
           start: first(dates),
           end: last(dates),
         } as IEvent;
@@ -56,24 +61,6 @@ export default defineComponent({
   components: {
     LeafletMap,
     Timeline,
-  },
-  beforeCreate() {
-    const fromDate = localStorage.getItem("timeline.from");
-    if (fromDate) {
-      this.from = dayjs(fromDate).toDate();
-    } else {
-      this.to = dayjs().subtract(2, "months").toDate();
-    }
-    const toDate = localStorage.getItem("timeline.to");
-    if (toDate) {
-      this.to = dayjs(toDate).toDate();
-    } else {
-      this.to = new Date();
-    }
-  },
-  async beforeMount() {
-    const payload = { from: this.from, to: this.to };
-    await this.getFlights(payload);
   },
 });
 </script>

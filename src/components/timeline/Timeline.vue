@@ -1,5 +1,4 @@
 <template>
-  <button @click="zoomClick">Zoom Out</button>
   <div class="d3" ref="d3"></div>
 </template>
 
@@ -63,11 +62,6 @@ export default defineComponent({
   data() {
     return {
       outerSize: { height: 0, width: 0 },
-      zoom: {
-        // from: dayjs().subtract(3, "months").toDate(),
-        from: dayjs().subtract(0.75, "months").toDate(),
-        to: new Date(),
-      },
       zoomBehavior: {} as ZoomBehavior<SVGRectElement, unknown>,
       zoomRect: {} as Selection<SVGRectElement, unknown, HTMLElement, unknown>,
       margin: { top: 10, right: 30, bottom: 30, left: 150 },
@@ -97,7 +91,7 @@ export default defineComponent({
     };
   },
   methods: {
-    zoomTest(event: D3ZoomEvent<SVGRectElement, unknown>) {
+    zoom(event: D3ZoomEvent<SVGRectElement, unknown>) {
       this.xScale = event.transform.rescaleX(this.xScale);
       this.xAxisDefinition = axisBottom(this.xScale);
       this.$emit(
@@ -105,12 +99,6 @@ export default defineComponent({
         this.xScale.domain()[0],
         this.xScale.domain()[1]
       );
-    },
-    zoomClick() {
-      this.zoom = {
-        from: dayjs(this.zoom.from).subtract(3, "months").toDate(),
-        to: this.zoom.to,
-      };
     },
     drawEvents(outerSize: { height: number; width: number }) {
       const innerSize = {
@@ -193,19 +181,6 @@ export default defineComponent({
     },
   },
   watch: {
-    zoom(zoom: { from: Date; to: Date }) {
-      // if (zoom.to < zoom.from) {
-      // }
-      if (zoom.from < this.minDate) {
-        zoom.from = this.minDate;
-      }
-      if (zoom.to > this.maxDate) {
-        zoom.to = this.maxDate;
-      }
-      // localStorage.setItem("timeline.zoom.from", this.zoom.from.toISOString());
-      // TODO re-render axis etc.
-      this.$emit("dateRangeChanged", this.zoom.from, this.zoom.to);
-    },
     events() {
       this.yScale = scaleBand()
         .domain(this.labels.map((kl) => kl.key))
@@ -279,7 +254,7 @@ export default defineComponent({
 
     this.zoomBehavior = zoom<SVGRectElement, unknown>()
       // .scaleExtent([0.5, 20]) // This control how much you can unzoom (x0.5) and zoom (x20)
-      .on("zoom", this.zoomTest);
+      .on("zoom", this.zoom);
 
     this.xAxis = this.svg
       .append("g")

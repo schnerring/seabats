@@ -42,6 +42,18 @@ export default defineComponent({
     },
   },
   computed: {
+    innerSize(): { height: number; width: number } {
+      return {
+        height: Math.max(
+          0,
+          this.outerSize.height - this.margin.top - this.margin.bottom
+        ),
+        width: Math.max(
+          0,
+          this.outerSize.width - this.margin.left - this.margin.right
+        ),
+      };
+    },
     daysInDomain(): number {
       return dayjs(this.maxDate).diff(dayjs(this.minDate), "days", true);
     },
@@ -61,11 +73,15 @@ export default defineComponent({
   },
   data() {
     return {
+      debounceDateRangeChanged: debounce((from: Date, to: Date) => {
+        this.$emit("dateRangeChanged", from, to);
+      }, 400),
       outerSize: { height: 0, width: 0 },
       zoomBehavior: {} as ZoomBehavior<SVGRectElement, unknown>,
       zoomRect: {} as Selection<SVGRectElement, unknown, HTMLElement, unknown>,
       margin: { top: 10, right: 30, bottom: 30, left: 150 },
       xScale: {} as ScaleTime<number, number, never>,
+      xScaleInitial: {} as ScaleTime<number, number, never>,
       yScale: {} as ScaleBand<string>,
       xAxisDefinition: {} as Axis<Date | NumberValue>,
       xAxis: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
@@ -92,49 +108,43 @@ export default defineComponent({
   },
   methods: {
     zoom(event: D3ZoomEvent<SVGRectElement, unknown>) {
-      this.xScale = event.transform.rescaleX(this.xScale);
-      this.xAxisDefinition = axisBottom(this.xScale);
-      this.$emit(
-        "dateRangeChanged",
-        this.xScale.domain()[0],
-        this.xScale.domain()[1]
-      );
-    },
-    drawEvents(outerSize: { height: number; width: number }) {
-      const innerSize = {
-        height: Math.max(
-          0,
-          outerSize.height - this.margin.top - this.margin.bottom
-        ),
-        width: Math.max(
-          0,
-          outerSize.width - this.margin.left - this.margin.right
-        ),
-      };
+      const newScale = event.transform.rescaleX(this.xScale);
+      this.xAxisDefinition = this.xAxisDefinition.scale(newScale);
 
+      const domainMin = this.xScale.domain()[0];
+      const domainMax = this.xScale.domain()[1];
+      this.debounceDateRangeChanged(domainMin, domainMax);
+    },
+    resizeAxis() {
+      console.log("bla");
+    },
+    drawEvents() {
       this.svg
         .transition()
-        .attr("width", innerSize.width)
-        .attr("height", innerSize.height);
+        .attr("width", this.innerSize.width)
+        .attr("height", this.innerSize.height);
 
       const paddingBottom = 20;
 
-      this.xScale.rangeRound([0, innerSize.width]);
-      this.yScale.rangeRound([0, innerSize.height - paddingBottom]);
+      this.xScale.rangeRound([0, this.innerSize.width]);
+      this.yScale.rangeRound([0, this.innerSize.height - paddingBottom]);
 
       this.zoomBehavior.extent([
         [0, 0],
-        [innerSize.width, innerSize.height],
+        [this.innerSize.width, this.innerSize.height],
       ]);
       // .scaleExtent([1, this.maxZoomFactor]);
 
       this.zoomRect
-        .attr("width", innerSize.width)
-        .attr("height", innerSize.height);
+        .attr("width", this.innerSize.width)
+        .attr("height", this.innerSize.height);
 
       this.xAxis
         .transition()
-        .attr("transform", `translate(0, ${innerSize.height - paddingBottom})`)
+        .attr(
+          "transform",
+          `translate(0, ${this.innerSize.height - paddingBottom})`
+        )
         .call(this.xAxisDefinition);
 
       selectAll<SVGGElement, { key: string; label: string }>(".track-group")
@@ -145,7 +155,7 @@ export default defineComponent({
         });
 
       selectAll(".track-rect")
-        .attr("width", innerSize.width)
+        .attr("width", this.innerSize.width)
         .attr("height", this.yScale.bandwidth);
 
       selectAll(".event")
@@ -227,10 +237,11 @@ export default defineComponent({
           }
         );
 
-      this.drawEvents(this.outerSize);
+      this.drawEvents();
     },
-    outerSize(outerSize: { height: number; width: number }) {
-      this.drawEvents(outerSize);
+    innerSize() {
+      this.drawEvents();
+      this.resizeAxis();
     },
   },
   created() {
@@ -241,6 +252,7 @@ export default defineComponent({
     // }
 
     this.xScale = scaleTime().domain([this.minDate, this.maxDate]);
+    this.xScaleInitial = this.xScale.copy();
     this.yScale = scaleBand()
       .domain(this.labels.map((kl) => kl.key))
       .padding(0.6);

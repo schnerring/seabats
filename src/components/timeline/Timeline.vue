@@ -26,7 +26,7 @@ import {
 } from "d3";
 
 export default defineComponent({
-  emits: ["eventMouseover", "dateRangeChanged"],
+  emits: ["eventMouseover", "eventMouseout", "dateRangeChanged"],
   props: {
     minDate: {
       type: Date,
@@ -195,7 +195,8 @@ export default defineComponent({
               )
               .on("mouseout", function () {
                 select(this).attr("fill", "var(--blue600)");
-              }),
+              })
+              .on("mouseout.emit", () => this.$emit("eventMouseout")),
           (update) => {
             return update;
           },

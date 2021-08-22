@@ -61,11 +61,14 @@ export default defineComponent({
   },
   data() {
     return {
-      outerSize: { height: 0, width: 0 },
+      debounceDateRangeChanged: debounce((from: Date, to: Date) => {
+        this.$emit("dateRangeChanged", from, to);
+      }, 1000),
       zoomBehavior: {} as ZoomBehavior<SVGRectElement, unknown>,
       zoomRect: {} as Selection<SVGRectElement, unknown, HTMLElement, unknown>,
       margin: { top: 10, right: 30, bottom: 30, left: 150 },
       xScale: {} as ScaleTime<number, number, never>,
+      zoomScale: {} as ScaleTime<number, number, never>,
       yScale: {} as ScaleBand<string>,
       xAxisDefinition: {} as Axis<Date | NumberValue>,
       xAxis: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
@@ -83,6 +86,7 @@ export default defineComponent({
         SVGGElement,
         unknown
       >,
+      clipRect: {} as Selection<SVGRectElement, unknown, HTMLElement, unknown>,
       resizeObserver: new ResizeObserver(
         debounce((entries) => {
           this.onResize(entries);
@@ -92,100 +96,89 @@ export default defineComponent({
   },
   methods: {
     zoom(event: D3ZoomEvent<SVGRectElement, unknown>) {
-      this.xScale = event.transform.rescaleX(this.xScale);
-      this.xAxisDefinition = axisBottom(this.xScale);
-      this.$emit(
-        "dateRangeChanged",
-        this.xScale.domain()[0],
-        this.xScale.domain()[1]
-      );
+      this.zoomScale = event.transform.rescaleX(this.xScale);
+      this.xAxisDefinition.scale(this.zoomScale);
+      this.scalesChanged();
+
+      const domainMin = this.zoomScale.domain()[0];
+      const domainMax = this.zoomScale.domain()[1];
+      this.debounceDateRangeChanged(domainMin, domainMax);
     },
-    drawEvents(outerSize: { height: number; width: number }) {
-      const innerSize = {
-        height: Math.max(
-          0,
-          outerSize.height - this.margin.top - this.margin.bottom
-        ),
-        width: Math.max(
-          0,
-          outerSize.width - this.margin.left - this.margin.right
-        ),
-      };
+    onResize(entries: ResizeObserverEntry[]) {
+      entries.forEach((entry) => {
+        const outerSize = {
+          height: entry.contentRect.height,
+          width: entry.contentRect.width,
+        };
+        const innerSize = {
+          height: Math.max(
+            0,
+            outerSize.height - this.margin.top - this.margin.bottom
+          ),
+          width: Math.max(
+            0,
+            outerSize.width - this.margin.left - this.margin.right
+          ),
+        };
 
-      this.svg
-        .transition()
-        .attr("width", innerSize.width)
-        .attr("height", innerSize.height);
+        this.svg
+          .attr("width", innerSize.width)
+          .attr("height", innerSize.height);
 
-      const paddingBottom = 20;
+        this.zoomRect
+          .attr("width", innerSize.width)
+          .attr("height", innerSize.height);
 
-      this.xScale.rangeRound([0, innerSize.width]);
-      this.yScale.rangeRound([0, innerSize.height - paddingBottom]);
+        this.zoomBehavior.extent([
+          [0, 0],
+          [innerSize.width, innerSize.height],
+        ]);
+        this.clipRect
+          .attr("width", innerSize.width)
+          .attr("height", innerSize.height);
+        const paddingBottom = 20;
 
-      this.zoomBehavior.extent([
-        [0, 0],
-        [innerSize.width, innerSize.height],
-      ]);
-      // .scaleExtent([1, this.maxZoomFactor]);
+        this.zoomScale.rangeRound([0, innerSize.width]);
+        this.xScale.rangeRound([0, innerSize.width]);
+        this.yScale.rangeRound([0, innerSize.height - paddingBottom]);
 
-      this.zoomRect
-        .attr("width", innerSize.width)
-        .attr("height", innerSize.height);
-
-      this.xAxis
-        .transition()
-        .attr("transform", `translate(0, ${innerSize.height - paddingBottom})`)
-        .call(this.xAxisDefinition);
-
-      selectAll<SVGGElement, { key: string; label: string }>(".track-group")
-        .transition()
-        .attr("transform", (kl) => {
-          const y = this.yScale(kl.key);
-          return y === undefined ? "translate(0, 0)" : `translate(0, ${y})`;
-        });
-
+        this.scalesChanged();
+      });
+    },
+    scalesChanged() {
       selectAll(".track-rect")
-        .attr("width", innerSize.width)
+        .attr("width", this.zoomScale.range()[1])
         .attr("height", this.yScale.bandwidth);
 
-      selectAll(".event")
-        .data(this.events)
+      selectAll<SVGGElement, { key: string; label: string }>(
+        ".track-group"
+      ).attr("transform", (kl) => {
+        const y = this.yScale(kl.key);
+        return y === undefined ? "translate(0, 0)" : `translate(0, ${y})`;
+      });
+
+      selectAll<SVGRectElement, IEvent>(".event")
         .attr("width", (event) => {
-          const xEnd = this.xScale(event.end);
-          const xStart = this.xScale(event.start);
+          const xEnd = this.zoomScale(event.end);
+          const xStart = this.zoomScale(event.start);
           return Math.max(10, xEnd - xStart);
         })
         .attr("height", this.yScale.bandwidth)
         .attr(
           "transform",
           (event) =>
-            `translate(${this.xScale(event.start)}, ${this.yScale(event.key)})`
-        )
-        .on("mouseover.fill", function () {
-          select(this).attr("fill", "var(--blue900)");
-        })
-        .on("mouseover.emit", (event, data) => {
-          this.$emit("eventMouseover", data);
-        })
-        .on("mouseout", function (event, data) {
-          select(this).attr("fill", "var(--blue600)");
-        });
-    },
-    onResize(entries: ResizeObserverEntry[]) {
-      entries.forEach((entry) => {
-        this.outerSize = {
-          height: entry.contentRect.height,
-          width: entry.contentRect.width,
-        };
-      });
+            `translate(${this.zoomScale(event.start)}, ${this.yScale(
+              event.key
+            )})`
+        );
+
+      this.xAxis
+        .attr("transform", `translate(0, ${this.yScale.range()[1]})`)
+        .call(this.xAxisDefinition);
     },
   },
   watch: {
     events() {
-      this.yScale = scaleBand()
-        .domain(this.labels.map((kl) => kl.key))
-        .padding(0.6);
-
       this.eventsSelection = this.eventsSelection
         .data(this.events, (e) => e.key)
         .join(
@@ -193,7 +186,16 @@ export default defineComponent({
             enter
               .append("rect")
               .attr("class", "event")
-              .attr("fill", "var(--blue600)"),
+              .attr("fill", "var(--blue600)")
+              .on("mouseover.fill", function () {
+                select(this).attr("fill", "var(--blue900)");
+              })
+              .on("mouseover.emit", (event, data) =>
+                this.$emit("eventMouseover", data)
+              )
+              .on("mouseout", function () {
+                select(this).attr("fill", "var(--blue600)");
+              }),
           (update) => {
             return update;
           },
@@ -227,10 +229,8 @@ export default defineComponent({
           }
         );
 
-      this.drawEvents(this.outerSize);
-    },
-    outerSize(outerSize: { height: number; width: number }) {
-      this.drawEvents(outerSize);
+      this.yScale.domain(this.labels.map((kl) => kl.key).sort());
+      this.scalesChanged();
     },
   },
   created() {
@@ -239,11 +239,9 @@ export default defineComponent({
     // if (from) {
     //   this.zoom.from = dayjs(from).toDate();
     // }
-
     this.xScale = scaleTime().domain([this.minDate, this.maxDate]);
-    this.yScale = scaleBand()
-      .domain(this.labels.map((kl) => kl.key))
-      .padding(0.6);
+    this.zoomScale = this.xScale;
+    this.yScale = scaleBand().padding(0.6);
     this.xAxisDefinition = axisBottom(this.xScale);
   },
   mounted() {
@@ -251,10 +249,6 @@ export default defineComponent({
       .append("svg")
       .attr("class", "canvas")
       .attr("transform", `translate(${this.margin.left}, ${this.margin.top})`);
-
-    this.zoomBehavior = zoom<SVGRectElement, unknown>()
-      // .scaleExtent([0.5, 20]) // This control how much you can unzoom (x0.5) and zoom (x20)
-      .on("zoom", this.zoom);
 
     this.xAxis = this.svg
       .append("g")
@@ -266,20 +260,32 @@ export default defineComponent({
       .attr("class", "tracks-g")
       .selectAll(".track");
 
+    this.zoomBehavior = zoom<SVGRectElement, unknown>()
+      .scaleExtent([1, 999999]) // This control how much you can unzoom (x0.5) and zoom (x20)
+      .on("zoom", this.zoom);
+
     this.zoomRect = this.svg
       .append("rect")
       .style("fill", "none")
       .style("pointer-events", "all")
-      .call(this.zoomBehavior)
-      .on("mousedown.zoom", null);
+      .call(this.zoomBehavior);
+    //.on("mousedown.zoom", null);
     // TODO
     // .on("touchstart.zoom", null)
     // .on("touchmove.zoom", null)
     // .on("touchend.zoom", null);
 
+    this.clipRect = this.svg
+      .append("defs")
+      .append("clipPath")
+      .attr("id", "EventsClip")
+      .append("rect")
+      .attr("fill", "transparent");
+
     this.eventsSelection = this.svg
       .append("g")
       .attr("class", "events-g")
+      .attr("clip-path", "url(#EventsClip)")
       .selectAll(".event");
 
     this.resizeObserver.observe(this.$refs["d3"] as Element);

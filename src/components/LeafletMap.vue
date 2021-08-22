@@ -36,6 +36,7 @@ export default defineComponent({
         const coords = flight.traces.map((t) => new LatLng(t.lat, t.lon));
         const polyline = new Polyline(coords, {
           color: `#42a5f5`, // TODO var?
+          weight: 1,
         });
         // Add the polyline to the Typescript map
         this.polylines.set(flight._id, polyline);
@@ -62,14 +63,14 @@ export default defineComponent({
       zoomControl: false,
     });
     this.map.setView(this.center, this.zoom);
-    const osmLayer = new TileLayer(
-      "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    const stadiaLayer = new TileLayer(
+      "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png",
       {
         attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
       }
     );
-    this.map.addLayer(osmLayer);
+    this.map.addLayer(stadiaLayer);
   },
   beforeUnmount() {
     this.map.remove();

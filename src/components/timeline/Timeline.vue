@@ -68,6 +68,7 @@ export default defineComponent({
       zoomRect: {} as Selection<SVGRectElement, unknown, HTMLElement, unknown>,
       margin: { top: 10, right: 30, bottom: 30, left: 150 },
       xScale: {} as ScaleTime<number, number, never>,
+      zoomScale: {} as ScaleTime<number, number, never>,
       yScale: {} as ScaleBand<string>,
       xAxisDefinition: {} as Axis<Date | NumberValue>,
       xAxis: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
@@ -94,19 +95,13 @@ export default defineComponent({
   },
   methods: {
     zoom(event: D3ZoomEvent<SVGRectElement, unknown>) {
-      const zoomScale = event.transform.rescaleX(this.xScale);
-      this.xAxisDefinition.scale(zoomScale);
+      this.zoomScale = event.transform.rescaleX(this.xScale);
+      this.xAxisDefinition.scale(this.zoomScale);
+      this.scalesChanged();
 
-      const domainMin = this.xScale.domain()[0];
-      const domainMax = this.xScale.domain()[1];
+      const domainMin = this.zoomScale.domain()[0];
+      const domainMax = this.zoomScale.domain()[1];
       this.debounceDateRangeChanged(domainMin, domainMax);
-      this.resizeAxis();
-    },
-    resizeAxis() {
-      this.xAxis
-        .transition()
-        .attr("transform", `translate(0, ${this.yScale.range()[1]})`)
-        .call(this.xAxisDefinition);
     },
     onResize(entries: ResizeObserverEntry[]) {
       entries.forEach((entry) => {
@@ -141,6 +136,7 @@ export default defineComponent({
 
         const paddingBottom = 20;
 
+        this.zoomScale.rangeRound([0, innerSize.width]);
         this.xScale.rangeRound([0, innerSize.width]);
         this.yScale.rangeRound([0, innerSize.height - paddingBottom]);
 
@@ -149,7 +145,7 @@ export default defineComponent({
     },
     scalesChanged() {
       selectAll(".track-rect")
-        .attr("width", this.xScale.range()[1])
+        .attr("width", this.zoomScale.range()[1])
         .attr("height", this.yScale.bandwidth);
 
       selectAll<SVGGElement, { key: string; label: string }>(".track-group")
@@ -161,17 +157,22 @@ export default defineComponent({
 
       selectAll<SVGRectElement, IEvent>(".event")
         .attr("width", (event) => {
-          const xEnd = this.xScale(event.end);
-          const xStart = this.xScale(event.start);
+          const xEnd = this.zoomScale(event.end);
+          const xStart = this.zoomScale(event.start);
           return Math.max(10, xEnd - xStart);
         })
         .attr("height", this.yScale.bandwidth)
         .attr(
           "transform",
           (event) =>
-            `translate(${this.xScale(event.start)}, ${this.yScale(event.key)})`
+            `translate(${this.zoomScale(event.start)}, ${this.yScale(
+              event.key
+            )})`
         );
-      this.resizeAxis();
+
+      this.xAxis
+        .attr("transform", `translate(0, ${this.yScale.range()[1]})`)
+        .call(this.xAxisDefinition);
     },
   },
   watch: {
@@ -183,7 +184,16 @@ export default defineComponent({
             enter
               .append("rect")
               .attr("class", "event")
-              .attr("fill", "var(--blue600)"),
+              .attr("fill", "var(--blue600)")
+              .on("mouseover.fill", function () {
+                select(this).attr("fill", "var(--blue900)");
+              })
+              .on("mouseover.emit", (event, data) =>
+                this.$emit("eventMouseover", data)
+              )
+              .on("mouseout", function () {
+                select(this).attr("fill", "var(--blue600)");
+              }),
           (update) => {
             return update;
           },
@@ -219,17 +229,6 @@ export default defineComponent({
 
       this.yScale.domain(this.labels.map((kl) => kl.key));
       this.scalesChanged();
-
-      selectAll(".event")
-        .on("mouseover.fill", function () {
-          select(this).attr("fill", "var(--blue900)");
-        })
-        .on("mouseover.emit", (event, data) => {
-          this.$emit("eventMouseover", data);
-        })
-        .on("mouseout", function (event, data) {
-          select(this).attr("fill", "var(--blue600)");
-        });
     },
   },
   created() {
@@ -239,6 +238,7 @@ export default defineComponent({
     //   this.zoom.from = dayjs(from).toDate();
     // }
     this.xScale = scaleTime().domain([this.minDate, this.maxDate]);
+    this.zoomScale = this.xScale;
     this.yScale = scaleBand().padding(0.6);
     this.xAxisDefinition = axisBottom(this.xScale);
   },
@@ -266,8 +266,8 @@ export default defineComponent({
       .append("rect")
       .style("fill", "none")
       .style("pointer-events", "all")
-      .call(this.zoomBehavior)
-      .on("mousedown.zoom", null);
+      .call(this.zoomBehavior);
+    //.on("mousedown.zoom", null);
     // TODO
     // .on("touchstart.zoom", null)
     // .on("touchmove.zoom", null)

@@ -3,11 +3,19 @@
     <timeline
       :events="events"
       @event-mouseover="highlightFlight"
+      @event-mouseout="dehighlightFlight"
       @date-range-changed="dateRangeChanged"
     />
   </div>
   <div class="map">
     <leaflet-map />
+  </div>
+  <div
+    class="flight-tooltip"
+    v-if="tooltipData !== undefined"
+    :key="tooltipData._id"
+  >
+    <flight-tooltip :flight="tooltipData" />
   </div>
 </template>
 
@@ -16,6 +24,7 @@ import { defineComponent } from "vue";
 import { mapState, mapActions } from "vuex";
 import { first, last, find } from "lodash";
 import LeafletMap from "@/components/LeafletMap.vue";
+import FlightTooltip from "@/components/FlightTooltip.vue";
 import Timeline from "@/components/timeline/Timeline.vue";
 import { IEvent } from "@/components/timeline/timeline";
 import { Flight } from "@/shared/Flight";
@@ -26,6 +35,7 @@ export default defineComponent({
     return {
       dbData: {},
       events: [] as IEvent[],
+      tooltipData: undefined,
     };
   },
   methods: {
@@ -33,7 +43,11 @@ export default defineComponent({
       await this.getFlights({ from, to });
     },
     highlightFlight(event: IEvent) {
-      console.log(event.key);
+      console.log(this.tooltipData);
+      this.tooltipData = event.data;
+    },
+    dehighlightFlight() {
+      this.tooltipData = undefined;
     },
     ...mapActions(["getAircrafts", "getFlights"]),
   },
@@ -50,6 +64,7 @@ export default defineComponent({
           (a: Aircraft) => a.icao === f.icao
         ); // TODO dictionary
         return {
+          data: f,
           label: aircraft.model,
           key: f.icao,
           start: first(dates),
@@ -61,6 +76,7 @@ export default defineComponent({
   components: {
     LeafletMap,
     Timeline,
+    FlightTooltip,
   },
 });
 </script>
@@ -76,5 +92,14 @@ export default defineComponent({
   top: 0;
   width: 100%;
   z-index: 100;
+}
+.flight-tooltip {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200px;
+  height: 150px;
+  background: white;
+  z-index: 99;
 }
 </style>

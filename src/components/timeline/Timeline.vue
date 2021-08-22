@@ -108,42 +108,6 @@ export default defineComponent({
         .attr("transform", `translate(0, ${this.yScale.range()[1]})`)
         .call(this.xAxisDefinition);
     },
-    drawEvents() {
-      // .scaleExtent([1, this.maxZoomFactor]);
-      selectAll(".track-rect")
-        .attr("width", this.xScale.range()[1])
-        .attr("height", this.yScale.bandwidth);
-
-      selectAll<SVGGElement, { key: string; label: string }>(".track-group")
-        .transition()
-        .attr("transform", (kl) => {
-          const y = this.yScale(kl.key);
-          return y === undefined ? "translate(0, 0)" : `translate(0, ${y})`;
-        });
-
-      selectAll(".event")
-        .data(this.events)
-        .attr("width", (event) => {
-          const xEnd = this.xScale(event.end);
-          const xStart = this.xScale(event.start);
-          return Math.max(10, xEnd - xStart);
-        })
-        .attr("height", this.yScale.bandwidth)
-        .attr(
-          "transform",
-          (event) =>
-            `translate(${this.xScale(event.start)}, ${this.yScale(event.key)})`
-        )
-        .on("mouseover.fill", function () {
-          select(this).attr("fill", "var(--blue900)");
-        })
-        .on("mouseover.emit", (event, data) => {
-          this.$emit("eventMouseover", data);
-        })
-        .on("mouseout", function (event, data) {
-          select(this).attr("fill", "var(--blue600)");
-        });
-    },
     onResize(entries: ResizeObserverEntry[]) {
       entries.forEach((entry) => {
         const outerSize = {
@@ -180,16 +144,37 @@ export default defineComponent({
         this.xScale.rangeRound([0, innerSize.width]);
         this.yScale.rangeRound([0, innerSize.height - paddingBottom]);
 
-        console.log("onResize");
-        this.resizeAxis();
-        // this.drawEvents();
+        this.scalesChanged();
       });
+    },
+    scalesChanged() {
+      selectAll(".track-rect")
+        .attr("width", this.xScale.range()[1])
+        .attr("height", this.yScale.bandwidth);
+
+      selectAll<SVGGElement, { key: string; label: string }>(".track-group")
+        .transition()
+        .attr("transform", (kl) => {
+          const y = this.yScale(kl.key);
+          return y === undefined ? "translate(0, 0)" : `translate(0, ${y})`;
+        });
+
+      selectAll<SVGRectElement, IEvent>(".event")
+        .attr("width", (event) => {
+          const xEnd = this.xScale(event.end);
+          const xStart = this.xScale(event.start);
+          return Math.max(10, xEnd - xStart);
+        })
+        .attr("height", this.yScale.bandwidth)
+        .attr(
+          "transform",
+          (event) =>
+            `translate(${this.xScale(event.start)}, ${this.yScale(event.key)})`
+        );
+      this.resizeAxis();
     },
   },
   watch: {
-    labels() {
-      this.yScale = this.yScale.domain(this.labels.map((kl) => kl.key));
-    },
     events() {
       this.eventsSelection = this.eventsSelection
         .data(this.events, (e) => e.key)
@@ -231,6 +216,20 @@ export default defineComponent({
             return exit.remove();
           }
         );
+
+      this.yScale.domain(this.labels.map((kl) => kl.key));
+      this.scalesChanged();
+
+      selectAll(".event")
+        .on("mouseover.fill", function () {
+          select(this).attr("fill", "var(--blue900)");
+        })
+        .on("mouseover.emit", (event, data) => {
+          this.$emit("eventMouseover", data);
+        })
+        .on("mouseout", function (event, data) {
+          select(this).attr("fill", "var(--blue600)");
+        });
     },
   },
   created() {
@@ -239,7 +238,6 @@ export default defineComponent({
     // if (from) {
     //   this.zoom.from = dayjs(from).toDate();
     // }
-
     this.xScale = scaleTime().domain([this.minDate, this.maxDate]);
     this.yScale = scaleBand().padding(0.6);
     this.xAxisDefinition = axisBottom(this.xScale);

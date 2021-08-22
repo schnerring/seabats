@@ -86,6 +86,7 @@ export default defineComponent({
         SVGGElement,
         unknown
       >,
+      clipRect: {} as Selection<SVGRectElement, unknown, HTMLElement, unknown>,
       resizeObserver: new ResizeObserver(
         debounce((entries) => {
           this.onResize(entries);
@@ -121,7 +122,6 @@ export default defineComponent({
         };
 
         this.svg
-          .transition()
           .attr("width", innerSize.width)
           .attr("height", innerSize.height);
 
@@ -133,7 +133,9 @@ export default defineComponent({
           [0, 0],
           [innerSize.width, innerSize.height],
         ]);
-
+        this.clipRect
+          .attr("width", innerSize.width)
+          .attr("height", innerSize.height);
         const paddingBottom = 20;
 
         this.zoomScale.rangeRound([0, innerSize.width]);
@@ -148,12 +150,12 @@ export default defineComponent({
         .attr("width", this.zoomScale.range()[1])
         .attr("height", this.yScale.bandwidth);
 
-      selectAll<SVGGElement, { key: string; label: string }>(".track-group")
-        .transition()
-        .attr("transform", (kl) => {
-          const y = this.yScale(kl.key);
-          return y === undefined ? "translate(0, 0)" : `translate(0, ${y})`;
-        });
+      selectAll<SVGGElement, { key: string; label: string }>(
+        ".track-group"
+      ).attr("transform", (kl) => {
+        const y = this.yScale(kl.key);
+        return y === undefined ? "translate(0, 0)" : `translate(0, ${y})`;
+      });
 
       selectAll<SVGRectElement, IEvent>(".event")
         .attr("width", (event) => {
@@ -227,7 +229,7 @@ export default defineComponent({
           }
         );
 
-      this.yScale.domain(this.labels.map((kl) => kl.key));
+      this.yScale.domain(this.labels.map((kl) => kl.key).sort());
       this.scalesChanged();
     },
   },
@@ -259,7 +261,7 @@ export default defineComponent({
       .selectAll(".track");
 
     this.zoomBehavior = zoom<SVGRectElement, unknown>()
-      // .scaleExtent([0.5, 20]) // This control how much you can unzoom (x0.5) and zoom (x20)
+      .scaleExtent([1, 999999]) // This control how much you can unzoom (x0.5) and zoom (x20)
       .on("zoom", this.zoom);
 
     this.zoomRect = this.svg
@@ -273,9 +275,17 @@ export default defineComponent({
     // .on("touchmove.zoom", null)
     // .on("touchend.zoom", null);
 
+    this.clipRect = this.svg
+      .append("defs")
+      .append("clipPath")
+      .attr("id", "EventsClip")
+      .append("rect")
+      .attr("fill", "transparent");
+
     this.eventsSelection = this.svg
       .append("g")
       .attr("class", "events-g")
+      .attr("clip-path", "url(#EventsClip)")
       .selectAll(".event");
 
     this.resizeObserver.observe(this.$refs["d3"] as Element);

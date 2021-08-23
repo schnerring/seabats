@@ -6,7 +6,7 @@
 import { defineComponent } from "vue";
 import dayjs from "dayjs";
 import { debounce, uniqBy } from "lodash";
-import { IEvent } from "@/components/timeline/timeline";
+import { IEventBase } from "@/components/timeline/timeline";
 
 import {
   scaleTime,
@@ -26,7 +26,7 @@ import {
 } from "d3";
 
 export default defineComponent({
-  emits: ["eventMouseover", "dateRangeChanged"],
+  emits: ["eventMouseover", "eventMouseout", "dateRangeChanged"],
   props: {
     minDate: {
       type: Date,
@@ -37,8 +37,8 @@ export default defineComponent({
       default: new Date(),
     },
     events: {
-      type: Array as () => IEvent[],
-      default: [] as IEvent[],
+      type: Array as () => IEventBase[],
+      default: [] as IEventBase[],
     },
   },
   computed: {
@@ -82,7 +82,7 @@ export default defineComponent({
       svg: {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>,
       eventsSelection: {} as Selection<
         SVGRectElement,
-        IEvent,
+        IEventBase,
         SVGGElement,
         unknown
       >,
@@ -157,7 +157,7 @@ export default defineComponent({
         return y === undefined ? "translate(0, 0)" : `translate(0, ${y})`;
       });
 
-      selectAll<SVGRectElement, IEvent>(".event")
+      selectAll<SVGRectElement, IEventBase>(".event")
         .attr("width", (event) => {
           const xEnd = this.zoomScale(event.end);
           const xStart = this.zoomScale(event.start);
@@ -195,7 +195,8 @@ export default defineComponent({
               )
               .on("mouseout", function () {
                 select(this).attr("fill", "var(--blue600)");
-              }),
+              })
+              .on("mouseout.emit", () => this.$emit("eventMouseout")),
           (update) => {
             return update;
           },

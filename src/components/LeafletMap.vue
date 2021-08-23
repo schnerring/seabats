@@ -4,30 +4,67 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import {
-  Canvas,
-  Map as LeafletMap,
-  LatLng,
-  TileLayer,
-  Polyline,
-} from "leaflet";
+import { select, Selection, BaseType } from "d3";
+import { Map as LeafletMap, LatLng, TileLayer, Polyline } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { mapState } from "vuex";
 import { Flight } from "@/shared/Flight";
 
 export default defineComponent({
-  data() {
+  data(): {
+    zoom: number;
+    center: LatLng;
+    map: LeafletMap | undefined;
+    polylines: Map<string, Polyline>;
+    selectedPolyline:
+      | Selection<BaseType, unknown, HTMLElement, any>
+      | undefined;
+  } {
     return {
       zoom: 6,
       center: new LatLng(35.917973, 14.409943),
-      map: {} as LeafletMap,
-      polylines: new Map() as Map<string, Polyline>,
+      map: undefined,
+      polylines: new Map(),
+      selectedPolyline: undefined,
     };
+  },
+  props: {
+    polylineShadowHighlighted: {
+      type: String,
+      default: "drop-shadow(0px 0px 3px rgb(255 255 255 / 1))",
+    },
+    polylineColor: {
+      type: String,
+      default: "#42a5f5", // TODO var?
+    },
+    polylineWeight: {
+      type: Number,
+      default: 1,
+    },
+    polylineWeightHighlighted: {
+      type: Number,
+      default: 3,
+    },
+    selectedPolylineId: {
+      type: String,
+    },
   },
   computed: {
     ...mapState(["flights"]),
   },
   watch: {
+    selectedPolylineId() {
+      if (this.selectedPolylineId) {
+        this.selectedPolyline = select(`.polyline_${this.selectedPolylineId}`)
+          .style("filter", this.polylineShadowHighlighted)
+          .style("stroke-width", `${this.polylineWeightHighlighted}px`);
+      } else {
+        this.selectedPolyline
+          ?.style("filter", "none")
+          .style("stroke-width", `${this.polylineWeight}px`);
+        this.selectedPolyline = undefined;
+      }
+    },
     flights(flights: Flight[]) {
       for (const flight of flights) {
         if (this.polylines.has(flight._id)) {
@@ -35,8 +72,9 @@ export default defineComponent({
         }
         const coords = flight.traces.map((t) => new LatLng(t.lat, t.lon));
         const polyline = new Polyline(coords, {
-          color: `#42a5f5`, // TODO var?
-          weight: 1,
+          className: `polyline_${flight._id}`,
+          color: this.polylineColor,
+          weight: this.polylineWeight,
         });
         // Add the polyline to the Typescript map
         this.polylines.set(flight._id, polyline);
@@ -59,7 +97,7 @@ export default defineComponent({
   },
   mounted() {
     this.map = new LeafletMap("leaflet", {
-      renderer: new Canvas(),
+      //renderer: new Canvas(),
       zoomControl: false,
     });
     this.map.setView(this.center, this.zoom);
@@ -73,7 +111,7 @@ export default defineComponent({
     this.map.addLayer(stadiaLayer);
   },
   beforeUnmount() {
-    this.map.remove();
+    this.map?.remove();
   },
 });
 </script>

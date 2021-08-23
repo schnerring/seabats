@@ -12,7 +12,7 @@ export class Flight {
   // ADSB Exchange
   constructor(tc: AdsbExchangeResponse) {
     this.icao = tc.icao ?? tc.hex;
-    this._id = `${this.icao}-${tc.timestamp}`;
+    this._id = `${this.icao}-${tc.timestamp}`.replace(".", "_");
     const flightDate = dayjs.unix(tc.timestamp);
     this.date = flightDate.toDate();
     this.traces = tc.trace.map((t) => {

@@ -2,6 +2,7 @@
   <nav>
     <router-link to="/">Map</router-link>
     <router-link to="/info">Info</router-link>
+    <router-link to="/admin">Upload</router-link>
   </nav>
   <main>
     <div id="map">

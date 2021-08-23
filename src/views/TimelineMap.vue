@@ -8,46 +8,71 @@
     />
   </div>
   <div class="map">
-    <leaflet-map />
+    <leaflet-map :selectedPolylineId="selectedFlightId" />
   </div>
-  <div
-    class="flight-tooltip"
-    v-if="tooltipData !== undefined"
-    :key="tooltipData._id"
-  >
-    <flight-tooltip :flight="tooltipData" />
+  <div class="flight-tooltip" v-if="tooltipContent" :key="tooltipContent.title">
+    <flight-tooltip :content="tooltipContent" />
   </div>
 </template>
 
 <script lang="ts">
+import dayjs from "dayjs";
 import { defineComponent } from "vue";
 import { mapState, mapActions } from "vuex";
 import { first, last, find } from "lodash";
 import LeafletMap from "@/components/LeafletMap.vue";
-import FlightTooltip from "@/components/FlightTooltip.vue";
+import FlightTooltip, { TooltipContent } from "@/components/FlightTooltip.vue";
 import Timeline from "@/components/timeline/Timeline.vue";
 import { IEvent } from "@/components/timeline/timeline";
 import { Flight } from "@/shared/Flight";
 import { Aircraft } from "@/shared/Aircraft";
 
 export default defineComponent({
-  data() {
+  data(): {
+    events: IEvent<Flight>[];
+    tooltipContent: TooltipContent | undefined;
+    selectedFlightId: string | undefined;
+  } {
     return {
-      dbData: {},
-      events: [] as IEvent[],
-      tooltipData: undefined,
+      events: [],
+      tooltipContent: undefined,
+      selectedFlightId: undefined,
     };
   },
   methods: {
     async dateRangeChanged(from: Date, to: Date) {
       await this.getFlights({ from, to });
     },
-    highlightFlight(event: IEvent) {
-      console.log(this.tooltipData);
-      this.tooltipData = event.data;
+    highlightFlight(event: IEvent<Flight>) {
+      this.selectedFlightId = event.data._id;
+      const aircraft = find(
+        this.aircrafts,
+        (a: Aircraft) => a.icao === event.data.icao
+      );
+
+      const flightEnd = last(event.data.traces)?.date;
+      const flightStart = first(event.data.traces)?.date;
+      const totalMinutes = dayjs(flightEnd).diff(flightStart, "minutes");
+      const totalHours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
+      this.tooltipContent = new TooltipContent(
+        aircraft.model,
+        `#${event.data.icao}`,
+        [
+          {
+            key: "Date",
+            value: dayjs(event.data.date).format("YYYY-MM-DD HH:mm"),
+          },
+          {
+            key: "Duration",
+            value: `${totalHours.toString()}h ${minutes}m`,
+          },
+        ]
+      );
     },
     dehighlightFlight() {
-      this.tooltipData = undefined;
+      this.tooltipContent = undefined;
+      this.selectedFlightId = undefined;
     },
     ...mapActions(["getAircrafts", "getFlights"]),
   },
@@ -69,7 +94,7 @@ export default defineComponent({
           key: f.icao,
           start: first(dates),
           end: last(dates),
-        } as IEvent;
+        } as IEvent<Flight>;
       });
     },
   },
@@ -95,8 +120,8 @@ export default defineComponent({
 }
 .flight-tooltip {
   position: absolute;
-  bottom: 0;
-  left: 0;
+  bottom: 20px;
+  left: 20px;
   width: 200px;
   height: 150px;
   background: white;

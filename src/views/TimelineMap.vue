@@ -122,7 +122,7 @@ export default defineComponent({
   position: absolute;
   bottom: 20px;
   left: 20px;
-  width: 200px;
+  width: 300px;
   height: 150px;
   background: white;
   z-index: 99;

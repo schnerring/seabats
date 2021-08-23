@@ -58,6 +58,16 @@ export default defineComponent({
         this.selectedPolyline = select(`.polyline_${this.selectedPolylineId}`)
           .style("filter", this.polylineShadowHighlighted)
           .style("stroke-width", `${this.polylineWeightHighlighted}px`);
+
+        const polyline = this.polylines.get(this.selectedPolylineId);
+        if (polyline) {
+          if (!this.map) return;
+          const centerPoint = this.map
+            .latLngToContainerPoint(polyline.getCenter())
+            .subtract([0, 50]);
+          const centerLatLng = this.map.containerPointToLatLng(centerPoint);
+          this.map.panTo(centerLatLng);
+        }
       } else {
         this.selectedPolyline
           ?.style("filter", "none")

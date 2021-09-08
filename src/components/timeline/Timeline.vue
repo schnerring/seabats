@@ -1,8 +1,12 @@
 <template>
   <div class="d3" ref="d3"></div>
+  <div class="button-container">
+    <date-range @dateRangeChanged="setDateRange($event)" />
+  </div>
 </template>
 
 <script lang="ts">
+import DateRange from "@/components/DateRange.vue";
 import { defineComponent } from "vue";
 import dayjs from "dayjs";
 import { debounce, uniqBy } from "lodash";
@@ -23,10 +27,14 @@ import {
   BaseType,
   ZoomBehavior,
   D3ZoomEvent,
+  zoomIdentity,
 } from "d3";
 
 export default defineComponent({
   emits: ["eventMouseover", "eventMouseout", "dateRangeChanged"],
+  components: {
+    DateRange,
+  },
   props: {
     minDate: {
       type: Date,
@@ -66,7 +74,7 @@ export default defineComponent({
       }, 1000),
       zoomBehavior: {} as ZoomBehavior<SVGRectElement, unknown>,
       zoomRect: {} as Selection<SVGRectElement, unknown, HTMLElement, unknown>,
-      margin: { top: 10, right: 30, bottom: 30, left: 150 },
+      margin: { top: 10, right: 30, bottom: 100, left: 150 },
       xScale: {} as ScaleTime<number, number, never>,
       zoomScale: {} as ScaleTime<number, number, never>,
       yScale: {} as ScaleBand<string>,
@@ -95,6 +103,21 @@ export default defineComponent({
     };
   },
   methods: {
+    resetZoom() {
+      this.zoomBehavior.transform(this.zoomRect, zoomIdentity);
+    },
+    setDateRange(range: [Date, Date]) {
+      const from = range[0];
+      const to = range[1];
+
+      this.zoomScale = this.zoomScale.domain([from, to]);
+      this.xAxisDefinition.scale(this.zoomScale);
+      this.scalesChanged();
+
+      const domainMin = this.zoomScale.domain()[0];
+      const domainMax = this.zoomScale.domain()[1];
+      this.debounceDateRangeChanged(domainMin, domainMax);
+    },
     zoom(event: D3ZoomEvent<SVGRectElement, unknown>) {
       this.zoomScale = event.transform.rescaleX(this.xScale);
       this.xAxisDefinition.scale(this.zoomScale);
@@ -296,7 +319,7 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style scoped>
 .d3 {
   background: white;
   border-bottom: var(--blue900) solid 1px;
@@ -309,5 +332,13 @@ export default defineComponent({
 }
 .canvas {
   overflow: inherit;
+}
+.button-container {
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  bottom: 60px;
+  left: 150px;
+  z-index: 200;
 }
 </style>

@@ -112,7 +112,7 @@ export default defineComponent({
   z-index: 50;
 }
 .timeline {
-  height: 200px;
+  height: 280px;
   position: absolute;
   top: 0;
   width: 100%;

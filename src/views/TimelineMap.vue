@@ -77,20 +77,22 @@ export default defineComponent({
   watch: {
     async flights(flights: Flight[]) {
       await this.getAircrafts();
-      this.events = flights.map((f) => {
-        const dates = f.traces.map((t) => t.date);
-        const aircraft = find(
-          this.aircrafts,
-          (a: Aircraft) => a.icao === f.icao
-        ); // TODO dictionary
-        return {
-          data: f,
-          label: aircraft.model,
-          key: f.icao,
-          start: first(dates),
-          end: last(dates),
-        } as IEvent<Flight>;
-      });
+      this.events = flights
+        .filter((f) => f.traces && f.traces.length > 0) // TODO any()?
+        .map((f) => {
+          const dates = f.traces.map((t) => t.date);
+          const aircraft = find(
+            this.aircrafts,
+            (a: Aircraft) => a.icao === f.icao
+          ); // TODO dictionary
+          return {
+            data: f,
+            label: aircraft.model,
+            key: f.icao,
+            start: first(dates),
+            end: last(dates),
+          } as IEvent<Flight>;
+        });
     },
   },
   components: {

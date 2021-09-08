@@ -38,11 +38,11 @@ export default defineComponent({
   props: {
     minDate: {
       type: Date,
-      default: new Date(2016, 1, 1),
+      default: new Date(2021, 1, 1),
     },
     maxDate: {
       type: Date,
-      default: new Date(),
+      default: new Date(2021, 12, 13),
     },
     events: {
       type: Array as () => IEventBase[],
@@ -261,11 +261,7 @@ export default defineComponent({
     // if (from) {
     //   this.zoom.from = dayjs(from).toDate();
     // }
-    // this.xScale = scaleTime().domain([this.minDate, this.maxDate]);
-    this.xScale = scaleTime().domain([
-      new Date(2021, 1, 1),
-      new Date(2021, 12, 31),
-    ]);
+    this.xScale = scaleTime().domain([this.minDate, this.maxDate]);
     this.zoomScale = this.xScale;
     this.yScale = scaleBand().padding(0.6);
     this.xAxisDefinition = axisBottom(this.xScale);

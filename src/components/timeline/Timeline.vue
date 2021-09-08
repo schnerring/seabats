@@ -31,7 +31,7 @@ import {
 } from "d3";
 
 export default defineComponent({
-  emits: ["eventMouseover", "eventMouseout", "dateRangeChanged"],
+  emits: ["eventClick", "dateRangeChanged"],
   components: {
     DateRange,
   },
@@ -210,16 +210,14 @@ export default defineComponent({
               .append("rect")
               .attr("class", "event")
               .attr("fill", "var(--blue600)")
-              .on("mouseover.fill", function () {
-                select(this).attr("fill", "var(--blue900)");
+              .on("click.select", function () {
+                selectAll(".selected-track").classed("selected-track", false);
+                select(this).classed("selected-track", true);
+                select(this).attr("selected");
               })
-              .on("mouseover.emit", (event, data) =>
-                this.$emit("eventMouseover", data)
-              )
-              .on("mouseout", function () {
-                select(this).attr("fill", "var(--blue600)");
-              })
-              .on("mouseout.emit", () => this.$emit("eventMouseout")),
+              .on("click.emit", (event, data) =>
+                this.$emit("eventClick", data)
+              ),
           (update) => {
             return update;
           },
@@ -318,7 +316,12 @@ export default defineComponent({
   },
 });
 </script>
-
+<style>
+/* TODO remove global state? */
+.selected-track {
+  fill: var(--blue900);
+}
+</style>
 <style scoped>
 .d3 {
   background: white;

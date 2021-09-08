@@ -2,8 +2,7 @@
   <div class="timeline">
     <timeline
       :events="events"
-      @event-mouseover="highlightFlight"
-      @event-mouseout="dehighlightFlight"
+      @event-click="highlightFlight"
       @date-range-changed="dateRangeChanged"
     />
   </div>
@@ -69,10 +68,6 @@ export default defineComponent({
           },
         ]
       );
-    },
-    dehighlightFlight() {
-      this.tooltipContent = undefined;
-      this.selectedFlightId = undefined;
     },
     ...mapActions(["getAircrafts", "getFlights"]),
   },

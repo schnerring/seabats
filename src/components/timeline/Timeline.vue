@@ -261,7 +261,11 @@ export default defineComponent({
     // if (from) {
     //   this.zoom.from = dayjs(from).toDate();
     // }
-    this.xScale = scaleTime().domain([this.minDate, this.maxDate]);
+    // this.xScale = scaleTime().domain([this.minDate, this.maxDate]);
+    this.xScale = scaleTime().domain([
+      new Date(2021, 1, 1),
+      new Date(2021, 12, 31),
+    ]);
     this.zoomScale = this.xScale;
     this.yScale = scaleBand().padding(0.6);
     this.xAxisDefinition = axisBottom(this.xScale);
@@ -283,7 +287,7 @@ export default defineComponent({
       .selectAll(".track");
 
     this.zoomBehavior = zoom<SVGRectElement, unknown>()
-      .scaleExtent([1, 999999]) // This control how much you can unzoom (x0.5) and zoom (x20)
+      .scaleExtent([0.25, 999999]) // This control how much you can unzoom (x0.5) and zoom (x20)
       .on("zoom", this.zoom);
 
     this.zoomRect = this.svg

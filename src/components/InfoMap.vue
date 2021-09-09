@@ -5,6 +5,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { Map as LeafletMap, LatLng, TileLayer, Polyline } from "leaflet";
+import { Flight } from "@/shared/Flight";
 
 export default defineComponent({
   data(): {
@@ -19,6 +20,43 @@ export default defineComponent({
       map: undefined,
       polylines: new Map(),
     };
+  },
+  props: {
+    flights: {
+      default: () => [] as Flight[],
+      type: Array,
+    },
+  },
+  watch: {
+    flights(flights: Flight[]) {
+      for (const flight of flights) {
+        if (this.polylines.has(flight._id)) {
+          continue;
+        }
+        const coords = flight.traces.map((t) => new LatLng(t.lat, t.lon));
+        const polyline = new Polyline(coords, {
+          className: `polyline_${flight._id}`,
+          color: "blue",
+          weight: 3,
+        });
+        // Add the polyline to the Typescript map
+        this.polylines.set(flight._id, polyline);
+        // Render the polyline in Leaflet
+        polyline.addTo(this.map as LeafletMap);
+      }
+      for (const flightId of this.polylines.keys()) {
+        const existingFlight = flights.find(
+          (flight) => flight._id === flightId
+        );
+        if (existingFlight) {
+          continue;
+        }
+        // Un-render the polyline from Leaflet
+        this.polylines.get(flightId)?.remove();
+        // remove the polyline from the Typescript Map
+        this.polylines.delete(flightId);
+      }
+    },
   },
   mounted() {
     this.map = new LeafletMap("leaflet", {

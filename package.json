@@ -15,7 +15,6 @@
     "d3": "^7.0.0",
     "dayjs": "^1.10.6",
     "element-plus": "^1.0.2-beta.55",
-    "front-matter": "^4.0.2",
     "leaflet": "^1.7.1",
     "lodash": "^4.17.21",
     "marked": "^3.0.3",

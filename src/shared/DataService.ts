@@ -2,10 +2,8 @@ import PouchDB from "pouchdb";
 import find from "pouchdb-find";
 import { Aircraft } from "./Aircraft";
 import { Flight } from "./Flight";
-import { IFlightInfo, IFlightInfoMeta } from "./FlightInfo";
 import axios from "axios";
 import marked from "marked";
-import fm from "front-matter";
 
 const db = new PouchDB("flights");
 PouchDB.plugin(find);
@@ -38,20 +36,20 @@ export async function getFlights(from: Date, to: Date): Promise<Flight[]> {
   );
 }
 
-export async function getFlightInfos(
-  from: Date,
-  to: Date
-): Promise<IFlightInfo[]> {
-  const sampleFiles = ["md/10-lorem-ipsum.md", "md/20-hello-world.md"];
-  const flightInfos: IFlightInfo[] = [];
-  for (const sampleFile of sampleFiles) {
-    const response = await axios.get<string>(sampleFile);
-    const frontMatter = fm<IFlightInfoMeta>(response.data);
-    const html = marked(frontMatter.body);
-    const meta = frontMatter.attributes;
-    flightInfos.push({ meta, html } as IFlightInfo);
-  }
-  return flightInfos;
+export async function getFlightsByIds(ids: string[]): Promise<Flight[]> {
+  const findResponse = await db.find({
+    selector: {
+      _id: { $in: ids },
+    },
+  });
+  return findResponse.docs.map(
+    (doc) => doc as PouchDB.Core.ExistingDocument<Flight>
+  );
+}
+
+export async function getInfoText(): Promise<string> {
+  const response = await axios.get<string>("info-text.md");
+  return marked(response.data);
 }
 
 export async function getAircrafts(): Promise<Aircraft[]> {

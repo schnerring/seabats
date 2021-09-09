@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
-import TimelineMap from "@/views/TimelineMap.vue";
+import Timeline from "@/views/Timeline.vue";
 import UnlockApp from "@/views/UnlockApp.vue";
 import { store } from "../store/index";
 
@@ -8,7 +8,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/",
     alias: "/map",
     name: "Map",
-    component: TimelineMap,
+    component: Timeline,
     meta: {
       // requireAuth: true,
     },

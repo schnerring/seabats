@@ -1,8 +1,12 @@
 <template>
   <div class="d3" ref="d3"></div>
+  <div class="button-container">
+    <date-range @dateRangeChanged="setDateRange($event)" />
+  </div>
 </template>
 
 <script lang="ts">
+import DateRange from "@/components/DateRange.vue";
 import { defineComponent } from "vue";
 import dayjs from "dayjs";
 import { debounce, uniqBy } from "lodash";
@@ -23,18 +27,22 @@ import {
   BaseType,
   ZoomBehavior,
   D3ZoomEvent,
+  zoomIdentity,
 } from "d3";
 
 export default defineComponent({
-  emits: ["eventMouseover", "eventMouseout", "dateRangeChanged"],
+  emits: ["eventClick", "dateRangeChanged"],
+  components: {
+    DateRange,
+  },
   props: {
     minDate: {
       type: Date,
-      default: new Date(2016, 1, 1),
+      default: new Date(2021, 1, 1),
     },
     maxDate: {
       type: Date,
-      default: new Date(),
+      default: new Date(2021, 12, 13),
     },
     events: {
       type: Array as () => IEventBase[],
@@ -66,7 +74,7 @@ export default defineComponent({
       }, 1000),
       zoomBehavior: {} as ZoomBehavior<SVGRectElement, unknown>,
       zoomRect: {} as Selection<SVGRectElement, unknown, HTMLElement, unknown>,
-      margin: { top: 10, right: 30, bottom: 30, left: 150 },
+      margin: { top: 10, right: 30, bottom: 100, left: 150 },
       xScale: {} as ScaleTime<number, number, never>,
       zoomScale: {} as ScaleTime<number, number, never>,
       yScale: {} as ScaleBand<string>,
@@ -95,6 +103,21 @@ export default defineComponent({
     };
   },
   methods: {
+    resetZoom() {
+      this.zoomBehavior.transform(this.zoomRect, zoomIdentity);
+    },
+    setDateRange(range: [Date, Date]) {
+      const from = range[0];
+      const to = range[1];
+
+      this.zoomScale = this.zoomScale.domain([from, to]);
+      this.xAxisDefinition.scale(this.zoomScale);
+      this.scalesChanged();
+
+      const domainMin = this.zoomScale.domain()[0];
+      const domainMax = this.zoomScale.domain()[1];
+      this.debounceDateRangeChanged(domainMin, domainMax);
+    },
     zoom(event: D3ZoomEvent<SVGRectElement, unknown>) {
       this.zoomScale = event.transform.rescaleX(this.xScale);
       this.xAxisDefinition.scale(this.zoomScale);
@@ -187,16 +210,14 @@ export default defineComponent({
               .append("rect")
               .attr("class", "event")
               .attr("fill", "var(--blue600)")
-              .on("mouseover.fill", function () {
-                select(this).attr("fill", "var(--blue900)");
+              .on("click.select", function () {
+                selectAll(".selected-track").classed("selected-track", false);
+                select(this).classed("selected-track", true);
+                select(this).attr("selected");
               })
-              .on("mouseover.emit", (event, data) =>
-                this.$emit("eventMouseover", data)
-              )
-              .on("mouseout", function () {
-                select(this).attr("fill", "var(--blue600)");
-              })
-              .on("mouseout.emit", () => this.$emit("eventMouseout")),
+              .on("click.emit", (event, data) =>
+                this.$emit("eventClick", data)
+              ),
           (update) => {
             return update;
           },
@@ -262,7 +283,7 @@ export default defineComponent({
       .selectAll(".track");
 
     this.zoomBehavior = zoom<SVGRectElement, unknown>()
-      .scaleExtent([1, 999999]) // This control how much you can unzoom (x0.5) and zoom (x20)
+      .scaleExtent([0.25, 999999]) // This control how much you can unzoom (x0.5) and zoom (x20)
       .on("zoom", this.zoom);
 
     this.zoomRect = this.svg
@@ -295,8 +316,13 @@ export default defineComponent({
   },
 });
 </script>
-
 <style>
+/* TODO remove global state? */
+.selected-track {
+  fill: var(--blue900);
+}
+</style>
+<style scoped>
 .d3 {
   background: white;
   border-bottom: var(--blue900) solid 1px;
@@ -309,5 +335,13 @@ export default defineComponent({
 }
 .canvas {
   overflow: inherit;
+}
+.button-container {
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  bottom: 60px;
+  left: 150px;
+  z-index: 200;
 }
 </style>

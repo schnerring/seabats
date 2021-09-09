@@ -54,6 +54,10 @@ export default defineComponent({
   },
   watch: {
     selectedPolylineId() {
+      this.selectedPolyline
+        ?.style("filter", "none")
+        .style("stroke-width", `${this.polylineWeight}px`);
+      this.selectedPolyline = undefined;
       if (this.selectedPolylineId) {
         this.selectedPolyline = select(`.polyline_${this.selectedPolylineId}`)
           .style("filter", this.polylineShadowHighlighted)
@@ -68,11 +72,6 @@ export default defineComponent({
           const centerLatLng = this.map.containerPointToLatLng(centerPoint);
           this.map.panTo(centerLatLng);
         }
-      } else {
-        this.selectedPolyline
-          ?.style("filter", "none")
-          .style("stroke-width", `${this.polylineWeight}px`);
-        this.selectedPolyline = undefined;
       }
     },
     flights(flights: Flight[]) {

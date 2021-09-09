@@ -2,8 +2,7 @@
   <div class="timeline">
     <timeline
       :events="events"
-      @event-mouseover="highlightFlight"
-      @event-mouseout="dehighlightFlight"
+      @event-click="highlightFlight"
       @date-range-changed="dateRangeChanged"
     />
   </div>
@@ -70,10 +69,6 @@ export default defineComponent({
         ]
       );
     },
-    dehighlightFlight() {
-      this.tooltipContent = undefined;
-      this.selectedFlightId = undefined;
-    },
     ...mapActions(["getAircrafts", "getFlights"]),
   },
   computed: {
@@ -82,20 +77,22 @@ export default defineComponent({
   watch: {
     async flights(flights: Flight[]) {
       await this.getAircrafts();
-      this.events = flights.map((f) => {
-        const dates = f.traces.map((t) => t.date);
-        const aircraft = find(
-          this.aircrafts,
-          (a: Aircraft) => a.icao === f.icao
-        ); // TODO dictionary
-        return {
-          data: f,
-          label: aircraft.model,
-          key: f.icao,
-          start: first(dates),
-          end: last(dates),
-        } as IEvent<Flight>;
-      });
+      this.events = flights
+        .filter((f) => f.traces && f.traces.length > 0) // TODO any()?
+        .map((f) => {
+          const dates = f.traces.map((t) => t.date);
+          const aircraft = find(
+            this.aircrafts,
+            (a: Aircraft) => a.icao === f.icao
+          ); // TODO dictionary
+          return {
+            data: f,
+            label: aircraft.model,
+            key: f.icao,
+            start: first(dates),
+            end: last(dates),
+          } as IEvent<Flight>;
+        });
     },
   },
   components: {
@@ -112,7 +109,7 @@ export default defineComponent({
   z-index: 50;
 }
 .timeline {
-  height: 200px;
+  height: 280px;
   position: absolute;
   top: 0;
   width: 100%;

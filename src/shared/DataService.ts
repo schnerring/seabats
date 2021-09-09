@@ -2,8 +2,10 @@ import PouchDB from "pouchdb";
 import find from "pouchdb-find";
 import { Aircraft } from "./Aircraft";
 import { Flight } from "./Flight";
-import { IFlightInfo } from "./FlightInfo";
+import { IFlightInfo, IFlightInfoMeta } from "./FlightInfo";
 import axios from "axios";
+import marked from "marked";
+import fm from "front-matter";
 
 const db = new PouchDB("flights");
 PouchDB.plugin(find);
@@ -40,12 +42,16 @@ export async function getFlightInfos(
   from: Date,
   to: Date
 ): Promise<IFlightInfo[]> {
-  // TODO implement real data store
-  return [
-    { flightId: "", markdown: "# Hello World" } as IFlightInfo,
-    { flightId: "", markdown: "## H2" } as IFlightInfo,
-    { flightId: "", markdown: "### H3" } as IFlightInfo,
-  ];
+  const sampleFiles = ["md/10-lorem-ipsum.md", "md/20-hello-world.md"];
+  const flightInfos: IFlightInfo[] = [];
+  for (const sampleFile of sampleFiles) {
+    const response = await axios.get<string>(sampleFile);
+    const frontMatter = fm<IFlightInfoMeta>(response.data);
+    const html = marked(frontMatter.body);
+    const meta = frontMatter.attributes;
+    flightInfos.push({ meta, html } as IFlightInfo);
+  }
+  return flightInfos;
 }
 
 export async function getAircrafts(): Promise<Aircraft[]> {

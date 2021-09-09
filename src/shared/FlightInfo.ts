@@ -1,4 +1,9 @@
 export interface IFlightInfo {
-  flightId: string;
-  markdown: string;
+  meta: IFlightInfoMeta;
+  html: string;
+}
+
+export interface IFlightInfoMeta {
+  key: number;
+  flightIds: string[];
 }

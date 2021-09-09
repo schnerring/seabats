@@ -2,6 +2,7 @@ import PouchDB from "pouchdb";
 import find from "pouchdb-find";
 import { Aircraft } from "./Aircraft";
 import { Flight } from "./Flight";
+import { IFlightInfo } from "./FlightInfo";
 import axios from "axios";
 
 const db = new PouchDB("flights");
@@ -33,6 +34,18 @@ export async function getFlights(from: Date, to: Date): Promise<Flight[]> {
   return findResponse.docs.map(
     (doc) => doc as PouchDB.Core.ExistingDocument<Flight>
   );
+}
+
+export async function getFlightInfos(
+  from: Date,
+  to: Date
+): Promise<IFlightInfo[]> {
+  // TODO implement real data store
+  return [
+    { flightId: "", markdown: "# Hello World" } as IFlightInfo,
+    { flightId: "", markdown: "## H2" } as IFlightInfo,
+    { flightId: "", markdown: "### H3" } as IFlightInfo,
+  ];
 }
 
 export async function getAircrafts(): Promise<Aircraft[]> {

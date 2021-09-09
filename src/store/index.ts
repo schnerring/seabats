@@ -5,12 +5,13 @@ import {
   LOGOUT,
   UNLOCK_APP,
   GET_FLIGHTS,
+  GET_FLIGHT_INFOS,
   GET_AIRCRAFTS,
   SELECT_AIRCRAFT,
   UNSELECT_AIRCRAFT,
 } from "./types";
 import router from "../router";
-import { getAircrafts, getFlights } from "@/shared/DataService";
+import { getAircrafts, getFlights, getFlightInfos } from "@/shared/DataService";
 
 export const store = createStore<State>({
   state: {
@@ -23,6 +24,7 @@ export const store = createStore<State>({
     selectedAircraftIcaos: [],
     aircraftStates: [],
     flights: [],
+    flightInfos: [],
     selectedFlights: [],
     tracks: [],
   },
@@ -54,6 +56,9 @@ export const store = createStore<State>({
     [GET_FLIGHTS](state, flights) {
       state.flights = flights;
     },
+    [GET_FLIGHT_INFOS](state, flightInfos) {
+      state.flightInfos = flightInfos;
+    },
   },
   actions: {
     async unlockApp({ commit }, password) {
@@ -72,6 +77,10 @@ export const store = createStore<State>({
     async getAircrafts({ commit }) {
       const aircrafts = await getAircrafts();
       commit(GET_AIRCRAFTS, aircrafts);
+    },
+    async getFlightInfos({ commit }) {
+      const flightInfos = await getFlightInfos(new Date(), new Date());
+      commit(GET_FLIGHT_INFOS, flightInfos);
     },
     async getFlights({ commit }, payload) {
       const flights = await getFlights(payload.from, payload.to);

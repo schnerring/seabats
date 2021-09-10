@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import Timeline from "@/views/Timeline.vue";
-import UnlockApp from "@/views/UnlockApp.vue";
+import Setup from "@/views/Setup.vue";
 import { store } from "../store/index";
 
 const routes: Array<RouteRecordRaw> = [
@@ -10,13 +10,13 @@ const routes: Array<RouteRecordRaw> = [
     name: "Map",
     component: Timeline,
     meta: {
-      // requireAuth: true,
+      requireData: true,
     },
   },
   {
-    path: "/login",
-    name: "Login",
-    component: UnlockApp,
+    path: "/hi",
+    name: "Setup",
+    component: Setup,
   },
   {
     path: "/admin",
@@ -48,10 +48,10 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   if (
-    to.matched.some((record) => record.meta.requireAuth) &&
+    to.matched.some((record) => record.meta.requireData) &&
     !store.getters.isLoggedIn
   ) {
-    next("/login");
+    next("/hi");
     return;
   }
   next();

@@ -1,28 +1,19 @@
 import { State } from "@vue/runtime-core";
 import { createStore } from "vuex";
-import { checkAppPassword } from "@/shared/Auth";
 import {
-  LOGOUT,
-  UNLOCK_APP,
   GET_FLIGHTS,
   GET_AIRCRAFTS,
   SELECT_AIRCRAFT,
   UNSELECT_AIRCRAFT,
   GET_INFO_TEXT,
 } from "./types";
-import router from "../router";
 import { getAircrafts, getFlights, getInfoText } from "@/shared/DataService";
 
 export const store = createStore<State>({
   state: {
     appPassword: "",
-    openSkyUser: {
-      username: "",
-      password: "",
-    },
     aircrafts: [],
     selectedAircraftIcaos: [],
-    aircraftStates: [],
     flights: [],
     infoText: "",
     selectedFlights: [],
@@ -40,16 +31,6 @@ export const store = createStore<State>({
         (i) => i !== icao
       );
     },
-    [UNLOCK_APP](state, password) {
-      state.appPassword = password;
-    },
-    [LOGOUT](state) {
-      state.appPassword = "";
-      state.openSkyUser = {
-        username: "",
-        password: "",
-      };
-    },
     [GET_AIRCRAFTS](state, aircrafts) {
       state.aircrafts = aircrafts;
     },
@@ -61,18 +42,6 @@ export const store = createStore<State>({
     },
   },
   actions: {
-    async unlockApp({ commit }, password) {
-      if (await checkAppPassword(password)) {
-        commit(UNLOCK_APP, password);
-        router.push("/");
-        return;
-      }
-      throw "Ah ah ah, you didn't say the magic word!";
-    },
-    logout({ commit }) {
-      commit(LOGOUT);
-      router.push("/login");
-    },
     // Data
     async getAircrafts({ commit }) {
       const aircrafts = await getAircrafts();

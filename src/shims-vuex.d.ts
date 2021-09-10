@@ -13,7 +13,7 @@ declare module "@vue/runtime-core" {
     selectedAircraftIcaos: string[];
     aircraftStates: AircraftState[];
     flights: Flight[];
-    flightInfos: IFlightInfo[];
+    infoText: string;
     selectedFlights: Flight[];
     tracks: Track[];
   }

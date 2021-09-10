@@ -1,5 +1,5 @@
 <template>
-  <div class="infomap">
+  <div class="info-map">
     <div class="info" v-html="infoText"></div>
     <info-map :flights="flights" />
   </div>
@@ -59,7 +59,7 @@ export default defineComponent({
 .opensky-attribution {
   font-style: italic;
 }
-.infomap {
+.info-map {
   display: flex;
   flex-direction: row;
   height: 100%;
@@ -67,7 +67,10 @@ export default defineComponent({
 }
 .info {
   width: 50vw;
+  padding: 5px 30px;
+  box-sizing: border-box;
   height: 100%;
+  overflow-y: scroll;
 }
 div#leaflet {
   height: 100%;

@@ -4,7 +4,13 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { Map as LeafletMap, LatLng, TileLayer, Polyline } from "leaflet";
+import {
+  Map as LeafletMap,
+  LatLng,
+  TileLayer,
+  Polyline,
+  FeatureGroup,
+} from "leaflet";
 import { Flight } from "@/shared/Flight";
 
 export default defineComponent({
@@ -12,13 +18,13 @@ export default defineComponent({
     zoom: number;
     center: LatLng;
     map: LeafletMap | undefined;
-    polylines: Map<string, Polyline>;
+    polylines: FeatureGroup | undefined;
   } {
     return {
       zoom: 6,
       center: new LatLng(35.917973, 14.409943),
       map: undefined,
-      polylines: new Map(),
+      polylines: undefined,
     };
   },
   props: {
@@ -29,33 +35,26 @@ export default defineComponent({
   },
   watch: {
     flights(flights: Flight[]) {
+      if (!this.map) return;
+
+      if (this.polylines) {
+        this.polylines.remove();
+      }
+
+      this.polylines = new FeatureGroup<Polyline>();
       for (const flight of flights) {
-        if (this.polylines.has(flight._id)) {
-          continue;
-        }
         const coords = flight.traces.map((t) => new LatLng(t.lat, t.lon));
         const polyline = new Polyline(coords, {
           className: `polyline_${flight._id}`,
           color: "blue",
           weight: 3,
         });
-        // Add the polyline to the Typescript map
-        this.polylines.set(flight._id, polyline);
-        // Render the polyline in Leaflet
-        polyline.addTo(this.map as LeafletMap);
+        this.polylines.addLayer(polyline);
       }
-      for (const flightId of this.polylines.keys()) {
-        const existingFlight = flights.find(
-          (flight) => flight._id === flightId
-        );
-        if (existingFlight) {
-          continue;
-        }
-        // Un-render the polyline from Leaflet
-        this.polylines.get(flightId)?.remove();
-        // remove the polyline from the Typescript Map
-        this.polylines.delete(flightId);
-      }
+      // Render polylines in Leaflet
+      this.polylines.addTo(this.map as LeafletMap);
+
+      this.map.fitBounds(this.polylines.getBounds());
     },
   },
   mounted() {

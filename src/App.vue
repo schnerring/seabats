@@ -86,8 +86,8 @@ nav {
 
 main {
   grid-area: main;
+  overflow: hidden;
 }
-
 footer {
   grid-area: footer;
 }
@@ -104,5 +104,19 @@ footer {
   grid-area: map;
   height: 100%;
   position: relative;
+}
+
+::-webkit-scrollbar {
+  height: 5px;
+  width: 5px;
+  scrollbar-width: auto;
+}
+::-webkit-scrollbar-thumb {
+  background: black;
+  /* border-radius: 0.2rem; */
+}
+::-webkit-scrollbar-track {
+  /* background: lightgrey; */
+  /* border-radius: 0.2rem; */
 }
 </style>

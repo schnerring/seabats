@@ -18,7 +18,7 @@
           type="file"
           ref="file"
           multiple="multiple"
-          @change="selectionChanged($event.target.files)"
+          @change="loadData($event.target.files)"
           :disabled="isLoading"
         />
 
@@ -94,13 +94,46 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { AdsbExchangeResponse } from "@/shared/adsb/AdsbExchangeResponse";
+import { addFlight } from "@/shared/DataService";
+import { Flight } from "@/shared/Flight";
+
+const initialStatus =
+  "Click here to select a data set from the local file system";
 
 export default defineComponent({
   data() {
     return {
-      status: "Click here to select a data set from the local file system",
+      status: initialStatus,
       isLoading: false,
     };
+  },
+  methods: {
+    async loadData(files: FileList) {
+      this.isLoading = true;
+      try {
+        for (let i = 0; i < files.length; i++) {
+          this.status = `Importing (${Math.floor(++i / files.length)}%) ...`;
+          const adsbTraces: AdsbExchangeResponse[] = JSON.parse(
+            await files[i].text()
+          );
+          for (const trace of adsbTraces) {
+            try {
+              const flight = new Flight(trace);
+              await addFlight(flight);
+            } catch {
+              console.warn(trace);
+            }
+          }
+        }
+      } catch (error) {
+        // TODO show error to user
+        console.error(error);
+      } finally {
+        this.status = initialStatus;
+        this.isLoading = false;
+      }
+    },
   },
 });
 </script>

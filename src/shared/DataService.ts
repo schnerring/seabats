@@ -13,7 +13,7 @@ export async function addFlight(flight: Flight): Promise<void> {
     await db.put(flight);
   } catch (error) {
     if (error.name === "conflict") {
-      console.info(`Skip duplicate flight: ${flight._id}, ${flight.date}`);
+      //console.info(`Skip duplicate flight: ${flight._id}, ${flight.date}`);
     } else {
       throw error;
     }

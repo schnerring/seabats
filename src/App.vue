@@ -1,13 +1,10 @@
 <template>
   <nav>
-    <router-link to="/">Map</router-link>
-    <router-link to="/info">Info</router-link>
-    <router-link to="/admin">Upload</router-link>
+    <router-link to="/">MAP</router-link>
+    <router-link to="/info">INFO</router-link>
   </nav>
   <main>
-    <div id="map">
-      <router-view />
-    </div>
+    <router-view />
   </main>
   <footer>
     <span>© Michael Schnerring, Sebastian Deuss</span> | Source code
@@ -68,10 +65,23 @@ body {
   height: 100vh;
   overflow-y: hidden;
 }
+
+::-webkit-scrollbar {
+  height: 5px;
+  width: 5px;
+  scrollbar-width: auto;
+}
+::-webkit-scrollbar-thumb {
+  background: black;
+}
+</style>
+
+<style lang="scss" scoped>
 nav {
   display: flex;
-  justify-content: space-between;
+  font-size: 14pt;
   grid-area: nav;
+  justify-content: space-between;
   padding: 5px;
 
   a {
@@ -90,33 +100,5 @@ main {
 }
 footer {
   grid-area: footer;
-}
-
-#flights {
-  grid-area: flights;
-}
-
-#aircrafts {
-  grid-area: aircrafts;
-}
-
-#map {
-  grid-area: map;
-  height: 100%;
-  position: relative;
-}
-
-::-webkit-scrollbar {
-  height: 5px;
-  width: 5px;
-  scrollbar-width: auto;
-}
-::-webkit-scrollbar-thumb {
-  background: black;
-  /* border-radius: 0.2rem; */
-}
-::-webkit-scrollbar-track {
-  /* background: lightgrey; */
-  /* border-radius: 0.2rem; */
 }
 </style>

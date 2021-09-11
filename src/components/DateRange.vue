@@ -1,14 +1,16 @@
 <template>
-  <el-radio-group v-model="duration" size="mini">
+  <el-radio-group v-model="duration" size="medium">
     <el-radio-button label="year"></el-radio-button>
     <el-radio-button label="month"></el-radio-button>
     <el-radio-button label="week" disabled></el-radio-button>
     <el-radio-button label="day"></el-radio-button>
   </el-radio-group>
   <div class="buttons">
-    <button v-if="enabled" class="pre" @click="previous()">&lt;</button>
+    <button v-if="enabled" class="pre nav-button" @click="previous()">
+      &lt;
+    </button>
     <div class="current">{{ formattedDate }}</div>
-    <button v-if="enabled" class="next" @click="next()">&gt;</button>
+    <button v-if="enabled" class="next nav-button" @click="next()">&gt;</button>
   </div>
 </template>
 
@@ -77,20 +79,41 @@ export default defineComponent({
 
 <style scoped>
 .buttons {
-  background: white;
-  color: rgb(77, 77, 77);
-  padding: 10px 20px;
-  font-size: 10pt;
+  background: var(--white);
+  color: var(--grey3);
+  padding: 6px 20px;
+  font-size: 14px;
+  height: 16px;
   margin-right: 10px;
-  border: solid 0.5pt rgb(77, 77, 77);
+  border: solid 1px #dcdfe6;
   display: flex;
-  min-width: 119px;
+  align-items: center;
+  align-self: center;
   justify-content: space-around;
+}
+.buttons:hover {
+  background: var(--grey3);
+  color: var(--white);
+  height: 18px;
+}
+.nav-button {
+  color: inherit;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+}
+.nav-button:hover {
+  cursor: pointer;
 }
 .pre {
   margin-right: 10px;
 }
 .next {
   margin-left: 10px;
+}
+.el-radio-button:last-child .el-radio-button__inner {
+  border-radius: none !important;
 }
 </style>

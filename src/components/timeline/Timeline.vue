@@ -1,8 +1,12 @@
 <template>
-  <div class="component">
+  <div class="timeline">
     <div class="d3" ref="d3"></div>
-    <div class="button-container">
+    <div class="info-bar">
       <date-range @dateRangeChanged="setDateRange($event)" />
+      <div class="event-info"></div>
+      <div class="event-info" v-if="tooltipContent" :key="tooltipContent.title">
+        <flight-tooltip :content="tooltipContent" />
+      </div>
     </div>
   </div>
 </template>
@@ -31,11 +35,13 @@ import {
   D3ZoomEvent,
   zoomIdentity,
 } from "d3";
+import FlightTooltip, { TooltipContent } from "../FlightTooltip.vue";
 
 export default defineComponent({
   emits: ["eventClick", "dateRangeChanged"],
   components: {
     DateRange,
+    FlightTooltip,
   },
   props: {
     minDate: {
@@ -49,6 +55,10 @@ export default defineComponent({
     events: {
       type: Array as () => IEventBase[],
       default: [] as IEventBase[],
+    },
+    tooltipContent: {
+      type: TooltipContent,
+      default: undefined,
     },
   },
   computed: {
@@ -326,14 +336,14 @@ export default defineComponent({
 }
 </style>
 <style scoped>
-.component {
+.timeline {
   background: var(--grey);
   border-bottom: var(--grey2) solid 1px;
   display: grid;
   height: inherit;
   grid-template-areas:
     "d3"
-    "buttons";
+    "info-bar";
   grid-template-rows: 1fr auto;
 }
 .d3 {
@@ -343,11 +353,12 @@ export default defineComponent({
   opacity: 1;
   width: inherit;
 }
-.button-container {
+.info-bar {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  grid-area: buttons;
-  margin: 10px 10px 10px 150px;
+  justify-content: space-between;
+  grid-area: info-bar;
+  margin: 10px 30px 10px 150px;
+}
+.event-info {
 }
 </style>

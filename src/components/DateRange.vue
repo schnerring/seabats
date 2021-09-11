@@ -1,14 +1,18 @@
 <template>
-  <el-radio-group v-model="duration" size="medium">
-    <el-radio-button label="year"></el-radio-button>
-    <el-radio-button label="month"></el-radio-button>
-    <el-radio-button label="week" disabled></el-radio-button>
-    <el-radio-button label="day"></el-radio-button>
-  </el-radio-group>
-  <div class="date-pager">
-    <button v-if="enabled" class="nav-button" @click="previous()">&lt;</button>
-    <div class="current">{{ formattedDate }}</div>
-    <button v-if="enabled" class="nav-button" @click="next()">&gt;</button>
+  <div class="date-range">
+    <el-radio-group v-model="duration" size="medium">
+      <el-radio-button label="year"></el-radio-button>
+      <el-radio-button label="month"></el-radio-button>
+      <el-radio-button label="week" disabled></el-radio-button>
+      <el-radio-button label="day"></el-radio-button>
+    </el-radio-group>
+    <div class="date-pager">
+      <button v-if="enabled" class="pager-button" @click="previous()">
+        &lt;
+      </button>
+      <div class="current">{{ formattedDate }}</div>
+      <button v-if="enabled" class="pager-button" @click="next()">&gt;</button>
+    </div>
   </div>
 </template>
 
@@ -76,24 +80,29 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.date-range {
+  display: flex;
+  flex-direction: row;
+}
+
 .date-pager {
   box-sizing: border-box;
   background: var(--white);
   color: var(--grey3);
   font-size: 14px;
-  height: 100%;
   border: solid 1px #dcdfe6;
   display: flex;
   align-items: center;
   justify-content: space-around;
 }
-
 .date-pager:hover {
   background: var(--grey3);
   color: var(--white);
+  cursor: default;
+  border: solid 1px var(--grey3);
 }
 
-.nav-button {
+.pager-button {
   color: inherit;
   background: transparent;
   border: 0;
@@ -102,7 +111,7 @@ export default defineComponent({
   height: 100%;
   padding: 0px 9px;
 }
-.nav-button:hover {
+.pager-button:hover {
   cursor: pointer;
 }
 </style>

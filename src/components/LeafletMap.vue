@@ -43,7 +43,7 @@ export default defineComponent({
     },
     polylineColorHighlighted: {
       type: String,
-      default: "#4586ff",
+      default: "#1148fe",
     },
     selectedPolylineId: {
       type: String,

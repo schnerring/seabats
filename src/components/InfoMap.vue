@@ -46,7 +46,7 @@ export default defineComponent({
         const coords = flight.traces.map((t) => new LatLng(t.lat, t.lon));
         const polyline = new Polyline(coords, {
           className: `polyline_${flight._id}`,
-          color: "#4586ff",
+          color: "#1148fe",
           weight: 3,
         });
         this.polylines.addLayer(polyline);

@@ -1,7 +1,5 @@
 <template>
   <div id="Tooltip-Container">
-    <strong>{{ content.title }}</strong>
-    {{ content.subtitle }}
     <div class="single-tooltip">
       <span v-for="field of content.fields" :key="field.key">
         <strong>{{ field.key }}</strong>
@@ -16,17 +14,8 @@
 import { defineComponent } from "vue";
 
 export class TooltipContent {
-  title: string;
-  subtitle: string;
   fields: { key: string; value: string }[];
-
-  constructor(
-    title: string,
-    subtitle: string,
-    fields: { key: string; value: string }[]
-  ) {
-    this.title = title;
-    this.subtitle = subtitle;
+  constructor(fields: { key: string; value: string }[]) {
     this.fields = fields;
   }
 }
@@ -56,10 +45,13 @@ p.subtitle {
   font-size: 14pt;
 }
 
-div#Tooltip-Container {
-  padding: 10px;
+#Tooltip-Container {
   display: flex;
+  text-transform: uppercase;
   flex-direction: row;
+  height: 100%;
+  align-items: center;
+  color: var(--blue);
 }
 .single-tooltip span {
   margin-left: 10px;

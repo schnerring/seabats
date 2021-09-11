@@ -36,10 +36,6 @@ body {
   --black: #818181;
 }
 
-a {
-  color: var(--blue900);
-}
-
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -52,7 +48,6 @@ a {
     "footer";
   grid-template-rows: auto 1fr auto;
   height: 100vh;
-  overflow-y: hidden;
 }
 
 ::-webkit-scrollbar {
@@ -61,13 +56,17 @@ a {
   scrollbar-width: auto;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--blue900);
+  background: #262626;
+}
+
+a {
+  color: var(--blue);
 }
 </style>
 
 <style lang="scss" scoped>
 nav {
-  border-bottom: var(--blue900) solid 1px;
+  border-bottom: var(--grey2) solid 1px;
   display: flex;
   font-size: 14pt;
   grid-area: nav;
@@ -88,23 +87,13 @@ nav {
 main {
   grid-area: main;
   overflow: hidden;
-  position: relative;
 }
 
 footer {
-  // border-top: solid 1px var(--blue900); TODO
+  border-top: var(--grey2) solid 1px;
   font-size: 8pt;
   grid-area: footer;
   text-align: right;
   padding: 0.3rem;
-}
-::-webkit-scrollbar {
-  height: 5px;
-  width: 5px;
-  scrollbar-width: auto;
-}
-::-webkit-scrollbar-thumb {
-  background: #262626;
-  /* border-radius: 0.2rem; */
 }
 </style>

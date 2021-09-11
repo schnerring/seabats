@@ -31,19 +31,19 @@ export default defineComponent({
   props: {
     polylineColor: {
       type: String,
-      default: "#90caf9", // TODO var?
+      default: "white", // TODO var?
     },
     polylineWeight: {
       type: Number,
       default: 1,
     },
-    polylineColorHighlighted: {
-      type: String,
-      default: "#0d47a1", // TODO var?
-    },
     polylineWeightHighlighted: {
       type: Number,
       default: 5,
+    },
+    polylineColorHighlighted: {
+      type: String,
+      default: "#4586ff",
     },
     selectedPolylineId: {
       type: String,
@@ -55,10 +55,10 @@ export default defineComponent({
   watch: {
     selectedPolylineId() {
       this.selectedPolyline
-        ?.style("filter", "none")
-        .style("stroke", `${this.polylineColor}`)
-        .style("stroke-width", `${this.polylineWeight}px`);
+        ?.style("stroke-width", "1")
+        .style("stroke", "white");
       this.selectedPolyline = undefined;
+
       if (this.selectedPolylineId) {
         this.selectedPolyline = select(`.polyline_${this.selectedPolylineId}`)
           .style("stroke", `${this.polylineColorHighlighted}`)
@@ -110,10 +110,10 @@ export default defineComponent({
     this.map.setView(this.center, this.zoom);
 
     const stamenLayer = new TileLayer(
-      "https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png",
+      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
       {
         attribution:
-          'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
       }
     );
     this.map.addLayer(stamenLayer);

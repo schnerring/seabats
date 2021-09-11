@@ -1,0 +1,24 @@
+/* theme color */
+$--color-primary: #707070;
+/* icon font path, required */
+$--font-path: '~element-plus/lib/theme-chalk/fonts';
+@import "~element-plus/packages/theme-chalk/src/index";
+
+@include b(radio-button) {
+  margin-right: 10px;
+  &:last-child {
+    .el-radio-button__inner {
+      border-radius: unset;
+    }
+  }
+  &:first-child {
+    .el-radio-button__inner {
+      border-radius: unset;
+    }
+  }
+
+}
+@include b(radio-button__inner) {
+  padding: 7px 30px !important;
+  border-left: 1px solid #DCDFE6;
+}

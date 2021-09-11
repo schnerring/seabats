@@ -46,8 +46,8 @@ export default defineComponent({
         const coords = flight.traces.map((t) => new LatLng(t.lat, t.lon));
         const polyline = new Polyline(coords, {
           className: `polyline_${flight._id}`,
-          color: "blue",
-          weight: 3,
+          color: "#1148fe",
+          weight: 2,
         });
         this.polylines.addLayer(polyline);
       }
@@ -61,15 +61,16 @@ export default defineComponent({
     this.map = new LeafletMap("leaflet", {
       //renderer: new Canvas(),
       zoomControl: false,
+      attributionControl: false,
+      keyboard: false,
+      dragging: false,
+      scrollWheelZoom: false,
+      doubleClickZoom: false,
     });
     this.map.setView(this.center, this.zoom);
 
     const stamenLayer = new TileLayer(
-      "https://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}{r}.png",
-      {
-        attribution:
-          'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      }
+      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
     );
     this.map.addLayer(stamenLayer);
   },

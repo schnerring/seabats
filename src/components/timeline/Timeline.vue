@@ -1,7 +1,13 @@
 <template>
-  <div class="d3" ref="d3"></div>
-  <div class="button-container">
-    <date-range @dateRangeChanged="setDateRange($event)" />
+  <div class="timeline">
+    <div class="d3" ref="d3"></div>
+    <div class="info-bar">
+      <date-range @dateRangeChanged="setDateRange($event)" />
+      <div class="event-info"></div>
+      <div class="event-info" v-if="tooltipContent" :key="tooltipContent.title">
+        <flight-tooltip :content="tooltipContent" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -29,11 +35,13 @@ import {
   D3ZoomEvent,
   zoomIdentity,
 } from "d3";
+import FlightTooltip, { TooltipContent } from "../FlightTooltip.vue";
 
 export default defineComponent({
   emits: ["eventClick", "dateRangeChanged"],
   components: {
     DateRange,
+    FlightTooltip,
   },
   props: {
     minDate: {
@@ -47,6 +55,10 @@ export default defineComponent({
     events: {
       type: Array as () => IEventBase[],
       default: [] as IEventBase[],
+    },
+    tooltipContent: {
+      type: TooltipContent,
+      default: undefined,
     },
   },
   computed: {
@@ -74,7 +86,7 @@ export default defineComponent({
       }, 1000),
       zoomBehavior: {} as ZoomBehavior<SVGRectElement, unknown>,
       zoomRect: {} as Selection<SVGRectElement, unknown, HTMLElement, unknown>,
-      margin: { top: 10, right: 30, bottom: 100, left: 150 },
+      margin: { top: 10, right: 30, bottom: 10, left: 150 },
       xScale: {} as ScaleTime<number, number, never>,
       zoomScale: {} as ScaleTime<number, number, never>,
       yScale: {} as ScaleBand<string>,
@@ -209,7 +221,7 @@ export default defineComponent({
             enter
               .append("rect")
               .attr("class", "event")
-              .attr("fill", "var(--blue600)")
+              .attr("fill", "var(--white)")
               .on("click.select", function () {
                 selectAll(".selected-track").classed("selected-track", false);
                 select(this).classed("selected-track", true);
@@ -233,7 +245,7 @@ export default defineComponent({
             const g = enter.append("g").attr("class", "track-group");
             g.append("rect")
               .attr("class", "track-rect")
-              .attr("fill", "var(--blue200)");
+              .attr("fill", "var(--grey2)");
             g.append("text")
               .attr("class", "track-label")
               .attr("text-anchor", "end")
@@ -320,25 +332,33 @@ export default defineComponent({
 <style>
 /* TODO remove global state? */
 .selected-track {
-  fill: var(--blue900);
+  fill: var(--blue);
 }
 </style>
 <style scoped>
-.d3 {
-  background: white;
-  border-bottom: var(--blue900) solid 1px;
-  color: var(--blue900);
+.timeline {
+  background: var(--grey);
+  border-bottom: var(--grey2) solid 1px;
+  display: grid;
   height: inherit;
-  opacity: 0.7;
-  width: inherit;
-  z-index: inherit;
+  grid-template-areas:
+    "d3"
+    "info-bar";
+  grid-template-rows: 1fr auto;
 }
-.button-container {
+.d3 {
+  color: var(--grey2);
+  grid-area: d3;
+  height: 100%;
+  opacity: 1;
+  width: inherit;
+}
+.info-bar {
   display: flex;
-  flex-direction: row;
-  position: absolute;
-  bottom: 60px;
-  left: 150px;
-  z-index: 200;
+  justify-content: space-between;
+  grid-area: info-bar;
+  margin: 10px 30px 10px 150px;
+}
+.event-info {
 }
 </style>

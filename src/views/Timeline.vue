@@ -1,16 +1,16 @@
 <template>
-  <div class="timeline">
-    <timeline
-      :events="events"
-      @event-click="highlightFlight"
-      @date-range-changed="dateRangeChanged"
-    />
-  </div>
-  <div class="map">
-    <leaflet-map :selectedPolylineId="selectedFlightId" />
-  </div>
-  <div class="flight-tooltip" v-if="tooltipContent" :key="tooltipContent.title">
-    <flight-tooltip :content="tooltipContent" />
+  <div class="parent">
+    <div class="timeline">
+      <timeline
+        :events="events"
+        :tooltipContent="tooltipContent"
+        @event-click="highlightFlight"
+        @date-range-changed="dateRangeChanged"
+      />
+    </div>
+    <div class="map">
+      <leaflet-map :selectedPolylineId="selectedFlightId" />
+    </div>
   </div>
 </template>
 
@@ -20,7 +20,7 @@ import { defineComponent } from "vue";
 import { mapState, mapActions } from "vuex";
 import { first, last, find } from "lodash";
 import LeafletMap from "@/components/LeafletMap.vue";
-import FlightTooltip, { TooltipContent } from "@/components/FlightTooltip.vue";
+import { TooltipContent } from "@/components/FlightTooltip.vue";
 import Timeline from "@/components/timeline/Timeline.vue";
 import { IEvent } from "@/components/timeline/timeline";
 import { Flight } from "@/shared/Flight";
@@ -54,20 +54,25 @@ export default defineComponent({
       const totalMinutes = dayjs(flightEnd).diff(flightStart, "minutes");
       const totalHours = Math.floor(totalMinutes / 60);
       const minutes = totalMinutes % 60;
-      this.tooltipContent = new TooltipContent(
-        aircraft.model,
-        `#${event.data.icao}`,
-        [
-          {
-            key: "Date",
-            value: dayjs(event.data.date).format("YYYY-MM-DD HH:mm"),
-          },
-          {
-            key: "Duration",
-            value: `${totalHours.toString()}h ${minutes}m`,
-          },
-        ]
-      );
+      this.tooltipContent = new TooltipContent([
+        {
+          key: "DATE",
+          value: dayjs(event.data.date).format("YYYY-MM-DD"),
+        },
+        {
+          key: "TIME",
+          value: dayjs(event.data.date).format("HH:mm"),
+          // value: `#${event.data.icao}`,
+        },
+        {
+          key: "DURATION",
+          value: `${totalHours.toString()}h ${minutes}m`,
+        },
+        {
+          key: "TYPE",
+          value: aircraft.model,
+        },
+      ]);
     },
     ...mapActions(["getAircrafts", "getFlights"]),
   },
@@ -98,30 +103,29 @@ export default defineComponent({
   components: {
     LeafletMap,
     Timeline,
-    FlightTooltip,
+    // FlightTooltip,
   },
 });
 </script>
 
 <style scoped>
+.parent {
+  display: grid;
+  grid-template-areas:
+    "timeline"
+    "map";
+  grid-template-rows: auto 1fr;
+}
+.parent,
 .map {
   height: 100%;
-  z-index: 50;
 }
 .timeline {
-  height: 280px;
-  position: absolute;
-  top: 0;
+  height: 240px;
   width: 100%;
-  z-index: 100;
+  grid-area: timeline;
 }
-.flight-tooltip {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  width: 300px;
-  height: 150px;
-  background: white;
-  z-index: 99;
+.map {
+  grid-area: map;
 }
 </style>

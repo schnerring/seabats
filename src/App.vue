@@ -7,8 +7,16 @@
     <router-view />
   </main>
   <footer>
-    <span>© 2021 Michael Schnerring, Sebastian Deuss</span> |
-    <a href="https://github.com/schnerring/seabats">GitHub</a>
+    <p>
+      MAP TILES: &copy;
+      <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>
+      contributors &copy;
+      <a href="https://carto.com/attributions">CARTO</a>
+    </p>
+    <p>
+      WEBSITE: © 2021 Michael Schnerring, Sebastian Deuss |
+      <a href="https://github.com/schnerring/seabats">GitHub</a>
+    </p>
   </footer>
 </template>
 
@@ -28,20 +36,12 @@ body {
 }
 :root {
   /* Material Blue */
-  --blue50: #e3f2fd;
-  --blue100: #bbdefb;
-  --blue200: #90caf9;
-  --blue300: #64b5f6;
-  --blue400: #42a5f5;
-  --blue500: #2196f3;
-  --blue600: #1e88e5;
-  --blue700: #1976d2;
-  --blue800: #1565c0;
-  --blue900: #0d47a1;
-}
-
-a {
-  color: var(--blue900);
+  --blue: #1148fe;
+  --grey: #e9e9e9;
+  --grey2: #acacac;
+  --grey3: #707070;
+  --white: #ffffff;
+  --black: #818181;
 }
 
 #app {
@@ -52,11 +52,9 @@ a {
   display: grid;
   grid-template-areas:
     "nav"
-    "main"
-    "footer";
-  grid-template-rows: auto 1fr auto;
+    "main";
+  grid-template-rows: auto 1fr;
   height: 100vh;
-  overflow-y: hidden;
 }
 
 ::-webkit-scrollbar {
@@ -65,13 +63,17 @@ a {
   scrollbar-width: auto;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--blue900);
+  background: #262626;
+}
+
+a {
+  color: var(--blue);
 }
 </style>
 
 <style lang="scss" scoped>
 nav {
-  border-bottom: var(--blue900) solid 1px;
+  border-bottom: var(--grey2) solid 1px;
   display: flex;
   font-size: 14pt;
   grid-area: nav;
@@ -81,10 +83,10 @@ nav {
   a {
     color: var(--blue900);
     font-weight: bold;
-    text-decoration: none;
+    color: var(--black);
 
     &.router-link-exact-active {
-      text-decoration: underline;
+      color: var(--blue);
     }
   }
 }
@@ -92,14 +94,22 @@ nav {
 main {
   grid-area: main;
   overflow: hidden;
-  position: relative;
 }
 
 footer {
-  border-top: solid 1px var(--blue900);
-  font-size: 8pt;
+  text-align: right;
+  position: absolute;
+  bottom: 0;
+  right: 10px;
+  font-size: 11px;
+  text-rendering: optimizeLegibility;
+  color: var(--white);
   grid-area: footer;
   text-align: right;
-  padding: 0.3rem;
+  z-index: 500;
+  background: transparent;
+}
+footer a {
+  color: var(--white);
 }
 </style>

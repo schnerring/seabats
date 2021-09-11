@@ -1,17 +1,14 @@
 <template>
   <div id="Tooltip-Container">
-    <h1>{{ content.title }}</h1>
-    <p class="subtitle">{{ content.subtitle }}</p>
-    <table>
-      <tbody>
-        <tr v-for="field of content.fields" :key="field.key">
-          <td>
-            <strong>{{ field.key }}</strong>
-          </td>
-          <td>{{ field.value }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <strong>{{ content.title }}</strong>
+    {{ content.subtitle }}
+    <div class="single-tooltip">
+      <span v-for="field of content.fields" :key="field.key">
+        <strong>{{ field.key }}</strong>
+
+        {{ field.value }}</span
+      >
+    </div>
   </div>
 </template>
 
@@ -62,10 +59,9 @@ p.subtitle {
 div#Tooltip-Container {
   padding: 10px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
 }
-
-table {
-  margin-top: 5px;
+.single-tooltip span {
+  margin-left: 10px;
 }
 </style>

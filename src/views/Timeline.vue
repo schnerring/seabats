@@ -109,7 +109,7 @@ export default defineComponent({
   z-index: 50;
 }
 .timeline {
-  height: 280px;
+  height: 240px;
   position: absolute;
   top: 0;
   width: 100%;
@@ -117,11 +117,9 @@ export default defineComponent({
 }
 .flight-tooltip {
   position: absolute;
-  bottom: 20px;
-  left: 20px;
-  width: 300px;
-  height: 150px;
-  background: white;
-  z-index: 99;
+  right: 20px;
+  top: 195px;
+  color: var(--blue);
+  z-index: 150;
 }
 </style>

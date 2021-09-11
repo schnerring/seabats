@@ -7,8 +7,16 @@
     <router-view />
   </main>
   <footer>
-    <span>© 2021 Michael Schnerring, Sebastian Deuss</span> |
-    <a href="https://github.com/schnerring/seabats">GitHub</a>
+    <p>
+      MAP TILES: &copy;
+      <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>
+      contributors &copy;
+      <a href="https://carto.com/attributions">CARTO</a>
+    </p>
+    <p>
+      WEBSITE: © 2021 Michael Schnerring, Sebastian Deuss |
+      <a href="https://github.com/schnerring/seabats">GitHub</a>
+    </p>
   </footer>
 </template>
 
@@ -44,9 +52,8 @@ body {
   display: grid;
   grid-template-areas:
     "nav"
-    "main"
-    "footer";
-  grid-template-rows: auto 1fr auto;
+    "main";
+  grid-template-rows: auto 1fr;
   height: 100vh;
 }
 
@@ -90,10 +97,19 @@ main {
 }
 
 footer {
-  border-top: var(--grey2) solid 1px;
-  font-size: 8pt;
+  text-align: right;
+  position: absolute;
+  bottom: 0;
+  right: 10px;
+  font-size: 11px;
+  text-rendering: optimizeLegibility;
+  color: var(--white);
   grid-area: footer;
   text-align: right;
-  padding: 0.3rem;
+  z-index: 500;
+  background: transparent;
+}
+footer a {
+  color: var(--white);
 }
 </style>

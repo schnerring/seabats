@@ -39,7 +39,7 @@ export default defineComponent({
     },
     polylineWeightHighlighted: {
       type: Number,
-      default: 5,
+      default: 2,
     },
     polylineColorHighlighted: {
       type: String,
@@ -68,7 +68,7 @@ export default defineComponent({
         if (polyline) {
           if (!this.map) return;
           const bounds = polyline.getBounds();
-          this.map.fitBounds(bounds.pad(0.7));
+          this.map.fitBounds(bounds);
         }
       }
     },
@@ -106,15 +106,12 @@ export default defineComponent({
     this.map = new LeafletMap("leaflet", {
       //renderer: new Canvas(),
       zoomControl: false,
+      attributionControl: false,
     });
     this.map.setView(this.center, this.zoom);
 
     const stamenLayer = new TileLayer(
-      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-      {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      }
+      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
     );
     this.map.addLayer(stamenLayer);
   },

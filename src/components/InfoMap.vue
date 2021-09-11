@@ -47,7 +47,7 @@ export default defineComponent({
         const polyline = new Polyline(coords, {
           className: `polyline_${flight._id}`,
           color: "#1148fe",
-          weight: 3,
+          weight: 2,
         });
         this.polylines.addLayer(polyline);
       }
@@ -61,15 +61,16 @@ export default defineComponent({
     this.map = new LeafletMap("leaflet", {
       //renderer: new Canvas(),
       zoomControl: false,
+      attributionControl: false,
+      keyboard: false,
+      dragging: false,
+      scrollWheelZoom: false,
+      doubleClickZoom: false,
     });
     this.map.setView(this.center, this.zoom);
 
     const stamenLayer = new TileLayer(
-      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
-      {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-      }
+      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
     );
     this.map.addLayer(stamenLayer);
   },

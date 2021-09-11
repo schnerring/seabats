@@ -1,9 +1,15 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import Timeline from "@/views/Timeline.vue";
 import Setup from "@/views/Setup.vue";
+import Info from "@/views/Info.vue";
 import { store } from "../store/index";
 
 const routes: Array<RouteRecordRaw> = [
+  {
+    path: "/setup",
+    name: "Setup",
+    component: Setup,
+  },
   {
     path: "/",
     alias: "/map",
@@ -14,21 +20,12 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
-    path: "/hi",
-    name: "Setup",
-    component: Setup,
-  },
-  {
     path: "/info",
     name: "Info",
-    // Lazy loading
-    component: () => import(/* webpackChunkName: "info" */ "../views/Info.vue"),
-  },
-  {
-    path: "/info",
-    name: "Archive",
-    component: () =>
-      import(/* webpackChunkName: "archive" */ "../views/Info.vue"),
+    component: Info,
+    meta: {
+      requireData: true,
+    },
   },
 ];
 
@@ -37,15 +34,22 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+  if (!store.state.dataExists) {
+    await store.dispatch("checkIfDataExists");
+  }
+
   if (
     to.matched.some((record) => record.meta.requireData) &&
-    !store.getters.isLoggedIn
+    !store.state.dataExists
   ) {
-    next("/hi");
-    return;
-  }
-  next();
+    next("/setup");
+  } else if (
+    to.matched.some((record) => record.name === "Setup") &&
+    store.state.dataExists
+  ) {
+    next(from);
+  } else next();
 });
 
 export default router;

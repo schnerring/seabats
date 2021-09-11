@@ -38,7 +38,6 @@ export default defineComponent({
         console.log(this.flights);
       });
     }
-    console.log("mounted");
   },
 });
 </script>

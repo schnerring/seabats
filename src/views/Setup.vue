@@ -98,22 +98,24 @@ import { AdsbExchangeResponse } from "@/shared/adsb/AdsbExchangeResponse";
 import { addFlight } from "@/shared/DataService";
 import { Flight } from "@/shared/Flight";
 
-const initialStatus =
-  "Click here to select a data set from the local file system";
-
 export default defineComponent({
   data() {
     return {
-      status: initialStatus,
       isLoading: false,
     };
+  },
+  computed: {
+    status(): string {
+      return this.isLoading
+        ? "Loading ..."
+        : "Click here to select a data set from the local file system";
+    },
   },
   methods: {
     async loadData(files: FileList) {
       this.isLoading = true;
       try {
         for (let i = 0; i < files.length; i++) {
-          this.status = `Importing (${Math.floor(++i / files.length)}%) ...`;
           const adsbTraces: AdsbExchangeResponse[] = JSON.parse(
             await files[i].text()
           );
@@ -130,9 +132,10 @@ export default defineComponent({
         // TODO show error to user
         console.error(error);
       } finally {
-        this.status = initialStatus;
         this.isLoading = false;
       }
+
+      this.$router.push("/");
     },
   },
 });

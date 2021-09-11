@@ -60,3 +60,7 @@ export async function getAircrafts(): Promise<Aircraft[]> {
   }
   return response.data;
 }
+
+export async function dataExists(): Promise<boolean> {
+  return (await db.info()).doc_count > 0;
+}

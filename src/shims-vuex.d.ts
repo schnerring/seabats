@@ -9,9 +9,8 @@ import Track from "@/shared/Track";
 
 declare module "@vue/runtime-core" {
   export interface State {
-    appPassword: string;
     aircrafts: Aircraft[];
-    selectedAircraftIcaos: string[];
+    dataExists: boolean;
     flights: Flight[];
     infoText: string;
     selectedFlights: Flight[];

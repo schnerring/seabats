@@ -17,14 +17,14 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { mapActions, mapGetters } from "vuex";
+import { mapActions } from "vuex";
 
 export default defineComponent({
-  computed: {
-    ...mapGetters(["isLoggedIn"]),
-  },
   methods: {
-    ...mapActions(["logout"]),
+    ...mapActions(["getAircrafts"]),
+  },
+  async created() {
+    await this.getAircrafts();
   },
 });
 </script>
@@ -97,6 +97,7 @@ nav {
 main {
   grid-area: main;
   overflow: hidden;
+  position: relative;
 }
 footer {
   grid-area: footer;

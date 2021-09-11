@@ -28,16 +28,12 @@ body {
 }
 :root {
   /* Material Blue */
-  --blue50: #e3f2fd;
-  --blue100: #bbdefb;
-  --blue200: #90caf9;
-  --blue300: #64b5f6;
-  --blue400: #42a5f5;
-  --blue500: #2196f3;
-  --blue600: #1e88e5;
-  --blue700: #1976d2;
-  --blue800: #1565c0;
-  --blue900: #0d47a1;
+  --blue: #4586ff;
+  --grey: #e9e9e9;
+  --grey2: #acacac;
+  --grey3: #707070;
+  --white: #ffffff;
+  --black: #818181;
 }
 
 a {
@@ -81,10 +77,10 @@ nav {
   a {
     color: var(--blue900);
     font-weight: bold;
-    text-decoration: none;
+    color: var(--black);
 
     &.router-link-exact-active {
-      text-decoration: underline;
+      color: var(--blue);
     }
   }
 }
@@ -96,10 +92,19 @@ main {
 }
 
 footer {
-  border-top: solid 1px var(--blue900);
+  // border-top: solid 1px var(--blue900); TODO
   font-size: 8pt;
   grid-area: footer;
   text-align: right;
   padding: 0.3rem;
+}
+::-webkit-scrollbar {
+  height: 5px;
+  width: 5px;
+  scrollbar-width: auto;
+}
+::-webkit-scrollbar-thumb {
+  background: #262626;
+  /* border-radius: 0.2rem; */
 }
 </style>

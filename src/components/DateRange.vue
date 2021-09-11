@@ -5,12 +5,10 @@
     <el-radio-button label="week" disabled></el-radio-button>
     <el-radio-button label="day"></el-radio-button>
   </el-radio-group>
-  <div class="buttons">
-    <button v-if="enabled" class="pre nav-button" @click="previous()">
-      &lt;
-    </button>
+  <div class="date-pager">
+    <button v-if="enabled" class="nav-button" @click="previous()">&lt;</button>
     <div class="current">{{ formattedDate }}</div>
-    <button v-if="enabled" class="next nav-button" @click="next()">&gt;</button>
+    <button v-if="enabled" class="nav-button" @click="next()">&gt;</button>
   </div>
 </template>
 
@@ -78,42 +76,33 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.buttons {
+.date-pager {
+  box-sizing: border-box;
   background: var(--white);
   color: var(--grey3);
-  padding: 6px 20px;
   font-size: 14px;
-  height: 16px;
-  margin-right: 10px;
+  height: 100%;
   border: solid 1px #dcdfe6;
   display: flex;
   align-items: center;
-  align-self: center;
   justify-content: space-around;
 }
-.buttons:hover {
+
+.date-pager:hover {
   background: var(--grey3);
   color: var(--white);
-  height: 18px;
 }
+
 .nav-button {
   color: inherit;
   background: transparent;
   border: 0;
-  padding: 0;
   font-family: inherit;
   font-size: inherit;
+  height: 100%;
+  padding: 0px 9px;
 }
 .nav-button:hover {
   cursor: pointer;
-}
-.pre {
-  margin-right: 10px;
-}
-.next {
-  margin-left: 10px;
-}
-.el-radio-button:last-child .el-radio-button__inner {
-  border-radius: none !important;
 }
 </style>

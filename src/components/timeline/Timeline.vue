@@ -1,7 +1,9 @@
 <template>
-  <div class="d3" ref="d3"></div>
-  <div class="button-container">
-    <date-range @dateRangeChanged="setDateRange($event)" />
+  <div class="component">
+    <div class="d3" ref="d3"></div>
+    <div class="button-container">
+      <date-range @dateRangeChanged="setDateRange($event)" />
+    </div>
   </div>
 </template>
 
@@ -74,7 +76,7 @@ export default defineComponent({
       }, 1000),
       zoomBehavior: {} as ZoomBehavior<SVGRectElement, unknown>,
       zoomRect: {} as Selection<SVGRectElement, unknown, HTMLElement, unknown>,
-      margin: { top: 10, right: 30, bottom: 50, left: 150 },
+      margin: { top: 10, right: 30, bottom: 10, left: 150 },
       xScale: {} as ScaleTime<number, number, never>,
       zoomScale: {} as ScaleTime<number, number, never>,
       yScale: {} as ScaleBand<string>,
@@ -324,24 +326,28 @@ export default defineComponent({
 }
 </style>
 <style scoped>
-.d3 {
+.component {
   background: var(--grey);
   border-bottom: var(--grey2) solid 1px;
-  border-top: var(--grey2) solid 1px;
-  color: var(--grey2);
+  display: grid;
   height: inherit;
+  grid-template-areas:
+    "d3"
+    "buttons";
+  grid-template-rows: 1fr auto;
+}
+.d3 {
+  color: var(--grey2);
+  grid-area: d3;
+  height: 100%;
   opacity: 1;
   width: inherit;
-  z-index: inherit;
 }
 .button-container {
   display: flex;
   flex-direction: row;
-  position: absolute;
   align-items: center;
-  bottom: 17px;
-  height: 18px;
-  left: 150px;
-  z-index: 200;
+  grid-area: buttons;
+  margin: 10px 10px 10px 150px;
 }
 </style>

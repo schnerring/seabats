@@ -61,13 +61,11 @@ export default defineComponent({
   display: flex;
   flex-direction: row;
   height: 100%;
-  width: 100vw;
 }
 .info {
   width: 50vw;
   padding: 5px 30px;
   box-sizing: border-box;
-  height: 100%;
   overflow-y: scroll;
 }
 div#leaflet {

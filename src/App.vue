@@ -28,7 +28,7 @@ body {
 }
 :root {
   /* Material Blue */
-  --blue: #4586ff;
+  --blue: #1148fe;
   --grey: #e9e9e9;
   --grey2: #acacac;
   --grey3: #707070;

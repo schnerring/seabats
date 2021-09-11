@@ -20,4 +20,5 @@ $--font-path: '~element-plus/lib/theme-chalk/fonts';
 }
 @include b(radio-button__inner) {
   padding: 7px 30px !important;
+  border-left: 1px solid #DCDFE6;
 }

@@ -19,10 +19,11 @@ import dayjs from "dayjs";
 import { defineComponent } from "vue";
 import { mapState, mapActions } from "vuex";
 import { first, last, find } from "lodash";
-import LeafletMap from "@/components/LeafletMap.vue";
-import { TooltipContent } from "@/components/FlightTooltip.vue";
-import Timeline from "@/components/timeline/Timeline.vue";
-import { IEvent } from "@/components/timeline/timeline";
+
+import { TooltipContent, IEvent } from ".";
+import LeafletMap from "./Leaflet.vue";
+import Timeline from "./Timeline.vue";
+
 import { Flight } from "@/shared/Flight";
 import { Aircraft } from "@/shared/Aircraft";
 

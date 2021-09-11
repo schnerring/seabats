@@ -12,13 +12,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-
-export class TooltipContent {
-  fields: { key: string; value: string }[];
-  constructor(fields: { key: string; value: string }[]) {
-    this.fields = fields;
-  }
-}
+import { TooltipContent } from ".";
 
 export default defineComponent({
   props: {

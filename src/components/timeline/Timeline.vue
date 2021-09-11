@@ -74,7 +74,7 @@ export default defineComponent({
       }, 1000),
       zoomBehavior: {} as ZoomBehavior<SVGRectElement, unknown>,
       zoomRect: {} as Selection<SVGRectElement, unknown, HTMLElement, unknown>,
-      margin: { top: 10, right: 30, bottom: 100, left: 150 },
+      margin: { top: 10, right: 30, bottom: 50, left: 150 },
       xScale: {} as ScaleTime<number, number, never>,
       zoomScale: {} as ScaleTime<number, number, never>,
       yScale: {} as ScaleBand<string>,
@@ -209,7 +209,7 @@ export default defineComponent({
             enter
               .append("rect")
               .attr("class", "event")
-              .attr("fill", "var(--blue600)")
+              .attr("fill", "var(--white)")
               .on("click.select", function () {
                 selectAll(".selected-track").classed("selected-track", false);
                 select(this).classed("selected-track", true);
@@ -233,7 +233,7 @@ export default defineComponent({
             const g = enter.append("g").attr("class", "track-group");
             g.append("rect")
               .attr("class", "track-rect")
-              .attr("fill", "var(--blue200)");
+              .attr("fill", "var(--grey2)");
             g.append("text")
               .attr("class", "track-label")
               .attr("text-anchor", "end")
@@ -320,16 +320,17 @@ export default defineComponent({
 <style>
 /* TODO remove global state? */
 .selected-track {
-  fill: var(--blue900);
+  fill: var(--blue);
 }
 </style>
 <style scoped>
 .d3 {
-  background: white;
-  border-bottom: var(--blue900) solid 1px;
-  color: var(--blue900);
+  background: var(--grey);
+  border-bottom: var(--grey2) solid 1px;
+  border-top: var(--grey2) solid 1px;
+  color: var(--grey2);
   height: inherit;
-  opacity: 0.7;
+  opacity: 1;
   width: inherit;
   z-index: inherit;
 }
@@ -337,7 +338,9 @@ export default defineComponent({
   display: flex;
   flex-direction: row;
   position: absolute;
-  bottom: 60px;
+  align-items: center;
+  bottom: 17px;
+  height: 18px;
   left: 150px;
   z-index: 200;
 }

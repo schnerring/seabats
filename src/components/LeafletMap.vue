@@ -29,21 +29,21 @@ export default defineComponent({
     };
   },
   props: {
-    polylineShadowHighlighted: {
-      type: String,
-      default: "drop-shadow(0px 0px 3px rgb(255 255 255 / 1))",
-    },
     polylineColor: {
       type: String,
-      default: "#42a5f5", // TODO var?
+      default: "#90caf9", // TODO var?
     },
     polylineWeight: {
       type: Number,
       default: 1,
     },
+    polylineColorHighlighted: {
+      type: String,
+      default: "#0d47a1", // TODO var?
+    },
     polylineWeightHighlighted: {
       type: Number,
-      default: 3,
+      default: 5,
     },
     selectedPolylineId: {
       type: String,
@@ -56,21 +56,19 @@ export default defineComponent({
     selectedPolylineId() {
       this.selectedPolyline
         ?.style("filter", "none")
+        .style("stroke", `${this.polylineColor}`)
         .style("stroke-width", `${this.polylineWeight}px`);
       this.selectedPolyline = undefined;
       if (this.selectedPolylineId) {
         this.selectedPolyline = select(`.polyline_${this.selectedPolylineId}`)
-          .style("filter", this.polylineShadowHighlighted)
+          .style("stroke", `${this.polylineColorHighlighted}`)
           .style("stroke-width", `${this.polylineWeightHighlighted}px`);
 
         const polyline = this.polylines.get(this.selectedPolylineId);
         if (polyline) {
           if (!this.map) return;
-          const centerPoint = this.map
-            .latLngToContainerPoint(polyline.getCenter())
-            .subtract([0, 50]);
-          const centerLatLng = this.map.containerPointToLatLng(centerPoint);
-          this.map.panTo(centerLatLng);
+          const bounds = polyline.getBounds();
+          this.map.fitBounds(bounds.pad(0.7));
         }
       }
     },

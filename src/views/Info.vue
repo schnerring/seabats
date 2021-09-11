@@ -35,7 +35,6 @@ export default defineComponent({
       if (!flightIds) throw "data-link requires data attribute";
       button.addEventListener("click", async () => {
         this.flights = await getFlightsByIds(flightIds);
-        console.log(this.flights);
       });
     }
   },

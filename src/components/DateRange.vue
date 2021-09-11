@@ -25,7 +25,7 @@ export default defineComponent({
   emits: ["dateRangeChanged"],
   data(): { selectedDate: Date; duration: string } {
     return {
-      selectedDate: new Date(),
+      selectedDate: new Date(2021, 6, 15),
       duration: "year",
     };
   },
@@ -33,10 +33,6 @@ export default defineComponent({
     enabled: {
       type: Boolean,
       default: true,
-    },
-    date: {
-      type: Date,
-      default: new Date(),
     },
   },
   watch: {
@@ -50,6 +46,7 @@ export default defineComponent({
       if (unitType === "year") {
         return dayjs(this.selectedDate).format("YYYY").toString();
       } else if (unitType === "month") {
+        console.log(this.selectedDate);
         return dayjs(this.selectedDate).format("YYYY / MM").toString();
       } else if (unitType === "day") {
         return dayjs(this.selectedDate).format("YYYY / MM / DD").toString();
@@ -58,6 +55,8 @@ export default defineComponent({
     },
     dateRange(): [Date, Date] {
       const unitType = this.duration as UnitType;
+      console.log(dayjs(this.selectedDate).startOf(unitType).toDate());
+      console.log(dayjs(this.selectedDate).endOf(unitType).toDate());
       return [
         dayjs(this.selectedDate).startOf(unitType).toDate(),
         dayjs(this.selectedDate).endOf(unitType).toDate(),
@@ -67,11 +66,13 @@ export default defineComponent({
   methods: {
     previous() {
       const unitType = this.duration as UnitType;
+      console.log("yo");
       this.selectedDate = dayjs(this.selectedDate)
         .subtract(1, unitType)
         .toDate();
     },
     next() {
+      console.log("yo");
       const unitType = this.duration as UnitType;
       this.selectedDate = dayjs(this.selectedDate).add(1, unitType).toDate();
     },

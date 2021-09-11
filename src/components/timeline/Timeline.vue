@@ -38,11 +38,11 @@ export default defineComponent({
   props: {
     minDate: {
       type: Date,
-      default: new Date(2021, 1, 1),
+      default: new Date(2021, 0, 1),
     },
     maxDate: {
       type: Date,
-      default: new Date(2021, 12, 13),
+      default: new Date(2021, 11, 31),
     },
     events: {
       type: Array as () => IEventBase[],

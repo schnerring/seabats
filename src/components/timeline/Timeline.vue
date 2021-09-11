@@ -270,7 +270,8 @@ export default defineComponent({
     this.svg = select(".d3")
       .append("svg")
       .attr("class", "canvas")
-      .attr("transform", `translate(${this.margin.left}, ${this.margin.top})`);
+      .attr("transform", `translate(${this.margin.left}, ${this.margin.top})`)
+      .style("overflow", "visible");
 
     this.xAxis = this.svg
       .append("g")
@@ -326,15 +327,11 @@ export default defineComponent({
 .d3 {
   background: white;
   border-bottom: var(--blue900) solid 1px;
-  border-top: var(--blue900) solid 1px;
   color: var(--blue900);
   height: inherit;
   opacity: 0.7;
   width: inherit;
   z-index: inherit;
-}
-.canvas {
-  overflow: inherit;
 }
 .button-container {
   display: flex;

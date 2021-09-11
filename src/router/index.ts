@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import TheTimeline from "@/views/timeline/TheTimeline.vue";
 import Setup from "@/views/Setup.vue";
-import Info from "@/views/Info.vue";
+import TheInfo from "@/views/info/TheInfo.vue";
 import { store } from "../store/index";
 
 const routes: Array<RouteRecordRaw> = [
@@ -22,7 +22,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/info",
     name: "Info",
-    component: Info,
+    component: TheInfo,
     meta: {
       requireData: true,
     },

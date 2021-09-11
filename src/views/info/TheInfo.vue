@@ -8,7 +8,9 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { mapState, mapActions } from "vuex";
-import InfoMap from "@/components/InfoMap.vue";
+
+import InfoMap from "./Leaflet.vue";
+
 import { getFlightsByIds } from "@/shared/DataService";
 import { Flight } from "@/shared/Flight";
 

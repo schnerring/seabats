@@ -7,26 +7,15 @@
     <router-view />
   </main>
   <footer>
-    <span>© Michael Schnerring, Sebastian Deuss</span> | Source code
-    <a href="https://github.com/schnerring/seabats/blob/main/LICENSE"
-      >licensed under MIT</a
-    >
-    | <a href="https://github.com/schnerring/seabats">GitHub</a>
+    <span>© 2021 Michael Schnerring, Sebastian Deuss</span> |
+    <a href="https://github.com/schnerring/seabats">GitHub</a>
   </footer>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { mapActions } from "vuex";
 
-export default defineComponent({
-  methods: {
-    ...mapActions(["getAircrafts"]),
-  },
-  async created() {
-    await this.getAircrafts();
-  },
-});
+export default defineComponent({});
 </script>
 
 <style lang="scss">
@@ -51,6 +40,10 @@ body {
   --blue900: #0d47a1;
 }
 
+a {
+  color: var(--blue900);
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -72,12 +65,13 @@ body {
   scrollbar-width: auto;
 }
 ::-webkit-scrollbar-thumb {
-  background: black;
+  background: var(--blue900);
 }
 </style>
 
 <style lang="scss" scoped>
 nav {
+  border-bottom: var(--blue900) solid 1px;
   display: flex;
   font-size: 14pt;
   grid-area: nav;
@@ -85,11 +79,12 @@ nav {
   padding: 5px;
 
   a {
+    color: var(--blue900);
     font-weight: bold;
-    color: #2c3e50;
+    text-decoration: none;
 
     &.router-link-exact-active {
-      color: #42b983;
+      text-decoration: underline;
     }
   }
 }
@@ -99,7 +94,12 @@ main {
   overflow: hidden;
   position: relative;
 }
+
 footer {
+  border-top: solid 1px var(--blue900);
+  font-size: 8pt;
   grid-area: footer;
+  text-align: right;
+  padding: 0.3rem;
 }
 </style>

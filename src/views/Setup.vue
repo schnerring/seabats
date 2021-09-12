@@ -165,11 +165,11 @@ label {
   margin: 40px 0;
 }
 label:hover {
-  color: var(--blue600);
+  color: var(--blue);
   cursor: pointer;
 }
 label:hover svg {
-  stroke: var(--blue600);
+  stroke: var(--blue);
   transform: translateY(-5px);
 }
 svg {

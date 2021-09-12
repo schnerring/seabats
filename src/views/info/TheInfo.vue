@@ -8,7 +8,9 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { mapState, mapActions } from "vuex";
-import InfoMap from "@/components/InfoMap.vue";
+
+import InfoMap from "./Leaflet.vue";
+
 import { getFlightsByIds } from "@/shared/DataService";
 import { Flight } from "@/shared/Flight";
 
@@ -63,7 +65,7 @@ export default defineComponent({
   height: 100%;
 }
 .info {
-  width: 50vw;
+  width: 100%;
   padding: 5px 30px;
   box-sizing: border-box;
   overflow-y: scroll;

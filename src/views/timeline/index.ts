@@ -1,7 +1,7 @@
 export interface ITimeline {
   min: Date;
   max: Date;
-  tracks: IEvent[];
+  tracks: IEventBase[];
 }
 
 export interface IEventBase {
@@ -13,4 +13,11 @@ export interface IEventBase {
 
 export interface IEvent<T> extends IEventBase {
   data: T;
+}
+
+export class TooltipContent {
+  fields: { key: string; value: string }[];
+  constructor(fields: { key: string; value: string }[]) {
+    this.fields = fields;
+  }
 }

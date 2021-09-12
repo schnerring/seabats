@@ -2,26 +2,26 @@
   {
     "icao": "406658",
     "registration": "G-DMPP",
-    "model": "Diamond DA42 Twin Star"
+    "model": "DA42"
   },
   {
     "icao": "407637",
     "registration": "G-WKTH",
-    "model": "Diamond DA62"
+    "model": "DA62"
   },
   {
     "icao": "40785B",
     "registration": "G-WKTI",
-    "model": "Diamond DA62"
+    "model": "DA62"
   },
   {
     "icao": "43ED4B",
     "registration": "2-WKTJ",
-    "model": "Beechcraft 300 Super King Air 350"
+    "model": "B350"
   },
   {
     "icao": "4D232D",
     "registration": "AS2132",
-    "model": "IAI Heron Shoval"
+    "model": "HRON"
   }
 ]

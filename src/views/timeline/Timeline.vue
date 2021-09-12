@@ -12,11 +12,11 @@
 </template>
 
 <script lang="ts">
-import DateRange from "@/components/DateRange.vue";
+import DateRange from "./DatePager.vue";
 import { defineComponent } from "vue";
 import dayjs from "dayjs";
 import { debounce, uniqBy } from "lodash";
-import { IEventBase } from "@/components/timeline/timeline";
+import { IEventBase } from ".";
 
 import {
   scaleTime,
@@ -35,7 +35,9 @@ import {
   D3ZoomEvent,
   zoomIdentity,
 } from "d3";
-import FlightTooltip, { TooltipContent } from "../FlightTooltip.vue";
+
+import { TooltipContent } from ".";
+import FlightTooltip from "./FlightTooltip.vue";
 
 export default defineComponent({
   emits: ["eventClick", "dateRangeChanged"],
@@ -234,6 +236,7 @@ export default defineComponent({
             return update;
           },
           (exit) => {
+            exit.selectAll(".selected-track").classed("selected-track", false);
             return exit.remove();
           }
         );
@@ -358,7 +361,5 @@ export default defineComponent({
   justify-content: space-between;
   grid-area: info-bar;
   margin: 10px 30px 10px 150px;
-}
-.event-info {
 }
 </style>

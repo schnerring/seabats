@@ -81,7 +81,7 @@ nav {
   padding: 5px;
 
   a {
-    color: var(--blue900);
+    color: var(--blue);
     font-weight: bold;
     color: var(--black);
 

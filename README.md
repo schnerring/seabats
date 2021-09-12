@@ -1,4 +1,17 @@
-# seabats
+# Sensing Skies
+
+## Data Format
+
+The application expects data in the form of GeoJSON Features. From the [GeoJSON Specification (RFC 7946)](https://datatracker.ietf.org/doc/html/rfc7946):
+
+> GeoJSON is a geospatial data interchange format based on JavaScript
+> Object Notation (JSON). It defines several types of JSON objects and
+> the manner in which they are combined to represent data about
+> geographic features, their properties, and their spatial extents.
+> GeoJSON uses a geographic coordinate reference system, World Geodetic
+> System 1984, and units of decimal degrees.
+
+To enrich the data displayed by the app, add additional properties the GeoJSON Features.
 
 ## Setup
 
@@ -10,42 +23,15 @@
 1. Install [Visual Studio Code](https://code.visualstudio.com/)
 2. Install the [recommended VS Code extensions (`.vscode/extensions.json`)](./.vscode/extensions.json)
 3. Install extensions for Chrome:
-    1. [Vue.js devtools](https://chrome.google.com/webstore/detail/vuejs-devtools/ljjemllljcmogpfapbkkighbhhppjdbg)
-    2. [Redux DevTools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd?hl=en)
+   1. [Vue.js devtools](https://chrome.google.com/webstore/detail/vuejs-devtools/ljjemllljcmogpfapbkkighbhhppjdbg)
+   2. [Redux DevTools](https://chrome.google.com/webstore/detail/redux-devtools/lmhkpmbekcpmknklioeibfkpmmfibljd?hl=en)
 
-## Project setup
+## Run Locally
 
 ```shell
 npm install
-```
-
-### Compiles and hot-reloads for development
-
-```shell
 npm run serve
 ```
-
-### Compiles and minifies for production
-
-```shell
-npm run build
-```
-
-### Run your unit tests
-
-```shell
-npm run test:unit
-```
-
-### Lints and fixes files
-
-```shell
-npm run lint
-```
-
-### Customize configuration
-
-See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ## Icons
 

@@ -1,9 +1,22 @@
 <template>
-  <div id="leaflet"></div>
+  <div class="leaflet-container">
+    <div id="leaflet"></div>
+    <div class="tooltip-list">
+      <info-tooltip
+        class="tooltip-box"
+        v-for="tooltipContent of tooltipContents"
+        :key="tooltipContent"
+        :from="tooltipContent.from"
+        :to="tooltipContent.to"
+        :aircraftName="tooltipContent.aircraftName"
+      />
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import InfoTooltip from "./InfoTooltip.vue";
 import {
   Map as LeafletMap,
   LatLng,
@@ -12,19 +25,27 @@ import {
   FeatureGroup,
 } from "leaflet";
 import { Flight } from "@/shared/Flight";
+import { last, first, find } from "lodash";
+import { mapState, mapActions } from "vuex";
+import { Aircraft } from "@/shared/Aircraft";
 
 export default defineComponent({
+  components: {
+    InfoTooltip,
+  },
   data(): {
     zoom: number;
     center: LatLng;
     map: LeafletMap | undefined;
     polylines: FeatureGroup | undefined;
+    tooltipContents: { from: Date; to: Date; aircraftName: string }[];
   } {
     return {
       zoom: 6,
       center: new LatLng(35.917973, 14.409943),
       map: undefined,
       polylines: undefined,
+      tooltipContents: [],
     };
   },
   props: {
@@ -33,16 +54,39 @@ export default defineComponent({
       type: Array,
     },
   },
+  methods: {
+    ...mapActions(["getAircrafts"]),
+  },
+  computed: {
+    ...mapState(["aircrafts"]),
+  },
   watch: {
-    flights(flights: Flight[]) {
+    async flights(flights: Flight[]) {
+      await this.getAircrafts();
       if (!this.map) return;
-
       if (this.polylines) {
         this.polylines.remove();
       }
-
+      if (this.tooltipContents.length > 0) {
+        this.tooltipContents = [];
+      }
       this.polylines = new FeatureGroup<Polyline>();
       for (const flight of flights) {
+        const aircraft = find<Aircraft>(
+          this.aircrafts,
+          (a: Aircraft) => a.icao === flight.icao
+        );
+
+        const flightEnd = last(flight.traces)?.date;
+        const flightStart = first(flight.traces)?.date;
+
+        if (!aircraft || !flightStart || !flightEnd) continue;
+
+        this.tooltipContents.push({
+          aircraftName: aircraft.model,
+          from: flightStart, //,
+          to: flightEnd, //).format("YYYY-MM-DD HH:mm"),
+        });
         const coords = flight.traces.map((t) => new LatLng(t.lat, t.lon));
         const polyline = new Polyline(coords, {
           className: `polyline_${flight._id}`,
@@ -80,4 +124,18 @@ export default defineComponent({
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.tooltip-list {
+  position: absolute;
+  left: 15px;
+  color: white;
+  z-index: 500;
+  top: 15px;
+  font-family: monospace;
+}
+.leaflet-container {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+</style>

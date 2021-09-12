@@ -65,7 +65,7 @@ export default defineComponent({
   height: 100%;
 }
 .info {
-  width: 50vw;
+  width: 100%;
   padding: 5px 30px;
   box-sizing: border-box;
   overflow-y: scroll;

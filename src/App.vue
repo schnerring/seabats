@@ -103,13 +103,13 @@ footer {
   right: 10px;
   font-size: 11px;
   text-rendering: optimizeLegibility;
-  color: var(--white);
+  color: var(--grey3);
   grid-area: footer;
   text-align: right;
   z-index: 500;
   background: transparent;
 }
 footer a {
-  color: var(--white);
+  color: inherit;
 }
 </style>

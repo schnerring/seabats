@@ -84,15 +84,15 @@ a {
 nav {
   border-bottom: var(--grey2) solid 1px;
   display: flex;
-  font-size: 14pt;
+  font-size: 16pt;
   grid-area: nav;
   justify-content: space-between;
   padding: 5px;
 
   a {
-    color: var(--blue);
-    font-weight: bold;
     color: var(--black);
+    font-weight: bold;
+    text-decoration: none;
 
     &.router-link-exact-active {
       color: var(--blue);

@@ -3,17 +3,15 @@
 // See: https://next.vuex.vuejs.org/guide/typescript-support.html#typing-store-property-in-vue-component
 import { ComponentCustomProperties } from "vue";
 import { Store } from "vuex";
-import Aircraft from "@/shared/Aircraft";
-import Flight from "@/shared/Flight";
+import { Feature, LineString } from "geojson";
+import Flight from "@/models/Flight";
 import Track from "@/shared/Track";
 
 declare module "@vue/runtime-core" {
   export interface State {
-    aircrafts: Aircraft[];
     dataExists: boolean;
-    flights: Flight[];
+    flights: Feature<LineString, Flight>[];
     infoText: string;
-    selectedFlights: Flight[];
     tracks: Track[];
   }
 

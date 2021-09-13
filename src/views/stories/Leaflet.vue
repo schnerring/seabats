@@ -10,6 +10,14 @@
         :aircraftName="content.aircraftName"
       />
     </div>
+    <div class="legend">
+      <legend-item
+        v-for="item of legendItems"
+        :key="item.label"
+        :color="item.color"
+        :label="item.label"
+      ></legend-item>
+    </div>
   </div>
 </template>
 
@@ -25,6 +33,7 @@ import {
   geoJSON,
 } from "leaflet";
 import Tooltip from "./Tooltip.vue";
+import LegendItem from "@/components/LegendItem.vue";
 import { Flight } from "@/models/Flight";
 import dayjs from "dayjs";
 
@@ -38,6 +47,7 @@ import {
 
 export default defineComponent({
   components: {
+    LegendItem,
     Tooltip,
   },
   computed: {
@@ -50,6 +60,7 @@ export default defineComponent({
   data(): {
     map: LeafletMap | undefined;
     data: FeatureGroup | undefined;
+    legendItems: { color: string; label: string }[];
     tooltipContents: {
       from: Date;
       to: Date;
@@ -59,6 +70,7 @@ export default defineComponent({
     return {
       map: undefined,
       data: undefined,
+      legendItems: [],
       tooltipContents: [],
     };
   },
@@ -96,6 +108,12 @@ export default defineComponent({
       this.data = data;
     },
     zones(zones: Feature[]) {
+      // TODO fix code duplication
+      this.legendItems = zones
+        .filter((z) => z.properties?.type === "sar")
+        .map((z) => {
+          return { color: z.properties?.color, label: z.properties?.title };
+        });
       for (const zone of zones) {
         this.map?.addLayer(
           geoJSON(zone, {
@@ -132,10 +150,17 @@ export default defineComponent({
 .tooltip-list {
   position: absolute;
   left: 15px;
-  color: white;
+  color: var(--white);
   z-index: 500;
   top: 15px;
   font-family: monospace;
+}
+.legend {
+  bottom: 15px;
+  color: var(--white);
+  position: absolute;
+  left: 15px;
+  z-index: 500;
 }
 .leaflet-container {
   position: relative;

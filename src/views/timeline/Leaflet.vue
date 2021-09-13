@@ -1,5 +1,13 @@
 <template>
   <div id="leaflet"></div>
+  <div class="legend">
+    <legend-item
+      v-for="item of legendItems"
+      :key="item.label"
+      :color="item.color"
+      :label="item.label"
+    ></legend-item>
+  </div>
 </template>
 
 <script lang="ts">
@@ -16,17 +24,23 @@ import {
   tileLayer,
   zoneStyle,
 } from "@/shared/LeafletConfig";
+import LegendItem from "@/components/LegendItem.vue";
 
 export default defineComponent({
+  components: {
+    LegendItem,
+  },
   data(): {
     map: LeafletMap | undefined;
     data: Map<string, GeoJSON>;
     selectedLine: GeoJSON | undefined;
+    legendItems: { color: string; label: string }[];
   } {
     return {
       map: undefined,
       data: new Map(),
       selectedLine: undefined,
+      legendItems: [],
     };
   },
   props: {
@@ -84,6 +98,12 @@ export default defineComponent({
       }
     },
     zones(zones: Feature[]) {
+      // TODO fix code duplication
+      this.legendItems = zones
+        .filter((z) => z.properties?.type === "sar")
+        .map((z) => {
+          return { color: z.properties?.color, label: z.properties?.title };
+        });
       for (const zone of zones) {
         this.map?.addLayer(
           geoJSON(zone, {
@@ -116,5 +136,12 @@ export default defineComponent({
 #leaflet {
   height: inherit;
   z-index: inherit;
+}
+.legend {
+  bottom: 15px;
+  color: var(--white);
+  position: absolute;
+  left: 15px;
+  z-index: 500;
 }
 </style>

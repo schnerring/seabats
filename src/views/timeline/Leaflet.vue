@@ -15,7 +15,13 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { mapActions, mapState } from "vuex";
-import { Map as LeafletMap, geoJSON, GeoJSON, Canvas } from "leaflet";
+import {
+  Map as LeafletMap,
+  geoJSON,
+  GeoJSON,
+  Canvas,
+  FeatureGroup,
+} from "leaflet";
 import { Feature } from "geojson";
 
 import {
@@ -79,6 +85,7 @@ export default defineComponent({
       }
     },
     flights(flights: Feature[]) {
+      const features = new FeatureGroup();
       for (const flight of flights) {
         if (typeof flight.id !== "string") throw "Flights require valid ID";
 
@@ -91,8 +98,10 @@ export default defineComponent({
         // Add the lines to the Typescript map
         this.data.set(flight.id, data);
         // Render the line in Leaflet
-        this.map?.addLayer(data); // TODO bringToFront()
+        features.addLayer(data); // TODO bringToFront()
       }
+      this.map?.addLayer(features);
+
       for (const flightId of this.data.keys()) {
         const existingFlight = flights.find((flight) => flight.id === flightId);
         if (existingFlight) {

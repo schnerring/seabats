@@ -2,13 +2,12 @@
   <div class="leaflet-container">
     <div id="leaflet"></div>
     <div class="tooltip-list">
-      <info-tooltip
-        class="tooltip-box"
-        v-for="tooltipContent of tooltipContents"
-        :key="tooltipContent"
-        :from="tooltipContent.from"
-        :to="tooltipContent.to"
-        :aircraftName="tooltipContent.aircraftName"
+      <tooltip
+        v-for="content of tooltipContents"
+        :key="content"
+        :from="content.from"
+        :to="content.to"
+        :aircraftName="content.aircraftName"
       />
     </div>
   </div>
@@ -25,7 +24,7 @@ import {
   FeatureGroup,
   geoJSON,
 } from "leaflet";
-import InfoTooltip from "./InfoTooltip.vue";
+import Tooltip from "./Tooltip.vue";
 import { Flight } from "@/models/Flight";
 import dayjs from "dayjs";
 
@@ -39,7 +38,7 @@ import {
 
 export default defineComponent({
   components: {
-    InfoTooltip,
+    Tooltip,
   },
   computed: {
     ...mapState(["zones"]),

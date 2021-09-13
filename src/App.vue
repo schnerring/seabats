@@ -1,7 +1,7 @@
 <template>
   <nav>
-    <router-link to="/">MAP</router-link>
-    <router-link to="/info">INFO</router-link>
+    <router-link to="/">TIMELINE</router-link>
+    <router-link to="/stories">STORIES</router-link>
   </nav>
   <main>
     <router-view />

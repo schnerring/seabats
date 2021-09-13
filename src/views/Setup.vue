@@ -17,8 +17,7 @@
         <input
           type="file"
           ref="file"
-          multiple="multiple"
-          @change="loadData($event.target.files)"
+          @change="loadData($event.target.files[0])"
           :disabled="isLoading"
         />
 
@@ -94,8 +93,10 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { AdsbExchangeResponse } from "@/shared/adsb/AdsbExchangeResponse";
-import { addFlight } from "@/shared/DataService";
+import { loadAsync } from "jszip";
+import { FeatureCollection } from "geojson";
+
+import { addGeoJSON } from "@/shared/DataService";
 import { Flight } from "@/shared/Flight";
 
 export default defineComponent({
@@ -112,21 +113,19 @@ export default defineComponent({
     },
   },
   methods: {
-    async loadData(files: FileList) {
+    async loadData(zip: File) {
       this.isLoading = true;
+      const buffer = await zip.arrayBuffer();
+      const unzipped = await loadAsync(buffer);
       try {
-        for (let i = 0; i < files.length; i++) {
-          const adsbTraces: AdsbExchangeResponse[] = JSON.parse(
-            await files[i].text()
-          );
-          for (const trace of adsbTraces) {
-            try {
-              const flight = new Flight(trace);
-              await addFlight(flight);
-            } catch {
-              console.warn(trace);
-            }
-          }
+        for (const filePath in unzipped.files) {
+          const file = unzipped.file(filePath);
+
+          if (!file) throw `Error unzipping file: ${filePath}`;
+
+          const content = await file.async("string");
+          const geoJSON: FeatureCollection = JSON.parse(content);
+          await addGeoJSON(geoJSON);
         }
       } catch (error) {
         // TODO show error to user

@@ -1,11 +1,10 @@
 import PouchDB from "pouchdb";
 import find from "pouchdb-find";
-import { Flight, Zone } from "@/models";
 import axios from "axios";
 import marked from "marked";
-import { Feature, FeatureCollection, LineString, Polygon } from "geojson";
+import { Feature, FeatureCollection } from "geojson";
 
-const db = new PouchDB("geoJSON");
+const db = new PouchDB<Feature>("geoJSON");
 PouchDB.plugin(find);
 
 export async function addGeoJSON(
@@ -19,7 +18,7 @@ export async function addGeoJSON(
   });
 }
 
-export async function getZones(): Promise<Feature<Polygon, Zone>[]> {
+export async function getZones(): Promise<Feature[]> {
   const found = await db.find({
     selector: {
       $or: [
@@ -35,15 +34,10 @@ export async function getZones(): Promise<Feature<Polygon, Zone>[]> {
       ],
     },
   });
-  return found.docs.map((doc) => {
-    return doc as PouchDB.Core.ExistingDocument<Feature<Polygon, Zone>>;
-  });
+  return found.docs;
 }
 
-export async function getFlights(
-  from: Date,
-  to: Date
-): Promise<Feature<LineString, Flight>[]> {
+export async function getFlights(from: Date, to: Date): Promise<Feature[]> {
   const found = await db.find({
     selector: {
       "properties.type": "flight",
@@ -51,22 +45,16 @@ export async function getFlights(
       // TODO properties.to
     },
   });
-  return found.docs.map((doc) => {
-    return doc as PouchDB.Core.ExistingDocument<Feature<LineString, Flight>>;
-  });
+  return found.docs;
 }
 
-export async function getFlightsByIds(
-  ids: string[]
-): Promise<Feature<LineString, Flight>[]> {
+export async function getFlightsByIds(ids: string[]): Promise<Feature[]> {
   const found = await db.find({
     selector: {
       id: { $in: ids },
     },
   });
-  return found.docs.map(
-    (doc) => doc as PouchDB.Core.ExistingDocument<Feature<LineString, Flight>>
-  );
+  return found.docs;
 }
 
 export async function dataExists(): Promise<boolean> {

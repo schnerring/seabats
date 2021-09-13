@@ -127,9 +127,9 @@ export default defineComponent({
       const data = geoJSON(zone, {
         style: {
           fill: false,
-          weight: zone.properties.type === "sar" ? 2 : 1,
-          color: zone.properties.color,
-          dashArray: zone.properties.type === "sar" ? "5, 5" : undefined,
+          weight: zone.properties?.type === "sar" ? 2 : 1,
+          color: zone.properties?.color,
+          dashArray: zone.properties?.type === "sar" ? "5, 5" : undefined,
         },
       });
       this.map.addLayer(data);

@@ -27,7 +27,7 @@ export default defineComponent({
     ElRadioButton,
   },
   emits: ["dateRangeChanged"],
-  data(): { selectedDate: Date; duration: string } {
+  data(): { selectedDate: Date; duration: UnitType } {
     return {
       selectedDate: new Date(2021, 6, 15),
       duration: "year",
@@ -46,34 +46,32 @@ export default defineComponent({
   },
   computed: {
     formattedDate(): string {
-      const unitType = this.duration as UnitType;
-      if (unitType === "year") {
+      if (this.duration === "year") {
         return dayjs(this.selectedDate).format("YYYY").toString();
-      } else if (unitType === "month") {
+      } else if (this.duration === "month") {
         return dayjs(this.selectedDate).format("YYYY / MM").toString();
-      } else if (unitType === "day") {
+      } else if (this.duration === "day") {
         return dayjs(this.selectedDate).format("YYYY / MM / DD").toString();
       }
-      throw `Unsupported unitType ${unitType}`;
+      throw `Unsupported unitType ${this.duration}`;
     },
     dateRange(): [Date, Date] {
-      const unitType = this.duration as UnitType;
       return [
-        dayjs(this.selectedDate).startOf(unitType).toDate(),
-        dayjs(this.selectedDate).endOf(unitType).toDate(),
+        dayjs(this.selectedDate).startOf(this.duration).toDate(),
+        dayjs(this.selectedDate).endOf(this.duration).toDate(),
       ];
     },
   },
   methods: {
     previous() {
-      const unitType = this.duration as UnitType;
       this.selectedDate = dayjs(this.selectedDate)
-        .subtract(1, unitType)
+        .subtract(1, this.duration)
         .toDate();
     },
     next() {
-      const unitType = this.duration as UnitType;
-      this.selectedDate = dayjs(this.selectedDate).add(1, unitType).toDate();
+      this.selectedDate = dayjs(this.selectedDate)
+        .add(1, this.duration)
+        .toDate();
     },
   },
 });

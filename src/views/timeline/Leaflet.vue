@@ -4,24 +4,18 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { mapState } from "vuex";
-import {
-  Map as LeafletMap,
-  TileLayer,
-  geoJSON,
-  GeoJSON,
-  Canvas,
-} from "leaflet";
-import { Feature, MultiPoint } from "geojson";
-import { Flight } from "@/models/Flight";
+import { mapActions, mapState } from "vuex";
+import { Map as LeafletMap, geoJSON, GeoJSON, Canvas } from "leaflet";
+import { Feature } from "geojson";
 
 import {
   lineStyle,
   lineStyleHighlighted,
   initialCenter,
   initialZoom,
+  tileLayer,
+  zoneStyle,
 } from "@/shared/LeafletConfig";
-import { getZones } from "@/shared/DataService";
 
 export default defineComponent({
   data(): {
@@ -41,7 +35,10 @@ export default defineComponent({
     },
   },
   computed: {
-    ...mapState(["flights"]),
+    ...mapState(["flights", "zones"]),
+  },
+  methods: {
+    ...mapActions(["getZones"]),
   },
   watch: {
     selectedLineId() {
@@ -60,7 +57,7 @@ export default defineComponent({
         }
       }
     },
-    flights(flights: Feature<MultiPoint, Flight>[]) {
+    flights(flights: Feature[]) {
       for (const flight of flights) {
         if (typeof flight.id !== "string") throw "Flights require valid ID";
 
@@ -73,7 +70,7 @@ export default defineComponent({
         // Add the lines to the Typescript map
         this.data.set(flight.id, data);
         // Render the line in Leaflet
-        this.map?.addLayer(data);
+        this.map?.addLayer(data); // TODO bringToFront()
       }
       for (const flightId of this.data.keys()) {
         const existingFlight = flights.find((flight) => flight.id === flightId);
@@ -86,6 +83,15 @@ export default defineComponent({
         this.data.delete(flightId);
       }
     },
+    zones(zones: Feature[]) {
+      for (const zone of zones) {
+        this.map?.addLayer(
+          geoJSON(zone, {
+            style: zoneStyle(zone.properties?.type, zone.properties?.color),
+          }) // TODO bringToBack()
+        );
+      }
+    },
   },
   async mounted() {
     this.map = new LeafletMap("leaflet", {
@@ -96,24 +102,9 @@ export default defineComponent({
 
     this.map.setView(initialCenter, initialZoom);
 
-    const tileLayer = new TileLayer(
-      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-    );
-    this.map.addLayer(tileLayer);
+    this.map.addLayer(tileLayer());
 
-    // TODO move to store
-    for (const zone of await getZones()) {
-      this.map.addLayer(
-        geoJSON(zone, {
-          style: {
-            weight: zone.properties?.type === "sar" ? 2 : 1,
-            color: zone.properties?.color,
-            stroke: false,
-            dashArray: zone.properties?.type === "sar" ? "5, 5" : "5, 10",
-          },
-        })
-      );
-    }
+    await this.getZones();
   },
   beforeUnmount() {
     this.map?.remove();

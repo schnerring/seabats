@@ -16,10 +16,10 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { mapActions, mapState } from "vuex";
 import { Feature, LineString } from "geojson";
 import {
   Map as LeafletMap,
-  TileLayer,
   GeoJSON,
   Canvas,
   FeatureGroup,
@@ -33,13 +33,21 @@ import {
   initialCenter,
   initialZoom,
   lineStyleHighlighted,
+  tileLayer,
+  zoneStyle,
 } from "@/shared/LeafletConfig";
-import { getZones } from "@/shared/DataService";
 
 export default defineComponent({
   components: {
     InfoTooltip,
   },
+  computed: {
+    ...mapState(["zones"]),
+  },
+  methods: {
+    ...mapActions(["getZones"]),
+  },
+
   data(): {
     map: LeafletMap | undefined;
     data: FeatureGroup | undefined;
@@ -88,6 +96,15 @@ export default defineComponent({
 
       this.data = data;
     },
+    zones(zones: Feature[]) {
+      for (const zone of zones) {
+        this.map?.addLayer(
+          geoJSON(zone, {
+            style: zoneStyle(zone.properties?.type, zone.properties?.color),
+          })
+        );
+      }
+    },
   },
   async mounted() {
     this.map = new LeafletMap("leaflet", {
@@ -102,23 +119,9 @@ export default defineComponent({
 
     this.map.setView(initialCenter, initialZoom);
 
-    const stamenLayer = new TileLayer(
-      "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-    );
-    this.map.addLayer(stamenLayer);
+    this.map.addLayer(tileLayer());
 
-    // TODO move to store
-    for (const zone of await getZones()) {
-      const data = geoJSON(zone, {
-        style: {
-          fill: false,
-          weight: zone.properties?.type === "sar" ? 2 : 1,
-          color: zone.properties?.color,
-          dashArray: zone.properties?.type === "sar" ? "5, 5" : undefined,
-        },
-      });
-      this.map.addLayer(data);
-    }
+    await this.getZones();
   },
   beforeUnmount() {
     this.map?.remove();

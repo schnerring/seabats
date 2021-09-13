@@ -10,9 +10,10 @@ import { defineComponent } from "vue";
 import { mapState, mapActions } from "vuex";
 
 import InfoMap from "./Leaflet.vue";
+import { Feature, LineString } from "geojson";
 
 import { getFlightsByIds } from "@/shared/DataService";
-import { Flight } from "@/shared/Flight";
+import { Flight } from "@/models/Flight";
 
 export default defineComponent({
   computed: {
@@ -24,7 +25,7 @@ export default defineComponent({
   components: {
     InfoMap,
   },
-  data(): { flights: Flight[] } {
+  data(): { flights: Feature<LineString, Flight>[] } {
     return {
       flights: [],
     };

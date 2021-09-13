@@ -9,7 +9,7 @@
       />
     </div>
     <div class="map">
-      <leaflet-map :selectedPolylineId="selectedFlightId" />
+      <leaflet-map :selectedLineId="selectedFlightId" />
     </div>
   </div>
 </template>
@@ -18,14 +18,13 @@
 import dayjs from "dayjs";
 import { defineComponent } from "vue";
 import { mapState, mapActions } from "vuex";
-import { first, last, find } from "lodash";
+import { Feature, LineString } from "geojson";
 
 import { TooltipContent, IEvent } from ".";
 import LeafletMap from "./Leaflet.vue";
 import Timeline from "./Timeline.vue";
 
-import { Flight } from "@/shared/Flight";
-import { Aircraft } from "@/shared/Aircraft";
+import { Flight } from "@/models/Flight";
 
 export default defineComponent({
   data(): {
@@ -44,26 +43,20 @@ export default defineComponent({
       await this.getFlights({ from, to });
     },
     highlightFlight(event: IEvent<Flight>) {
-      this.selectedFlightId = event.data._id;
-      const aircraft = find(
-        this.aircrafts,
-        (a: Aircraft) => a.icao === event.data.icao
-      );
-
-      const flightEnd = last(event.data.traces)?.date;
-      const flightStart = first(event.data.traces)?.date;
+      this.selectedFlightId = event.key;
+      const flightEnd = event.data.to;
+      const flightStart = event.data.from;
       const totalMinutes = dayjs(flightEnd).diff(flightStart, "minutes");
       const totalHours = Math.floor(totalMinutes / 60);
       const minutes = totalMinutes % 60;
       this.tooltipContent = new TooltipContent([
         {
           key: "DATE",
-          value: dayjs(event.data.date).format("YYYY-MM-DD"),
+          value: dayjs(event.data.from).format("YYYY-MM-DD"),
         },
         {
           key: "TIME",
-          value: dayjs(event.data.date).format("HH:mm"),
-          // value: `#${event.data.icao}`,
+          value: dayjs(event.data.from).format("HH:mm"),
         },
         {
           key: "DURATION",
@@ -71,40 +64,31 @@ export default defineComponent({
         },
         {
           key: "TYPE",
-          value: aircraft.model,
+          value: event.data.aircraft,
         },
       ]);
     },
-    ...mapActions(["getAircrafts", "getFlights"]),
+    ...mapActions(["getFlights"]),
   },
   computed: {
-    ...mapState(["aircrafts", "flights"]),
+    ...mapState(["flights"]),
   },
   watch: {
-    async flights(flights: Flight[]) {
-      await this.getAircrafts();
-      this.events = flights
-        .filter((f) => f.traces && f.traces.length > 0) // TODO any()?
-        .map((f) => {
-          const dates = f.traces.map((t) => t.date);
-          const aircraft = find(
-            this.aircrafts,
-            (a: Aircraft) => a.icao === f.icao
-          ); // TODO dictionary
-          return {
-            data: f,
-            label: aircraft.model,
-            key: f.icao,
-            start: first(dates),
-            end: last(dates),
-          } as IEvent<Flight>;
-        });
+    async flights(flights: Feature<LineString, Flight>[]) {
+      this.events = flights.map((f) => {
+        return {
+          data: f.properties,
+          label: f.properties.aircraft,
+          key: f.id as string,
+          start: dayjs(f.properties.from).toDate(),
+          end: dayjs(f.properties.to).toDate(),
+        };
+      });
     },
   },
   components: {
     LeafletMap,
     Timeline,
-    // FlightTooltip,
   },
 });
 </script>

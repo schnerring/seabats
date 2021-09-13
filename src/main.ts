@@ -9,6 +9,7 @@ const components = [ElIcon];
 const plugins = [ElNotification];
 
 import "@/assets/element-variables.scss";
+import "leaflet/dist/leaflet.css";
 
 const app = createApp(App).use(store).use(router);
 

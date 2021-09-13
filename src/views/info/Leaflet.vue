@@ -16,18 +16,20 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import InfoTooltip from "./InfoTooltip.vue";
+import { Feature, LineString } from "geojson";
 import {
   Map as LeafletMap,
   LatLng,
   TileLayer,
   Polyline,
   FeatureGroup,
+  geoJSON,
 } from "leaflet";
-import { Flight } from "@/shared/Flight";
-import { last, first, find } from "lodash";
-import { mapState, mapActions } from "vuex";
-import { Aircraft } from "@/shared/Aircraft";
+import InfoTooltip from "./InfoTooltip.vue";
+import { Flight } from "@/models/Flight";
+import dayjs from "dayjs";
+
+import { getZones } from "@/shared/DataService";
 
 export default defineComponent({
   components: {
@@ -37,71 +39,57 @@ export default defineComponent({
     zoom: number;
     center: LatLng;
     map: LeafletMap | undefined;
-    polylines: FeatureGroup | undefined;
-    tooltipContents: { from: Date; to: Date; aircraftName: string }[];
+    data: FeatureGroup | undefined;
+    tooltipContents: {
+      from: Date;
+      to: Date;
+      aircraftName: string;
+    }[];
   } {
     return {
       zoom: 6,
       center: new LatLng(35.917973, 14.409943),
       map: undefined,
-      polylines: undefined,
+      data: undefined,
       tooltipContents: [],
     };
   },
   props: {
     flights: {
-      default: () => [] as Flight[],
+      default: () => [] as Feature<LineString, Flight>[],
       type: Array,
     },
   },
-  methods: {
-    ...mapActions(["getAircrafts"]),
-  },
-  computed: {
-    ...mapState(["aircrafts"]),
-  },
   watch: {
-    async flights(flights: Flight[]) {
-      await this.getAircrafts();
+    async flights(flights: Feature<LineString, Flight>[]) {
       if (!this.map) return;
-      if (this.polylines) {
-        this.polylines.remove();
+      if (this.data) {
+        this.data.remove();
       }
       if (this.tooltipContents.length > 0) {
         this.tooltipContents = [];
       }
-      this.polylines = new FeatureGroup<Polyline>();
+      this.data = new FeatureGroup<Polyline>();
       for (const flight of flights) {
-        const aircraft = find<Aircraft>(
-          this.aircrafts,
-          (a: Aircraft) => a.icao === flight.icao
-        );
-
-        const flightEnd = last(flight.traces)?.date;
-        const flightStart = first(flight.traces)?.date;
-
-        if (!aircraft || !flightStart || !flightEnd) continue;
-
         this.tooltipContents.push({
-          aircraftName: aircraft.model,
-          from: flightStart, //,
-          to: flightEnd, //).format("YYYY-MM-DD HH:mm"),
+          aircraftName: flight.properties.aircraft,
+          from: dayjs(flight.properties.from).toDate(),
+          to: dayjs(flight.properties.to).toDate(),
         });
-        const coords = flight.traces.map((t) => new LatLng(t.lat, t.lon));
-        const polyline = new Polyline(coords, {
-          className: `polyline_${flight._id}`,
-          color: "#1148fe",
-          weight: 2,
+        const data = geoJSON(flight, {
+          style: {
+            color: "var(--blue)",
+            weight: 2,
+          },
         });
-        this.polylines.addLayer(polyline);
+        this.data.addLayer(data);
       }
       // Render polylines in Leaflet
-      this.polylines.addTo(this.map as LeafletMap);
-
-      this.map.fitBounds(this.polylines.getBounds());
+      this.data.addTo(this.map as LeafletMap);
+      this.map.fitBounds(this.data.getBounds());
     },
   },
-  mounted() {
+  async mounted() {
     this.map = new LeafletMap("leaflet", {
       //renderer: new Canvas(),
       zoomControl: false,
@@ -117,6 +105,19 @@ export default defineComponent({
       "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
     );
     this.map.addLayer(stamenLayer);
+
+    // TODO move to store
+    for (const zone of await getZones()) {
+      const data = geoJSON(zone, {
+        style: {
+          fill: false,
+          weight: zone.properties.type === "sar" ? 2 : 1,
+          color: zone.properties.color,
+          dashArray: zone.properties.type === "sar" ? "5, 5" : undefined,
+        },
+      });
+      this.map.addLayer(data);
+    }
   },
   beforeUnmount() {
     this.map?.remove();

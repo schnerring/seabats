@@ -4,48 +4,56 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { select, Selection, BaseType } from "d3";
-import { Map as LeafletMap, LatLng, TileLayer, Polyline } from "leaflet";
-import "leaflet/dist/leaflet.css";
 import { mapState } from "vuex";
-import { Flight } from "@/shared/Flight";
+import { select, Selection, BaseType } from "d3";
+import {
+  Map as LeafletMap,
+  LatLng,
+  TileLayer,
+  geoJSON,
+  GeoJSON,
+} from "leaflet";
+import { Feature, MultiPoint } from "geojson";
+import { Flight } from "@/models/Flight";
+
+import { getZones } from "@/shared/DataService";
 
 export default defineComponent({
   data(): {
     zoom: number;
     center: LatLng;
     map: LeafletMap | undefined;
-    polylines: Map<string, Polyline>;
+    data: Map<string, GeoJSON>;
     selectedPolyline:
-      | Selection<BaseType, unknown, HTMLElement, any>
+      | Selection<BaseType, unknown, HTMLElement, unknown>
       | undefined;
   } {
     return {
       zoom: 6,
       center: new LatLng(35.917973, 14.409943),
       map: undefined,
-      polylines: new Map(),
+      data: new Map(),
       selectedPolyline: undefined,
     };
   },
   props: {
-    polylineColor: {
+    lineColor: {
       type: String,
-      default: "white", // TODO var?
+      default: "var(--white)",
     },
-    polylineWeight: {
+    lineWeight: {
       type: Number,
       default: 1,
     },
-    polylineWeightHighlighted: {
+    lineWeightHighlighted: {
       type: Number,
       default: 2,
     },
-    polylineColorHighlighted: {
+    lineColorHighlighted: {
       type: String,
-      default: "#1148fe",
+      default: "var(--blue)",
     },
-    selectedPolylineId: {
+    selectedLineId: {
       type: String,
     },
   },
@@ -53,18 +61,18 @@ export default defineComponent({
     ...mapState(["flights"]),
   },
   watch: {
-    selectedPolylineId() {
+    selectedLineId() {
       this.selectedPolyline
-        ?.style("stroke-width", "1")
-        .style("stroke", "white");
+        ?.style("stroke", this.lineColor)
+        .style("stroke-width", this.lineWeight);
       this.selectedPolyline = undefined;
 
-      if (this.selectedPolylineId) {
-        this.selectedPolyline = select(`.polyline_${this.selectedPolylineId}`)
-          .style("stroke", `${this.polylineColorHighlighted}`)
-          .style("stroke-width", `${this.polylineWeightHighlighted}px`);
+      if (this.selectedLineId) {
+        this.selectedPolyline = select(`.polyline_${this.selectedLineId}`)
+          .style("stroke", `${this.lineColorHighlighted}`)
+          .style("stroke-width", `${this.lineWeightHighlighted}px`);
 
-        const polyline = this.polylines.get(this.selectedPolylineId);
+        const polyline = this.data.get(this.selectedLineId);
         if (polyline) {
           if (!this.map) return;
           const bounds = polyline.getBounds();
@@ -72,37 +80,36 @@ export default defineComponent({
         }
       }
     },
-    flights(flights: Flight[]) {
+    flights(flights: Feature<MultiPoint, Flight>[]) {
       for (const flight of flights) {
-        if (this.polylines.has(flight._id)) {
+        if (this.data.has(flight.id as string)) {
           continue;
         }
-        const coords = flight.traces.map((t) => new LatLng(t.lat, t.lon));
-        const polyline = new Polyline(coords, {
-          className: `polyline_${flight._id}`,
-          color: this.polylineColor,
-          weight: this.polylineWeight,
+        const data = geoJSON(flight, {
+          style: {
+            className: `polyline_${flight.id}`,
+            color: this.lineColor,
+            weight: this.lineWeight,
+          },
         });
         // Add the polyline to the Typescript map
-        this.polylines.set(flight._id, polyline);
+        this.data.set(flight.id as string, data);
         // Render the polyline in Leaflet
-        polyline.addTo(this.map as LeafletMap);
+        data.addTo(this.map as LeafletMap);
       }
-      for (const flightId of this.polylines.keys()) {
-        const existingFlight = flights.find(
-          (flight) => flight._id === flightId
-        );
+      for (const flightId of this.data.keys()) {
+        const existingFlight = flights.find((flight) => flight.id === flightId);
         if (existingFlight) {
           continue;
         }
         // Un-render the polyline from Leaflet
-        this.polylines.get(flightId)?.remove();
+        this.data.get(flightId)?.remove();
         // remove the polyline from the Typescript Map
-        this.polylines.delete(flightId);
+        this.data.delete(flightId);
       }
     },
   },
-  mounted() {
+  async mounted() {
     this.map = new LeafletMap("leaflet", {
       //renderer: new Canvas(),
       zoomControl: false,
@@ -114,6 +121,19 @@ export default defineComponent({
       "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
     );
     this.map.addLayer(stamenLayer);
+
+    // TODO move to store
+    for (const zone of await getZones()) {
+      const data = geoJSON(zone, {
+        style: {
+          fill: false,
+          weight: zone.properties.type === "sar" ? 2 : 1,
+          color: zone.properties.color,
+          dashArray: zone.properties.type === "sar" ? "5, 5" : undefined,
+        },
+      });
+      this.map.addLayer(data);
+    }
   },
   beforeUnmount() {
     this.map?.remove();

@@ -97,7 +97,6 @@ import { loadAsync } from "jszip";
 import { FeatureCollection } from "geojson";
 
 import { addGeoJSON } from "@/shared/DataService";
-import { Flight } from "@/shared/Flight";
 
 export default defineComponent({
   data() {

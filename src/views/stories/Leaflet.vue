@@ -16,6 +16,8 @@
         :key="item.label"
         :color="item.color"
         :label="item.label"
+        :attribution="item.attribution"
+        :description="item.description"
       ></legend-item>
     </div>
   </div>
@@ -60,7 +62,12 @@ export default defineComponent({
   data(): {
     map: LeafletMap | undefined;
     data: FeatureGroup | undefined;
-    legendItems: { color: string; label: string }[];
+    legendItems: {
+      color: string;
+      label: string;
+      attribution: string;
+      description: string;
+    }[];
     tooltipContents: {
       from: Date;
       to: Date;
@@ -112,7 +119,12 @@ export default defineComponent({
       this.legendItems = zones
         .filter((z) => z.properties?.type === "sar")
         .map((z) => {
-          return { color: z.properties?.color, label: z.properties?.title };
+          return {
+            color: z.properties?.color,
+            label: z.properties?.label,
+            attribution: z.properties?.attribution,
+            description: z.properties?.description,
+          };
         });
       for (const zone of zones) {
         this.map?.addLayer(

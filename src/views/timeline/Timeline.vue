@@ -239,7 +239,9 @@ export default defineComponent({
             .attr("dominant-baseline", "text-before-edge")
             .attr("transform", "translate(-10, 0)")
             .attr("text-align", "right")
-            .text((label) => label);
+            .text((label) => label)
+            .style("fill", "var(--grey3)")
+            .style("font-size", "10pt");
           return g;
         },
         (update) => {

@@ -14,8 +14,17 @@
       <a href="https://carto.com/attributions">CARTO</a>
     </p>
     <p>
-      WEBSITE: © 2021 Michael Schnerring, Sebastian Deuss |
+      WEBSITE: © <a href="https://schnerring.net">Michael Schnerring</a>,
+      Sebastian Deuss |
+      <a href="https://github.com/schnerring/seabats/blob/main/LICENSE">MIT</a>
+      |
       <a href="https://github.com/schnerring/seabats">GitHub</a>
+    </p>
+    <p>
+      DESIGN &amp; CONTENT © Giovanna |
+      <a rel="license" href="https://creativecommons.org/licenses/by/4.0"
+        >CC BY 4.0</a
+      >
     </p>
   </footer>
 </template>

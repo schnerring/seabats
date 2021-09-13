@@ -15,7 +15,7 @@
 import DateRange from "./DatePager.vue";
 import { defineComponent } from "vue";
 import dayjs from "dayjs";
-import { debounce, uniqBy } from "lodash";
+import { debounce, uniq } from "lodash";
 import { IEventBase } from ".";
 
 import {
@@ -71,14 +71,9 @@ export default defineComponent({
       const minDisplayedDays = 4;
       return this.daysInDomain / minDisplayedDays;
     },
-    labels(): { key: string; label: string }[] {
-      const keyLabels = this.events.map((e) => {
-        return {
-          key: e.key,
-          label: e.label,
-        };
-      });
-      return uniqBy(keyLabels, (event) => event.key);
+    labels(): string[] {
+      const keyLabels = this.events.map((e) => e.label);
+      return uniq(keyLabels);
     },
   },
   data() {
@@ -94,12 +89,7 @@ export default defineComponent({
       yScale: {} as ScaleBand<string>,
       xAxisDefinition: {} as Axis<Date | NumberValue>,
       xAxis: {} as Selection<SVGGElement, unknown, HTMLElement, unknown>,
-      tracksSelection: {} as Selection<
-        BaseType,
-        { key: string; label: string },
-        SVGGElement,
-        unknown
-      >,
+      tracksSelection: {} as Selection<BaseType, string, SVGGElement, unknown>,
       defaultSelection: [] as number[],
       svg: {} as Selection<SVGSVGElement, unknown, HTMLElement, unknown>,
       eventsSelection: {} as Selection<
@@ -187,10 +177,8 @@ export default defineComponent({
         .attr("width", this.zoomScale.range()[1])
         .attr("height", this.yScale.bandwidth);
 
-      selectAll<SVGGElement, { key: string; label: string }>(
-        ".track-group"
-      ).attr("transform", (kl) => {
-        const y = this.yScale(kl.key);
+      selectAll<SVGGElement, string>(".track-group").attr("transform", (l) => {
+        const y = this.yScale(l);
         return y === undefined ? "translate(0, 0)" : `translate(0, ${y})`;
       });
 
@@ -205,7 +193,7 @@ export default defineComponent({
           "transform",
           (event) =>
             `translate(${this.zoomScale(event.start)}, ${this.yScale(
-              event.key
+              event.label
             )})`
         );
 
@@ -229,9 +217,7 @@ export default defineComponent({
                 select(this).classed("selected-track", true);
                 select(this).attr("selected");
               })
-              .on("click.emit", (event, data) =>
-                this.$emit("eventClick", data)
-              ),
+              .on("click.emit", (_, event) => this.$emit("eventClick", event)),
           (update) => {
             return update;
           },
@@ -241,32 +227,30 @@ export default defineComponent({
           }
         );
 
-      this.tracksSelection = this.tracksSelection
-        .data(this.labels, (d) => d.key)
-        .join(
-          (enter) => {
-            const g = enter.append("g").attr("class", "track-group");
-            g.append("rect")
-              .attr("class", "track-rect")
-              .attr("fill", "var(--grey2)");
-            g.append("text")
-              .attr("class", "track-label")
-              .attr("text-anchor", "end")
-              .attr("dominant-baseline", "text-before-edge")
-              .attr("transform", "translate(-10, 0)")
-              .attr("text-align", "right")
-              .text((d) => d.label);
-            return g;
-          },
-          (update) => {
-            return update;
-          },
-          (exit) => {
-            return exit.remove();
-          }
-        );
+      this.tracksSelection = this.tracksSelection.data(this.labels).join(
+        (enter) => {
+          const g = enter.append("g").attr("class", "track-group");
+          g.append("rect")
+            .attr("class", "track-rect")
+            .attr("fill", "var(--grey2)");
+          g.append("text")
+            .attr("class", "track-label")
+            .attr("text-anchor", "end")
+            .attr("dominant-baseline", "text-before-edge")
+            .attr("transform", "translate(-10, 0)")
+            .attr("text-align", "right")
+            .text((label) => label);
+          return g;
+        },
+        (update) => {
+          return update;
+        },
+        (exit) => {
+          return exit.remove();
+        }
+      );
 
-      this.yScale.domain(this.labels.map((kl) => kl.key).sort());
+      this.yScale.domain(this.labels.sort());
       this.scalesChanged();
     },
   },

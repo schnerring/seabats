@@ -5,54 +5,37 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { mapState } from "vuex";
-import { select, Selection, BaseType } from "d3";
 import {
   Map as LeafletMap,
-  LatLng,
   TileLayer,
   geoJSON,
   GeoJSON,
+  Canvas,
 } from "leaflet";
 import { Feature, MultiPoint } from "geojson";
 import { Flight } from "@/models/Flight";
 
+import {
+  lineStyle,
+  lineStyleHighlighted,
+  initialCenter,
+  initialZoom,
+} from "@/shared/LeafletConfig";
 import { getZones } from "@/shared/DataService";
 
 export default defineComponent({
   data(): {
-    zoom: number;
-    center: LatLng;
     map: LeafletMap | undefined;
     data: Map<string, GeoJSON>;
-    selectedPolyline:
-      | Selection<BaseType, unknown, HTMLElement, unknown>
-      | undefined;
+    selectedLine: GeoJSON | undefined;
   } {
     return {
-      zoom: 6,
-      center: new LatLng(35.917973, 14.409943),
       map: undefined,
       data: new Map(),
-      selectedPolyline: undefined,
+      selectedLine: undefined,
     };
   },
   props: {
-    lineColor: {
-      type: String,
-      default: "var(--white)",
-    },
-    lineWeight: {
-      type: Number,
-      default: 1,
-    },
-    lineWeightHighlighted: {
-      type: Number,
-      default: 2,
-    },
-    lineColorHighlighted: {
-      type: String,
-      default: "var(--blue)",
-    },
     selectedLineId: {
       type: String,
     },
@@ -62,77 +45,74 @@ export default defineComponent({
   },
   watch: {
     selectedLineId() {
-      this.selectedPolyline
-        ?.style("stroke", this.lineColor)
-        .style("stroke-width", this.lineWeight);
-      this.selectedPolyline = undefined;
+      this.selectedLine?.remove();
+      this.selectedLine = undefined;
 
       if (this.selectedLineId) {
-        this.selectedPolyline = select(`.polyline_${this.selectedLineId}`)
-          .style("stroke", `${this.lineColorHighlighted}`)
-          .style("stroke-width", `${this.lineWeightHighlighted}px`);
-
-        const polyline = this.data.get(this.selectedLineId);
-        if (polyline) {
-          if (!this.map) return;
-          const bounds = polyline.getBounds();
-          this.map.fitBounds(bounds);
+        const line = this.data.get(this.selectedLineId);
+        if (line) {
+          const selectedLine = geoJSON(line.toGeoJSON(), {
+            style: lineStyleHighlighted,
+          });
+          this.map?.addLayer(selectedLine);
+          this.map?.fitBounds(selectedLine.getBounds().pad(0.2));
+          this.selectedLine = selectedLine;
         }
       }
     },
     flights(flights: Feature<MultiPoint, Flight>[]) {
       for (const flight of flights) {
-        if (this.data.has(flight.id as string)) {
+        if (typeof flight.id !== "string") throw "Flights require valid ID";
+
+        if (this.data.has(flight.id)) {
           continue;
         }
         const data = geoJSON(flight, {
-          style: {
-            className: `polyline_${flight.id}`,
-            color: this.lineColor,
-            weight: this.lineWeight,
-          },
+          style: lineStyle,
         });
-        // Add the polyline to the Typescript map
-        this.data.set(flight.id as string, data);
-        // Render the polyline in Leaflet
-        data.addTo(this.map as LeafletMap);
+        // Add the lines to the Typescript map
+        this.data.set(flight.id, data);
+        // Render the line in Leaflet
+        this.map?.addLayer(data);
       }
       for (const flightId of this.data.keys()) {
         const existingFlight = flights.find((flight) => flight.id === flightId);
         if (existingFlight) {
           continue;
         }
-        // Un-render the polyline from Leaflet
+        // Un-render the line from Leaflet
         this.data.get(flightId)?.remove();
-        // remove the polyline from the Typescript Map
+        // remove the line from the Typescript Map
         this.data.delete(flightId);
       }
     },
   },
   async mounted() {
     this.map = new LeafletMap("leaflet", {
-      //renderer: new Canvas(),
+      renderer: new Canvas(),
       zoomControl: false,
       attributionControl: false,
     });
-    this.map.setView(this.center, this.zoom);
 
-    const stamenLayer = new TileLayer(
+    this.map.setView(initialCenter, initialZoom);
+
+    const tileLayer = new TileLayer(
       "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
     );
-    this.map.addLayer(stamenLayer);
+    this.map.addLayer(tileLayer);
 
     // TODO move to store
     for (const zone of await getZones()) {
-      const data = geoJSON(zone, {
-        style: {
-          fill: false,
-          weight: zone.properties?.type === "sar" ? 2 : 1,
-          color: zone.properties?.color,
-          dashArray: zone.properties?.type === "sar" ? "5, 5" : undefined,
-        },
-      });
-      this.map.addLayer(data);
+      this.map.addLayer(
+        geoJSON(zone, {
+          style: {
+            weight: zone.properties?.type === "sar" ? 2 : 1,
+            color: zone.properties?.color,
+            stroke: false,
+            dashArray: zone.properties?.type === "sar" ? "5, 5" : "5, 10",
+          },
+        })
+      );
     }
   },
   beforeUnmount() {

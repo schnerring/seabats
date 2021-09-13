@@ -19,9 +19,9 @@ import { defineComponent } from "vue";
 import { Feature, LineString } from "geojson";
 import {
   Map as LeafletMap,
-  LatLng,
   TileLayer,
-  Polyline,
+  GeoJSON,
+  Canvas,
   FeatureGroup,
   geoJSON,
 } from "leaflet";
@@ -29,6 +29,11 @@ import InfoTooltip from "./InfoTooltip.vue";
 import { Flight } from "@/models/Flight";
 import dayjs from "dayjs";
 
+import {
+  initialCenter,
+  initialZoom,
+  lineStyleHighlighted,
+} from "@/shared/LeafletConfig";
 import { getZones } from "@/shared/DataService";
 
 export default defineComponent({
@@ -36,8 +41,6 @@ export default defineComponent({
     InfoTooltip,
   },
   data(): {
-    zoom: number;
-    center: LatLng;
     map: LeafletMap | undefined;
     data: FeatureGroup | undefined;
     tooltipContents: {
@@ -47,8 +50,6 @@ export default defineComponent({
     }[];
   } {
     return {
-      zoom: 6,
-      center: new LatLng(35.917973, 14.409943),
       map: undefined,
       data: undefined,
       tooltipContents: [],
@@ -62,36 +63,35 @@ export default defineComponent({
   },
   watch: {
     async flights(flights: Feature<LineString, Flight>[]) {
-      if (!this.map) return;
       if (this.data) {
         this.data.remove();
       }
       if (this.tooltipContents.length > 0) {
         this.tooltipContents = [];
       }
-      this.data = new FeatureGroup<Polyline>();
+      const data = new FeatureGroup<GeoJSON>();
       for (const flight of flights) {
         this.tooltipContents.push({
           aircraftName: flight.properties.aircraft,
           from: dayjs(flight.properties.from).toDate(),
           to: dayjs(flight.properties.to).toDate(),
         });
-        const data = geoJSON(flight, {
-          style: {
-            color: "var(--blue)",
-            weight: 2,
-          },
-        });
-        this.data.addLayer(data);
+        data.addLayer(
+          geoJSON(flight, {
+            style: lineStyleHighlighted,
+          })
+        );
       }
-      // Render polylines in Leaflet
-      this.data.addTo(this.map as LeafletMap);
-      this.map.fitBounds(this.data.getBounds());
+      // Render lines in Leaflet
+      this.map?.addLayer(data);
+      this.map?.fitBounds(data.getBounds().pad(0.2));
+
+      this.data = data;
     },
   },
   async mounted() {
     this.map = new LeafletMap("leaflet", {
-      //renderer: new Canvas(),
+      renderer: new Canvas(),
       zoomControl: false,
       attributionControl: false,
       keyboard: false,
@@ -99,7 +99,8 @@ export default defineComponent({
       scrollWheelZoom: false,
       doubleClickZoom: false,
     });
-    this.map.setView(this.center, this.zoom);
+
+    this.map.setView(initialCenter, initialZoom);
 
     const stamenLayer = new TileLayer(
       "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"

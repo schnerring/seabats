@@ -3,14 +3,15 @@ import { createStore } from "vuex";
 import {
   CHECK_IF_DATA_EXSISTS,
   GET_FLIGHTS,
-  GET_INFO_TEXT,
+  GET_ABOUT_TEXT,
+  GET_STORIES_TEXT,
   GET_ZONES,
 } from "./types";
 import {
   dataExists,
   getFlights,
   getZones,
-  getInfoText,
+  getArticle,
 } from "@/shared/DataService";
 
 export const store = createStore<State>({
@@ -18,7 +19,8 @@ export const store = createStore<State>({
     dataExists: false,
     flights: [],
     zones: [],
-    infoText: "",
+    aboutText: "",
+    storiesText: "",
   },
   mutations: {
     [CHECK_IF_DATA_EXSISTS](state, dataExists) {
@@ -30,15 +32,14 @@ export const store = createStore<State>({
     [GET_ZONES](state, zones) {
       state.zones = zones;
     },
-    [GET_INFO_TEXT](state, infoText) {
-      state.infoText = infoText;
+    [GET_ABOUT_TEXT](state, aboutText) {
+      state.aboutText = aboutText;
+    },
+    [GET_STORIES_TEXT](state, storiesText) {
+      state.storiesText = storiesText;
     },
   },
   actions: {
-    async getInfoText({ commit }) {
-      const flightInfos = await getInfoText();
-      commit(GET_INFO_TEXT, flightInfos);
-    },
     async getFlights({ commit }, payload) {
       const flights = await getFlights(payload.from, payload.to);
       commit(GET_FLIGHTS, flights);
@@ -49,6 +50,14 @@ export const store = createStore<State>({
     },
     async checkIfDataExists({ commit }) {
       commit(CHECK_IF_DATA_EXSISTS, await dataExists());
+    },
+    async getAboutText({ commit }) {
+      const text = await getArticle("about");
+      commit(GET_ABOUT_TEXT, text);
+    },
+    async getStoriesText({ commit }) {
+      const text = await getArticle("stories");
+      commit(GET_STORIES_TEXT, text);
     },
   },
   modules: {},

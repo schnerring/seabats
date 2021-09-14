@@ -1,6 +1,6 @@
 <template>
   <div class="the-info">
-    <div class="info-text" v-html="infoText"></div>
+    <div class="info-text" v-html="storiesText"></div>
     <leaflet-map :flights="flights" />
   </div>
 </template>
@@ -16,10 +16,10 @@ import { getFlightsByIds } from "@/shared/DataService";
 
 export default defineComponent({
   computed: {
-    ...mapState(["infoText"]),
+    ...mapState(["storiesText"]),
   },
   methods: {
-    ...mapActions(["getInfoText"]),
+    ...mapActions(["getStoriesText"]),
   },
   components: {
     LeafletMap,
@@ -30,7 +30,7 @@ export default defineComponent({
     };
   },
   async mounted() {
-    await this.getInfoText();
+    await this.getStoriesText();
     const buttons = document.getElementsByClassName("data-link");
     for (const button of buttons) {
       const flightIds = button.getAttribute("data")?.split(",");

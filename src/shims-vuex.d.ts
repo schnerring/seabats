@@ -10,7 +10,8 @@ declare module "@vue/runtime-core" {
     dataExists: boolean;
     flights: Feature[];
     zones: Feature[];
-    infoText: string;
+    aboutText: string;
+    storiesText: string;
   }
 
   interface ComponentCustomProperties {

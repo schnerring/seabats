@@ -61,7 +61,7 @@ export async function dataExists(): Promise<boolean> {
   return (await db.info()).doc_count > 0;
 }
 
-export async function getInfoText(): Promise<string> {
-  const response = await axios.get<string>("info-text.md");
+export async function getArticle(name: "about" | "stories"): Promise<string> {
+  const response = await axios.get<string>(`${name}.md`);
   return marked(response.data);
 }

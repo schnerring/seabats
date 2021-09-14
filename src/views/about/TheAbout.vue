@@ -1,7 +1,14 @@
 <template>
   <div class="the-about">
     <leaflet-map />
-    <div class="about-text" v-html="aboutText"></div>
+    <div class="about-text">
+      <div v-html="aboutText"></div>
+      <div>
+        <router-link to="/stories"
+          >You can read more about this here.</router-link
+        >
+      </div>
+    </div>
   </div>
 </template>
 

@@ -43,16 +43,23 @@ export default defineComponent({
 });
 </script>
 <style>
+a {
+  color: var(--blue);
+  text-decoration: none;
+}
+a::before {
+  content: "↗ ";
+}
 .data-link {
   border: none;
   background: none;
   padding: 0;
-  color: blue;
+  color: var(--blue);
   cursor: pointer;
   font-size: inherit;
 }
 .data-link::before {
-  content: "✈";
+  content: "✈ ";
 }
 </style>
 <style scoped>

@@ -1,109 +1,74 @@
-# Cumba cibos qvem cornibus
+# Stories
 
-Lorem markdownum declivis libentius in vulnera illius, et illa. <button class="data-link" data="ccc852d1-ca70-4e47-ba89-c219dd27dbff,9ff3bec6-b80c-42e7-bc5b-de426cd05c1c">Osprey</button> Nec propior,
-ventos agam fingetur, **limite** utrumque celebres. _Reperta exitus_ relictum in
-avidis in huic, illa Perseu atque, ille fatur. Respicit arces et retexite!
+## 1. Case, 20-22.04.21
 
-1. Sustulit montibus prohibente de sagax ne petii
-2. Cum est corpore auctorem
-3. Licuit et stabit in pericula regione undis
-4. Promissae proterva parvoque
-5. Percensuit et Calydon redolent plangens in ceditis
+Osprey 1, Osprey 3 / 33.433°, 13.933°
 
-Et flet ipse harenas atque. Aut se sunt ille myrtea? Altum ubi esse exstant
-vocantem auctor illis: et gramen miserum, in. Cur inmisit quassasque Cadmeida
-famae satam, idem sensit auras vocat amorem et tempore oscula data. Illas
-credetis, est, vulnus <button class="data-link" data="c262b250-c0a7-46b4-b282-21dc6a8fac36">pennis</button> in curva clipei aevum illos, nox!
+The dot shows the last know position of a shipwreck that happened in April involving Frontex ships, but without any records of their tracks. Alarmphone was in contact with the 130 people on board who had left Al Khoms in the evening of the 20th. At 11:00 the next day Alarmphone got their GPS position and tries to alert authorities. No one intervened despite efforts by Alarmphone. The NGO ship Ocean Viking by SOS Mediterranee disrupted an ongoing operation to head to the scene but is hours away. In the evening a mayday call is sent out by an unidentified assets – likely
+<a class="data-link" data="407637 + 2021-04-02 13:15">Osprey 1</a>
+spotted by people on board. A second Mayday call is sent out 23 minutes later – again by an unidentified asset. The next day around midday of the 22nd Osprey3 (no track available) and several vessels sight bodies. Despite searching for several hours no survivors were found.
 
-    if (impactProcessor(unmount.goodputParse(4), bsod)) {
-        serverEngine.edutainment(logicLionString + keystroke_password, netmask +
-                2, 1);
-        vga_internal(bankruptcy_imap - speed);
-        rich += 2;
-    }
-    usb.horse_ipx += pdfMap.lag(finder, card);
-    var emoticon = 4;
+A detailed timeline of the Shipwreck by Boder Forensics can be found [here](https://alarmphone.org/wp-content/uploads/2021/07/20210716_AP182_BF-COE.pdf).
+The [Guardian](https://www.theguardian.com/world/2021/apr/23/more-than-100-asylum-seekers-feared-dead-after-shipwreck-off-libya) and the [New York Times](https://www.nytimes.com/2021/04/23/world/europe/migrants-dead-mediterranean-libya.html) wrote about the Case, as well as a report by the NGO [SOS Mediterranee](https://sosmediterranee.com/left-in-the-dark-an-account-of-the-shipwreck-of-april-22nd-from-the-ocean-viking/).
 
-Dabat caelo, invitique percussis minacia, veluti spectant gentis egissem, malit
-optatos, modo famam quid. Nescio solvit poena, sonuere mixtam viminis armat, et
-liquida origo, in adstitit nec petentes!
+---
 
-1. Veniam cortice
-2. Quod Leucosiamque rogus
-3. Parens caelestes pariter dextra dubium non
-4. Agitur Maeandros est
+## 2. Case, 06.02.2021
 
-Eryx esse laesi coluit aequoreae enim tamquam inlimis hostemque cecinisse
-pondere Xanthique? Et passaque: tenuit est sena olim anguem omnia simul
-[laevo](http://www.velle.io/toto.php). Cui generum possis det patres, mutet
-Tiresiae opportuna, tutam Iason, memorabile conscendit.
+Eagle 1 / 033°027'013.090'',012°024'015.963''
 
-1. Falsi mirabere docti
-2. Terras minus erat onerique et gemina quicumque
-3. Pelasgi superosque coniunx horror tantummodo fingit magorum
-4. Sedesque excidit Delius famulasque Athis quam fortunaeque
+On the 6th of February 2021, a boat left Zawiya, heading towards Europe. Relatives of the people on board called Alarmphone who then tried to contact the people directly. They couldn’t reach anyone as the contact number wasn’t of a satellite phone. The weather was worsening and Alarmphone contact the authorities. The following day the Frontex aircraft
+<a class="data-link" data="43ed4b + 2021-02-06 04:29">Eagle 1</a>
+started its route in the middle of the night, flying towards the boat in distress and after a search pattern. Frontex aircraft are equipped with an infrared camera, making it easier for them to detect boats during the night. After a while they flew back to Malta. When Moonbird arrived they witnessed an interception by the sc Libyan CG who left a burning boat behind.
 
-Motibus **nec flammas obscura** fallebat pascere! Terga **o curat**, si quia
-quae puer figuras, tandem supera ubi neve.
+Adding a temporal delay to the spatial distance makes it even more unlikely Frontex is seen as the crucial intersection that precedes the violence of a pull-back. A woman who was on that boat trying to leave Libya told Alarmphone:
 
-Dabat caelo, invitique percussis minacia, veluti spectant gentis egissem, malit
-optatos, modo famam quid. Nescio solvit poena, sonuere mixtam viminis armat, et
-liquida origo, in adstitit nec petentes!
+> “This burning boat we were on board and the Frontex plane was the one that informed the Libyan Coast Guard I hope you stop this organization from violations.”
 
-1. Veniam cortice
-2. Quod Leucosiamque rogus
-3. Parens caelestes pariter dextra dubium non
-4. Agitur Maeandros est
+More Information on those Case can be found on [watchthemed](https://watchthemed.net/index.php/reports/view/1842) and [sea-watch](https://sea-watch.org/wp-content/uploads/2021/05/Frontex-Factsheet_Airborne_Sea-Watch_May-2021.pdf).
 
-Eryx esse laesi coluit aequoreae enim tamquam inlimis hostemque cecinisse
-pondere Xanthique? Et passaque: tenuit est sena olim anguem omnia simul
-[laevo](http://www.velle.io/toto.php). Cui generum possis det patres, mutet
-Tiresiae opportuna, tutam Iason, memorabile conscendit.
+---
 
-1. Falsi mirabere docti
-2. Terras minus erat onerique et gemina quicumque
-3. Pelasgi superosque coniunx horror tantummodo fingit magorum
-4. Sedesque excidit Delius famulasque Athis quam fortunaeque
+## 3. Case, 04.02.2021
 
-Motibus **nec flammas obscura** fallebat pascere! Terga **o curat**, si quia
-quae puer figuras, tandem supera ubi neve.
+Eagle 1, Osprey 1, Osprey 3 / unknown coordinates
 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+On the 4th of February 2021, 3 Frontex aircrafts operated in the central Mediterranean
+<a class="data-link" data="43ed4b + 2021-02-04 04:29">Eagle 1</a>,
+<a class="data-link" data="40785b + 2021-02-04 04:29">Osprey 1</a>, and
+<a class="data-link" data="406658 + 2021-02-04 04:29">Osprey 3</a> .
+Their search patterns are incomplete. This can happen for various reasons: Flight routes of aircrafts are tracked through Automatic Dependent Surveillance-Broadcast or ADS-B. With ADS-B aircrafts update their position once per second, sending geodata to other aircrafts, planes, and air traffic control ground stations. ADS-B is useful in maritime environment, since the range is wider, but signals of smaller aircrafts - like the ones Frontex uses - can still be lost for various reasons. Unlike in the Aegean where mobile networks, radar and ADS-B receivers reach from one shore to the other, the vastness of the Mediterranean creates a gap. The signal sent to ground stations is lost when the aircraft flies low because of the curvature of the earth and when there is no other airplane to receive its signal and pass it on.
 
-Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
+One day later on the 5th of February Frontex tweeted
 
-Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.
+> Yesterday, #Frontex planes spotted 10 boats with more than 900 people on board in the Central Mediterranean. We alerted the national rescue centres in the area and we’re glad to report that all have been rescued and no lives were lost #EUBorderGuard
 
-Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.
+IOM Libya tweeted the same day
 
-Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.
+> In 24 hours, more than 1,000 migrants departed from #Libya, fleeing dire humanitarian conditions. Over 800 of them were intercepted and returned to shore. While IOM teams continue to provide assistance at disembarkation points, we maintain that #Libya is not a safe port.
 
-At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.
+800 people were brought back to Libya and taken into detention. Alarmphone later reported that 5 people have drowned.
+More Information on the [Case](https://www.infomigrants.net/en/post/30091/one-of-the-busiest-days-in-a-long-time-as-hundreds-flee-libya). The original Tweet of [Frontex](https://twitter.com/frontex/status/1357757497092812800?lang=en), and [IOM](https://mobile.twitter.com/iom_libya/status/1357596805219962881?lang=eu). Read more about the Situation in [Libya](https://www.amnesty.eu/wp-content/uploads/2020/09/Libya-report-Between-life-and-death.pdf).
 
-Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus.
+---
 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+## 4. Case, 22.09.2020
 
-Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
+Eagle 1 / 34.05°, 13.817°
 
-Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.
+On the 22nd September 2020 at 01:15h CEST, Alarmphone was called by 86 people, on a boat in distress drifting in the Libyan SAR Zone. They had been on the water for 3 days but the boat was damaged and water was entering. Alarmphone alerted the Libyan, Maltese, and Italian authorities, passing on the phone number and GPS location shortly after the first call. In the next hours, nothing happened the boat was slowly deflating, and more water was entering. At 10:45h, they told Alarmphone they had seen a plane ¬– later confirmed to be a Frontex plane – circling above them.
+From the Map it looks like it could have been
+<a class="data-link" data="43ed4b + 2020-09-22 02:11">Eagle 1</a>. An hour later they told Alarmphone four people on the boat who had jumped or fallen into the water – their fate stays unclear. At 12:31 Alarmphone had the last contact, people were panicking and the situation on board was chaotic. Sea-Watch’s aircraft Seabird reported the interception by the so-called Libyan Coast Guard.
 
-Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.
+More Information on the Case can be found [here](https://watchthemed.net/reports/view/1669).
 
-Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.
+---
 
-At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.
+## 5. Case, 24.05.2020
 
-Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus.
+78 people left Al Khoms and were on their way to Europe for two days when the engine stopped working and water was entering the boat. When Alarmphone called the Maltese Coastguard to tell them about the distress case, they stated that a Frontex aircraft
+<a class="data-link" data="40785b + 2020-05-24 04:27">(Osprey 3)</a> had spotted the boat and that according to their photographs, no water was entering the boat.
 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+They told Alarmphone that a vessel would be dispatched to assist. After several hours and confusion with another boat the people were rescued during the night by the Maltese coastguard.
 
-Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
-
-Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.
-
-Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.
-
-Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.
-
-At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat.
+More Information on [watchthemed](https://watchthemed/reports/view/1548).

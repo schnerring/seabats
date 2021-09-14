@@ -56,7 +56,7 @@ More Information on the [Case](https://www.infomigrants.net/en/post/30091/one-of
 
 Eagle 1 / 34.05°, 13.817°
 
-On the 22nd September 2020 at 01:15h CEST, Alarmphone was called by 86 people, on a boat in distress drifting in the Libyan SAR Zone. They had been on the water for 3 days but the boat was damaged and water was entering. Alarmphone alerted the Libyan, Maltese, and Italian authorities, passing on the phone number and GPS location shortly after the first call. In the next hours, nothing happened the boat was slowly deflating, and more water was entering. At 10:45h, they told Alarmphone they had seen a plane ¬– later confirmed to be a Frontex plane – circling above them.
+On the 22nd September 2020 at 01:15h CEST, Alarmphone was called by 86 people, on a boat in distress drifting in the Libyan SAR Zone. They had been on the water for 3 days but the boat was damaged and water was entering. Alarmphone alerted the Libyan, Maltese, and Italian authorities, passing on the phone number and GPS location shortly after the first call. In the next hours, nothing happened the boat was slowly deflating, and more water was entering. At 10:45h, they told Alarmphone they had seen a plane – later confirmed to be a Frontex plane – circling above them.
 From the Map it looks like it could have been
 <a class="data-link" data="43ed4b + 2020-09-22 02:11">Eagle 1</a>. An hour later they told Alarmphone four people on the boat who had jumped or fallen into the water – their fate stays unclear. At 12:31 Alarmphone had the last contact, people were panicking and the situation on board was chaotic. Sea-Watch’s aircraft Seabird reported the interception by the so-called Libyan Coast Guard.
 

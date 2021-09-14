@@ -43,12 +43,12 @@ export default defineComponent({
 });
 </script>
 <style>
-a {
+.info-map a {
   color: var(--blue);
   text-decoration: none;
 }
-a::before {
-  content: "↗ ";
+.info-map a::after {
+  content: "↗";
 }
 .data-link {
   border: none;
@@ -59,7 +59,7 @@ a::before {
   font-size: inherit;
 }
 .data-link::before {
-  content: "✈ ";
+  content: "✈";
 }
 </style>
 <style scoped>

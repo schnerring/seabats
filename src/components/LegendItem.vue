@@ -2,7 +2,8 @@
   <div class="legend-item">
     <div class="legend-symbol" :style="{ background: color }"></div>
     <el-tooltip placement="right">
-      <template #content>{{ attribution }}<br />{{ description }}</template>
+      <!-- TODO <template #content>{{ attribution }}<br />{{ description }}</template> -->
+      <template #content>{{ attribution }}</template>
       <div class="legend-text">
         <span>{{ label }}</span>
       </div>

@@ -125,13 +125,15 @@ export default defineComponent({
             description: z.properties?.description,
           };
         });
+      const zonesLayer = new FeatureGroup();
       for (const zone of zones) {
-        this.map?.addLayer(
+        zonesLayer.addLayer(
           geoJSON(zone, {
             style: zoneStyle(zone.properties?.type, zone.properties?.color),
           }) // TODO bringToBack()
         );
       }
+      this.map?.addLayer(zonesLayer);
     },
   },
   async mounted() {

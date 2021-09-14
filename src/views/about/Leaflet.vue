@@ -18,7 +18,7 @@
 import { defineComponent } from "vue";
 import { mapActions, mapState } from "vuex";
 import { Feature, LineString } from "geojson";
-import { Map as LeafletMap, Canvas, geoJSON } from "leaflet";
+import { Map as LeafletMap, Canvas, FeatureGroup, geoJSON } from "leaflet";
 import LegendItem from "@/components/LegendItem.vue";
 import { Flight } from "@/models/Flight";
 
@@ -73,13 +73,15 @@ export default defineComponent({
             description: z.properties?.description,
           };
         });
+      const zonesLayer = new FeatureGroup();
       for (const zone of zones) {
-        this.map?.addLayer(
+        zonesLayer.addLayer(
           geoJSON(zone, {
             style: zoneStyle(zone.properties?.type, zone.properties?.color),
-          })
+          }) // TODO bringToBack()
         );
       }
+      this.map?.addLayer(zonesLayer);
     },
   },
   async mounted() {

@@ -29,7 +29,7 @@ To enrich the data displayed by the app, add additional properties the GeoJSON F
 ## Run Locally
 
 ```shell
-npm install
+npm ci
 npm run serve
 ```
 

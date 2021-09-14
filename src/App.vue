@@ -1,6 +1,7 @@
 <template>
   <nav>
-    <router-link to="/">TIMELINE</router-link>
+    <router-link to="/">ABOUT</router-link>
+    <router-link to="/timeline">TIMELINE</router-link>
     <router-link to="/stories">STORIES</router-link>
   </nav>
   <main>

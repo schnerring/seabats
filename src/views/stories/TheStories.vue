@@ -48,7 +48,6 @@ export default defineComponent({
 
 <style>
 .the-info a {
-  color: var(--blue);
   font-size: inherit;
 }
 .the-info a {

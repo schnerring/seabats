@@ -62,6 +62,6 @@ export async function dataExists(): Promise<boolean> {
 }
 
 export async function getArticle(name: "about" | "stories"): Promise<string> {
-  const response = await axios.get<string>(`${name}.md`);
+  const response = await axios.get<string>(`articles/${name}.md`);
   return marked(response.data);
 }

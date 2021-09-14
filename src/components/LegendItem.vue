@@ -32,7 +32,6 @@ export default defineComponent({
 .legend-item {
   align-items: center;
   display: flex;
-  font-family: monospace;
   padding: 0.2rem 0;
 }
 .legend-symbol {

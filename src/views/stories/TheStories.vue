@@ -34,7 +34,10 @@ export default defineComponent({
     const buttons = document.getElementsByClassName("data-link");
     for (const button of buttons) {
       const flightIds = button.getAttribute("data")?.split(",");
+
       if (!flightIds) throw "data-link requires data attribute";
+
+      // TODO memory leak? Remove in umount()?
       button.addEventListener("click", async () => {
         this.flights = await getFlightsByIds(flightIds);
       });
@@ -42,6 +45,7 @@ export default defineComponent({
   },
 });
 </script>
+
 <style>
 .info-map a {
   color: var(--blue);
@@ -62,10 +66,8 @@ export default defineComponent({
   content: "✈";
 }
 </style>
+
 <style scoped>
-.opensky-attribution {
-  font-style: italic;
-}
 .info-map {
   display: flex;
   flex-direction: row;
@@ -76,9 +78,5 @@ export default defineComponent({
   padding: 5px 30px;
   box-sizing: border-box;
   overflow-y: scroll;
-}
-div#leaflet {
-  height: 100%;
-  width: 50vw;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
-  <div class="info-map">
-    <div class="info" v-html="infoText"></div>
-    <info-map :flights="flights" />
+  <div class="the-info">
+    <div class="info-text" v-html="infoText"></div>
+    <leaflet-map :flights="flights" />
   </div>
 </template>
 
@@ -9,7 +9,7 @@
 import { defineComponent } from "vue";
 import { mapState, mapActions } from "vuex";
 
-import InfoMap from "./Leaflet.vue";
+import LeafletMap from "./Leaflet.vue";
 import { Feature } from "geojson";
 
 import { getFlightsByIds } from "@/shared/DataService";
@@ -22,7 +22,7 @@ export default defineComponent({
     ...mapActions(["getInfoText"]),
   },
   components: {
-    InfoMap,
+    LeafletMap,
   },
   data(): { flights: Feature[] } {
     return {
@@ -47,20 +47,27 @@ export default defineComponent({
 </script>
 
 <style>
-.info-map a {
+.the-info a {
+  color: var(--blue);
+  font-size: inherit;
+}
+.the-info a {
   color: var(--blue);
   text-decoration: none;
 }
-.info-map a::after {
+.the-info a::after {
   content: "↗";
 }
+.the-info h2 {
+  font-size: inherit;
+}
 .data-link {
-  border: none;
   background: none;
-  padding: 0;
+  border: none;
   color: var(--blue);
   cursor: pointer;
   font-size: inherit;
+  padding: 0;
 }
 .data-link::before {
   content: "✈";
@@ -68,12 +75,12 @@ export default defineComponent({
 </style>
 
 <style scoped>
-.info-map {
+.the-info {
   display: flex;
   flex-direction: row;
   height: 100%;
 }
-.info {
+.info-text {
   width: 100%;
   padding: 5px 30px;
   box-sizing: border-box;

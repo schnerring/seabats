@@ -217,7 +217,10 @@ export default defineComponent({
                 select(this).classed("selected-track", true);
                 select(this).attr("selected");
               })
-              .on("click.emit", (_, event) => this.$emit("eventClick", event)),
+              .on("click.emit", (_, event) => {
+                this.$emit("eventClick", event);
+                // console.log(event.label, event.key);
+              }),
           (update) => {
             return update;
           },

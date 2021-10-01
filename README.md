@@ -32,11 +32,3 @@ To enrich the data displayed by the app, add additional properties the GeoJSON F
 npm ci
 npm run serve
 ```
-
-## Icons
-
-Powered by [SVG Repo](https://www.svgrepo.com/)
-
-- [Plane](https://www.svgrepo.com/svg/151715/normal-plane) licensed under [CC0 1.0][cc0]
-
-[cc0]: https://creativecommons.org/publicdomain/zero/1.0/
